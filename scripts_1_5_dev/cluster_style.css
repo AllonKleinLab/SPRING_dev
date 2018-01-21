@@ -1,0 +1,112 @@
+
+
+
+#create_cluster_box {
+	position: absolute;
+	visibility: hidden;	
+	background: rgba(80,80,80,.5);
+	height: 52px;
+	overflow: hidden;
+}
+
+#enter_cluster_number {
+	font: 14px sans-serif;
+	padding: 0px 7px;
+	width: 30px;
+	margin-left: 5px;
+	margin-right: 20px;		
+}
+
+.cluster_name_input {
+	font: 15px sans-serif;
+	padding: 1px 5px;
+	width: 30px;
+	margin-left: 6px;
+	border: none;
+	color: white;
+	background-color: rgba(80,80,80,0);
+	width: 85%;
+}
+
+#cluster_button_bar {
+	margin-right: 17px;
+}
+
+
+#cluster_button_bar > * {
+	display: inline-block;
+	margin-top: 15px;
+}
+
+#cluster_label_button_bar {
+	margin-bottom: 16px;
+}
+
+#cluster_label_button_bar > * {
+	display: inline-block;
+	margin-top: 11px;
+}
+
+#cluster_label_button_bar > button {
+	margin-left: 2px;
+}
+
+#cluster_button_bar > p {
+	font: 14px sans-serif;
+	color: white;
+	margin-left: 30px;
+}
+
+#cluster_button_bar > button {
+	margin-right: 8px;
+}
+
+.explain_link {
+	margin-top: 10px;
+}
+
+.underline{
+    color: red;           
+}
+
+
+path { 
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1.5;
+    shape-rendering: crispEdges;
+}
+
+#update_cluster_labels_box {
+	position: absolute;
+	visibility: hidden;	
+	background: rgba(80,80,80,.5);
+	overflow: hidden;
+	width: 330px;
+	padding-top: 0px;
+	padding-bottom: 20px;
+	padding-left: 11px;
+}
+
+.cluster_swatch {
+	height:16px;
+	width:16px;
+	margin-top:3px;
+	margin-left:10px;
+	border-radius:50%;
+	float:left;
+}
+
+
+
+
+
+
+

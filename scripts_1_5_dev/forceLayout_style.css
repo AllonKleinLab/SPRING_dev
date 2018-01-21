@@ -1,0 +1,113 @@
+
+body {
+    background-color: #C7C7C7;
+    overflow: hidden;
+}
+
+*:focus {
+    outline: none;
+}
+
+
+#sound_toggle {
+	padding-left: 10px;
+	padding-right: 14px;
+}
+
+#sound_toggle > img {
+	width: 20px;
+	height: 20px;
+	position: relative;
+	top: 7px;
+}
+
+
+#container {
+	position:relative;
+}
+
+
+.column {
+	display: table-cell;
+}
+
+
+#options_bar {
+	white-space: nowrap;
+}
+
+#options_bar > div {
+	display: inline-block;
+	margin-right: 3px;
+}
+
+.downloadlink { display: none; }
+#color_chooser > div { 
+	display: inline-block;
+	margin-left: 15px; 
+}
+
+
+#menu_option { 
+	font: 4px sans-serif;
+}
+
+#button_panel > div { display: inline-block; }
+
+button { 
+	border: none; 
+	font: 13px sans-serif;
+	color: white;
+	background-color: gray;
+}
+
+button:active {
+	background-color: #3f3f3f;
+}
+
+
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+   	font: 13px sans-serif;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    background-color:  gray;
+    z-index: 10;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: white;
+    padding: 6px 8px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+	background-color: #595959;
+}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
+
+
+#rotation_outer_circ {	
+	opacity:0;
+	fill-opacity:0;
+	stroke:yellow;
+	stroke-opacity,.6;
+}	
+	
+#rotation_inner_circ {
+	fill-opacity: 0;
+	stroke: yellow;
+}		
+
+#rotation_pivot {
+	stroke:yellow;
+	fill:red;
+	visibility:hidden;
+}	

@@ -1,0 +1,15 @@
+#clone_viewer_popup {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(50,50,50,.75);
+	visibility: visible;
+	border: solid 1px rgb(150,150,150);
+	overflow: hidden;
+	padding: 10px;
+}
+
+#clone_viewer_popup > div {
+	padding: 10px;
+
+}

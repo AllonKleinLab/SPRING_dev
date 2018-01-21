@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/forceLayout_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/colorbar_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/settings_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/coexpression_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/diffex_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/make_new_SPRINGplot_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/clone_viewer.css">
+
+<div id="options_bar">
+	<div id="button_panel">
+		<!--
+		<div id="help">
+			<button>HELP!</button>
+		</div>
+		-->
+		<div id="deselect">
+			<button>(De)select All</button>
+		</div>
+		<div id="center_view">
+			<button> Center view </button>
+		</div>
+		
+		<div id="settings">
+			<button>Settings:</button>
+		</div>
+	
+		<div class="dropdown">
+		  <button id="download_dropdown_button">Download:</button>
+		  <div id="download_dropdown" class="dropdown-content">
+		  	<a href="javascript:downloadCoordinates()">Coordinates</a>
+			<a href="javascript:downloadSelection()">Selected cells</a>
+            <!-- <a href="javascript:downloadEdges()">Edge list</a> --!>
+			<a href="javascript:downloadRankedTerms()">Enriched terms</a>
+            <!--<a href="javascript:downloadSelectedExpr()">Expression of selected cells</a>-->
+			<!-- <a href="javascript:downloadPNG()">Screenshot (.png)</a> --!>
+			<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> --!>
+		  </div>
+		</div>
+
+
+		<div class="dropdown">
+		  <button id="goto_dropdown_button">Go to:</button>
+		  <div id="goto_dropdown" class="dropdown-content">
+		  	<a href="javascript:show_make_new_SPRINGplot_popup()">Make new subplot</a>
+			<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
+			<a target="_blank" id="changeViewer_link">Dynamic mode</a>
+		  </div>
+		</div>
+		<!-- <div id="toggleforce">
+			<button style="width:60px;">Pause</button>
+		</div>	-->
+		<!-- <div id="save_coords">
+			<button> Save coordinates </button>
+		</div>
+		-->
+		<div class="dropdown">
+		<div id="layout_tools">
+			<!--
+			<button id="layout_dropdown_button">Layout tools:</button>
+			<div id="layout_dropdown" class="dropdown-content">
+				<a href="javascript:fix()">Fix nodes</a>
+				<a href="javascript:unfix()">Unfix nodes</a>
+				<a href="javascript:rotation_update()">Rotate</a>
+			</div>
+			-->
+		</div>
+
+		</div>
+		<!--<div id="load_colors">
+			<button> Load color tracks </button>
+        </div>-->
+		<div id="sound_toggle"> </div>
+	</div>
+	<div id="color_chooser"> </div>
+</div>
+<div id="container">
+	<div id="pixi_canvas_holder"> </div>
+	<div id="force_layout"> </div>
+	<div id="termsheet" class="sidebar">
+		<div class="column" id="termcolumn"> </div>
+		<div class="column" id="scorecolumn" > </div>
+	</div>
+	<div id="legend" class="sidebar">
+		<div class="column" id="count_column"> </div>
+		<div class="column" id="label_column"> </div>
+	</div>
+
+</div>
+
+<script src="scripts_1_6_dev/d3.min.js"></script>
+<script src="scripts_1_6_dev/d3-queue.v3.min.js"></script> <!-- SPARSE UPDATE -->
+<script src="scripts_1_6_dev/jquery-3.1.0.min.js"></script>
+<script src="scripts_1_6_dev/colorBar.js"></script>
+<script src="scripts_1_6_dev/forceLayout_script.js"></script>
+<script src="scripts_1_6_dev/newSpringPlot.js"></script>
+<script src="scripts_1_6_dev/rotation_script.js"></script>
+<script src="scripts_1_6_dev/selection_script.js"></script>
+<script src="scripts_1_6_dev/settings_script.js"></script>
+<script src="scripts_1_6_dev/coexpression_script.js"></script>
+<script src="scripts_1_6_dev/diffex_script.js"></script>
+<script src="scripts_1_6_dev/simg.js"></script>
+<script src="scripts_1_6_dev/jspdf.min.js" ></script>
+<script src="scripts_1_6_dev/canvg.min.js"></script>
+<script src="scripts_1_6_dev/FileSaver.js"></script>
+<script src="scripts_1_6_dev/spin.min.js"></script>
+<script src="scripts_1_6_dev/pixi.min.js"></script>
+<script src="scripts_1_6_dev/make_new_SPRINGplot_script.js"></script>
+<script src="scripts_1_6_dev/LineSprite.js"></script>
+<script src="scripts_1_6_dev/clone_viewer.js"></script>
+<script>
+
+var rotator_radius = null;
+
+setup_download_dropdown();
+setup_goto_dropdown();
+
+d3.select("#sound_toggle").append('img')
+	.attr('src', "scripts_1_6_dev/sound_effects/icon_mute.svg")
+	.on("click", function() {
+		if (d3.select("#sound_toggle").select("img").attr("src") == "scripts_1_6_dev/sound_effects/icon_speaker.svg") {
+			d3.select("#sound_toggle").select("img").attr("src","scripts_1_6_dev/sound_effects/icon_mute.svg"); }
+		else { d3.select("#sound_toggle").select("img").attr("src","scripts_1_6_dev/sound_effects/icon_speaker.svg"); } });
+
+
+
+function callback() {
+	settings_setup();
+	selection_setup();
+	setup_layout_dropdown();
+	//colorBar(graph_directory, sub_directory);
+    //loadColors();
+	loadSelectedCells(graph_directory);
+	//coexpression_setup(graph_directory);
+	//diffex_setup(graph_directory);
+	initiateButtons();
+	make_new_SPRINGplot_setup();
+	clone_viewer_setup();
+	center_view();
+	
+	start_clone_viewer();
+
+	window.onclick = function(event) {
+		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }
+		if (!event.target.matches('#download_dropdown_button')) { closeDropdown(); }
+		if (!event.target.matches('#layout_dropdown_button')) { closeDropdown(); }
+	}
+
+}
+
+var name = window.location.search;
+var my_origin = window.location.origin;
+//d3.select("#changeViewer_link").attr("href", "https://kleintools.hms.harvard.edu/tools/springViewer_1_5_dev.html" + name);
+d3.select("#changeViewer_link").attr("href", my_origin + "/springViewer_1_5_dev.html" + name);
+//d3.select("#all_SPRINGplots_menu").attr("href", "https://kleintools.hms.harvard.edu/tools/currentDatasetsList.html?" + name.split('/')[2]);
+d3.select("#all_SPRINGplots_menu").attr("href", my_origin + "/currentDatasetsList.html?" + name.split('/')[2]);
+
+var force_on = 1;
+var n_nodes = 0;
+var colors_loaded = 0;
+graph_directory = name.slice(1,name.length);
+var tmp = graph_directory.split('/');
+if (tmp.length == 3) {
+    graph_directory = tmp.join('/');
+    sub_directory = "";
+}
+else {
+    graph_directory = tmp.slice(0,tmp.length-1).join('/');
+    sub_directory = tmp[tmp.length-1];
+};
+
+d3.select("#force_layout").select("svg").remove()
+d3.select("#color_chooser").selectAll("div").remove()
+d3.select("#color_chooser").selectAll("input").remove()
+d3.select("#color_chooser").selectAll("select").remove()
+forceLayout(graph_directory, sub_directory, callback);
+
+
+
+</script>
+
+<!--<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+         })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-105653247-2', 'auto');
+    ga('send', 'pageview');
+
+</script> -->
+
+</body>

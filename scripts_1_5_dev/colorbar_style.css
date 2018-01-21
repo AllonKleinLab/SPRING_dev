@@ -1,0 +1,107 @@
+
+#termsheet {
+	position: absolute;
+	top:52px;
+	bottom:0px;
+	left:-200px;
+	right:0px;
+	width: 190px;
+	overflow: auto;
+	display: inline;
+}
+
+#termsheet > div > div > p {
+	color: white;
+	font: 12px sans-serif;
+	padding: 5px;
+}
+
+#termsheet > div > div {
+	margin-top: -10px;
+	margin-left: 0px;
+	margin-right: -5px
+	background-color: "green";	
+}
+
+#color_chooser > div > p { 
+	font: 13px sans-serif;
+}
+
+select {
+    width: 120px;
+    text-overflow: ellipsis;
+    font: 13px sans-serif;
+}
+
+#ticks {
+  font: 10px sans-serif;
+}
+
+#track,
+#track-inset,
+#track-overlay {
+  stroke-linecap: round;
+}
+
+.bracket_label {
+  font: 14px sans-serif;
+  fill: yellow;
+}
+
+#track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+#track-inset {
+  stroke: #ddd;
+  stroke-width: 8px;
+}
+
+#track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  cursor: crosshair;
+}
+
+#legend {
+	position: absolute;
+	top: 166px;
+	overflow: auto;
+}
+
+
+.legend_row > div {
+	height:13px;
+	width:13px;
+	margin-top:5px;
+	margin-left:5px;
+	border-radius:50%;
+	float:left;
+}
+
+
+.text_label_div > p {
+	color: white;
+	font-family: sans-serif;
+	font-size: 13px;
+	padding-top: 4px;
+	padding-left: 5px;
+}
+
+.text_count_div > p {
+	color: white;
+	font-family: sans-serif;
+	font-size: 13px;
+	margin-top: 6px;
+	margin-left: 6px;
+}
+
+
+#handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+}
