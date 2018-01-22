@@ -5,7 +5,11 @@ import scipy.sparse as ssp
 import numpy as np
 import json
 import time
+import os
 
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
 
 def update_log(fname, logdat, overwrite=False):
 	if overwrite:
@@ -31,13 +35,13 @@ update_log(logf, 'Enrichment log:', True)
 
 gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
 
-if str(sel_filter) != "None": 
+if str(sel_filter) != "None":
     sel_filter = np.sort(np.array(map(int,sel_filter.split(','))))
 else:
     sel_filter = []
     sel_scores = np.zeros(len(gene_list), dtype=float)
 
-if str(comp_filter) != "None": 
+if str(comp_filter) != "None":
     comp_filter = np.sort(np.array(map(int,comp_filter.split(','))))
 else:
     comp_filter = []
@@ -62,7 +66,7 @@ update_log(logf, 'got cell filter -- %.3f' %(t1-t0))
 
 if len(sel_filter) > 0:
     cell_filter_use = cell_filter[sel_filter]
-    
+
     t0 = time.time()
     all_means = E[cell_filter_use,:].mean(0).A.squeeze()
     t1 = time.time()
@@ -79,7 +83,7 @@ if len(sel_filter) > 0:
 
 if len(comp_filter) > 0:
     cell_filter_use = cell_filter[comp_filter]
-    
+
     t0 = time.time()
     all_means = E[cell_filter_use,:].mean(0).A.squeeze()
     t1 = time.time()

@@ -12,12 +12,15 @@ import subprocess
 import json
 import numpy as np
 
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
 #####################
 # CGI
 do_the_rest = True
 
 data = cgi.FieldStorage()
-base_dir = data.getvalue('base_dir')[8:]
+base_dir = data.getvalue('base_dir')
 current_dir_short = data.getvalue('current_dir').strip('/')
 new_dir_short = data.getvalue('new_dir').strip('/')
 
@@ -155,6 +158,6 @@ else:
         o.write('Started processing<br>\n')
         o.close()
 
-        subprocess.call(["./new_spring_submit.sh", new_dir])
+        subprocess.call(["cgi-bin/new_spring_submit.sh", new_dir])
     except:
         print 'Error starting processing!<br>'

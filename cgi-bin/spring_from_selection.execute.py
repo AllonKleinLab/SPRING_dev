@@ -12,6 +12,10 @@ from fa2 import ForceAtlas2
 import pickle
 import datetime
 
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
+
 creation_time = datetime.datetime.now()
 
 t00 = time.time()
@@ -39,18 +43,18 @@ def update_log(fname, logdat, overwrite=False):
 	o.close()
 
 def send_confirmation_email(email, name, info_dict, start_dataset):
-    
+
     import smtplib
     from email.MIMEMultipart import MIMEMultipart
     from email.MIMEText import MIMEText
-    
+
     fromaddr = "calebsw@gmail.com"
     toaddr = email
     msg = MIMEMultipart()
     msg['From'] = fromaddr
     msg['To'] = toaddr
     msg['Subject'] = 'SPRING is finished processing '+name
-    
+
     body = 'SPRING finished processing your dataset '+name+' using the following parameters:\n\n'
     body += 'Starting dataset ' + start_dataset + '\n'
     body += 'Min expressing cells (gene filtering): ' + str(info_dict['Min_Cells']) + '\n'
@@ -59,10 +63,10 @@ def send_confirmation_email(email, name, info_dict, start_dataset):
     body += 'Number of principal components: ' + str(info_dict['Num_PCs']) + '\n'
     body += 'Number of nearest neighbors: ' + str(info_dict['Num_Neighbors']) + '\n'
     body += 'Number of force layout iterations: ' + str(info_dict['Num_Force_Iter']) + '\n\n'
-    body += 'Used %i cells and %i genes to build the SPRING plot.\n\n' %(info_dict['Nodes'], info_dict['Filtered_Genes']) 
+    body += 'Used %i cells and %i genes to build the SPRING plot.\n\n' %(info_dict['Nodes'], info_dict['Filtered_Genes'])
     body += 'You can view the results at\nhttps://kleintools.hms.harvard.edu/tools/springViewer_1_6_dev.html?cgi-bin/client_datasets/'+name
     msg.attach(MIMEText(body, 'plain'))
-    
+
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(fromaddr, "susannah11")
@@ -265,8 +269,6 @@ update_log(timef, 'Ran ForceAtlas2 -- %.2f' %(t1-t0))
 
 base_name = base_dir.strip('/').split('/')[-1]
 new_name = new_dir.strip('/').split('/')[-1]
-coords_dir = 'coordinates/'
-#np.savetxt(coords_dir + base_name + '_coordinates.' + new_name + '.txt', np.hstack((np.arange(E.shape[0])[:,None], positions)), fmt='%i,%.5f,%.5f')
 np.savetxt(new_dir + '/' +  'coordinates.txt', np.hstack((np.arange(E.shape[0])[:,None], positions)), fmt='%i,%.5f,%.5f')
 
 
@@ -296,4 +298,3 @@ url_pref = this_url.split('?')[0]
 update_log_html(logf, 'Run complete! Done in %i seconds.<br>' %(t11-t00) + '<a target="_blank" href="%s?%s"> Click here to view.</a>' %(url_pref,new_dir.strip('/')))
 #send_confirmation_email(user_email, base_name + '/' + new_name, info_dict, start_dataset)
 ################
-

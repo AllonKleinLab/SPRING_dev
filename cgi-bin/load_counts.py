@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 import cgi
 import cgitb
+import os
+
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
 
 cgitb.enable()  # for troubleshooting
 data = cgi.FieldStorage()

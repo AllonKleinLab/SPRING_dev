@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 
 import time
+import os
+
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
+	
 t00 = time.time()
 def update_log(fname, logdat, overwrite=False):
 	if overwrite:
@@ -88,4 +94,3 @@ update_log(logf, 'returned data -- %.3f' %(t1-t0))
 
 t11 = time.time()
 update_log(logf, str(t11-t00))
-

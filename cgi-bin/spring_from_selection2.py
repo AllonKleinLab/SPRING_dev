@@ -10,6 +10,10 @@ import pickle
 import numpy as np
 import subprocess
 
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
+
 #####################
 # CGI
 do_the_rest = True
