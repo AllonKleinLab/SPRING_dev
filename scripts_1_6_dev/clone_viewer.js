@@ -6,24 +6,28 @@ node_status = {};
 function clone_viewer_setup() {
 
 	clone_map = {};
-	for (var i=0; i<all_nodes.length-4; i++) {
-		clone_map[i] = [i+1,i+2,i+3,i+4];
-	}
-	for (i=all_nodes.length-4; i<all_nodes.length; i++) {
+	for (i in all_nodes) {
 		clone_map[i] = [];
 	}
 
+	d3.json(window.location.search.slice(1,name.length) + "/clone_map.json", function(data) {	
+		for (i in data) {
+			clone_map[i] = data[i];
+		}
+		console.log('DONE');
+	});
+	
 	clone_edge_container = new PIXI.Container();
 	clone_edge_container.position = sprites.position;
 	clone_edge_container.scale = sprites.scale;
-	
+
 	clone_sprites = new PIXI.Container(all_nodes.length, {scale: true, position: true, rotation: true, uvs: true, alpha: true});
 	clone_sprites.position = sprites.position;
 	clone_sprites.scale = sprites.scale;
-	
+
 	app.stage.addChild(clone_edge_container);
 	app.stage.addChild(clone_sprites);
-	
+
 	var popup = d3.select('#force_layout').append('div')
 		.attr('id','clone_viewer_popup');
 
@@ -45,7 +49,7 @@ function clone_viewer_setup() {
 		.style('margin-top','-2px')
 		.style('margin-bottom','10px')
 		.style('margin-left','5px')
-	
+
 	popup.append('div').append('button')
 		.text('Set source nodes')
 		.style('width','120px')
@@ -73,7 +77,6 @@ function clone_viewer_setup() {
 		.text('Close')
 		.style('width','54px')
 		.on('click',close_clone_viewer);
-		
 		
 	function clone_viewer_popup_dragstarted() {
 		d3.event.sourceEvent.stopPropagation();

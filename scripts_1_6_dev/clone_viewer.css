@@ -1,7 +1,7 @@
 #clone_viewer_popup {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 70px;
+	left: 40px;
 	background-color: rgba(150,150,150,.5);
 	visibility: hidden;
 	border: solid 1px rgb(230,230,230);

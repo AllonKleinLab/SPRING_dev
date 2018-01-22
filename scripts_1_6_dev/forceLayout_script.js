@@ -479,6 +479,17 @@ function showGotoDropdown() {
 	}
 }
 
+function showToolsDropdown() {
+	if (d3.select("#tools_dropdown").style("height") == 'auto') {
+		closeDropdown();
+		collapse_settings();
+		setTimeout(function() {
+			document.getElementById("tools_dropdown").classList.toggle("show");
+		}, 10);
+	}
+}
+
+
 
 function showDownloadDropdown() {
 	if (d3.select("#download_dropdown").style("height") == 'auto') {
@@ -520,6 +531,10 @@ function setup_download_dropdown() {
 
 function setup_goto_dropdown() {
 	d3.select("#goto_dropdown_button").on("click",showGotoDropdown);
+}
+
+function setup_tools_dropdown() {
+	d3.select("#tools_dropdown_button").on("click",showToolsDropdown);
 }
 
 

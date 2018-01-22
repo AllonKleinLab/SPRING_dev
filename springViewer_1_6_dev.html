@@ -51,29 +51,12 @@
 			<a target="_blank" id="changeViewer_link">Dynamic mode</a>
 		  </div>
 		</div>
-		<!-- <div id="toggleforce">
-			<button style="width:60px;">Pause</button>
-		</div>	-->
-		<!-- <div id="save_coords">
-			<button> Save coordinates </button>
-		</div>
-		-->
 		<div class="dropdown">
-		<div id="layout_tools">
-			<!--
-			<button id="layout_dropdown_button">Layout tools:</button>
-			<div id="layout_dropdown" class="dropdown-content">
-				<a href="javascript:fix()">Fix nodes</a>
-				<a href="javascript:unfix()">Unfix nodes</a>
-				<a href="javascript:rotation_update()">Rotate</a>
-			</div>
-			-->
+		 <button id="tools_dropdown_button">Tools:</button>
+		  <div id="tools_dropdown" class="dropdown-content">
+		  	<a href="javascript:start_clone_viewer()">Clone broswer</a>
+		  </div>
 		</div>
-
-		</div>
-		<!--<div id="load_colors">
-			<button> Load color tracks </button>
-        </div>-->
 		<div id="sound_toggle"> </div>
 	</div>
 	<div id="color_chooser"> </div>
@@ -118,6 +101,7 @@ var rotator_radius = null;
 
 setup_download_dropdown();
 setup_goto_dropdown();
+setup_tools_dropdown();
 
 d3.select("#sound_toggle").append('img')
 	.attr('src', "scripts_1_6_dev/sound_effects/icon_mute.svg")
@@ -141,8 +125,7 @@ function callback() {
 	make_new_SPRINGplot_setup();
 	clone_viewer_setup();
 	center_view();
-	
-	start_clone_viewer();
+
 
 	window.onclick = function(event) {
 		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }
