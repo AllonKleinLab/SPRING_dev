@@ -239,7 +239,7 @@ function activate_edges(i,stable) {
 	
 	else if (stable) {
 		for (var j=0; j<clone_map[i].length; j++)  {
-			if (node_status[j].target) {	
+			if (node_status[clone_map[i][j]].target) {	
 				activate_node(clone_map[i][j],stable);
 			}	
 		}
