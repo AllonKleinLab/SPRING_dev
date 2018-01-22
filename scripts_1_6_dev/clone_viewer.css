@@ -2,14 +2,30 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	background-color: rgba(50,50,50,.75);
-	visibility: visible;
-	border: solid 1px rgb(150,150,150);
+	background-color: rgba(150,150,150,.5);
+	visibility: hidden;
+	border: solid 1px rgb(230,230,230);
 	overflow: hidden;
 	padding: 10px;
+	width: 140px;
 }
 
 #clone_viewer_popup > div {
 	padding: 10px;
+
+}
+
+#clone_title {
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	user-select: none;
+	font-size: 14px;
+	text-align: center;
+	position: relative;
+	float: left;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-weight: 550;
 
 }
