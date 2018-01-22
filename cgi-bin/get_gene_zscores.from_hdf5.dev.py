@@ -8,6 +8,11 @@ import h5py
 import json
 import time
 
+
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
+
 def update_log(fname, logdat, overwrite=False):
 	if overwrite:
 		o = open(fname, 'w')
@@ -32,13 +37,13 @@ update_log(logf, 'Enrichment log:', True)
 
 gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
 
-if str(sel_filter) != "None": 
+if str(sel_filter) != "None":
     sel_filter = np.sort(np.array(map(int,sel_filter.split(','))))
 else:
     sel_filter = []
     sel_scores = np.zeros(len(gene_list), dtype=float)
 
-if str(comp_filter) != "None": 
+if str(comp_filter) != "None":
     comp_filter = np.sort(np.array(map(int,comp_filter.split(','))))
 else:
     comp_filter = []
@@ -61,13 +66,13 @@ if len(sel_filter) > 0:
     totals = np.zeros(len(gene_list), dtype=float)
     t1 = time.time()
     update_log(logf, 'got cell filter -- %.3f' %(t1-t0))
-    
+
     t0 = time.time()
     for cellid in cell_filter:
         gix = np.array(hf_gix[cellid])
         counts = np.array(hf_counts[cellid])
         totals[gix] = totals[gix] + counts
-    
+
     all_means = totals / float(len(cell_filter))
     t1 = time.time()
     update_log(logf, 'got means -- %.3f' %(t1-t0))
@@ -86,12 +91,12 @@ if len(comp_filter) > 0:
     t0 = time.time()
     cell_filter = np.array(np.load(sub_dir + '/cell_filter.npy')[comp_filter], dtype=str)
     totals = np.zeros(len(gene_list), dtype=float)
-    
+
     for cellid in cell_filter:
         gix = np.array(hf_gix[cellid])
         counts = np.array(hf_counts[cellid])
         totals[gix] = totals[gix] + counts
-    
+
     all_means = totals / float(len(cell_filter))
     t1 = time.time()
     update_log(logf, 'got means -- %.3f' %(t1-t0))
