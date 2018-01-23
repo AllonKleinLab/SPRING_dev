@@ -77,9 +77,8 @@ function add_list_item(project_directory,sub_directory,order) {
 		
 	
 		list_item.on('click',function() {
-			var my_url = window.location.href.split('/');
-			my_url = my_url.slice(0,my_url.length-1);
-			my_url.push('springViewer_1_6_dev.html?cgi-bin/client_datasets'); 
+			var my_url = [window.location.href.split('/')[0]];
+			my_url.push('springViewer_1_6_dev.html?'); 
 			my_url.push(project_directory);
 			my_url.push(sub_directory);
 			openInNewTab(my_url.join('/'));
@@ -90,7 +89,9 @@ function add_list_item(project_directory,sub_directory,order) {
 }
 
 function populate_subdirs_list(project_directory) {
-	d3.select('#project_directory_title').text('SPRING subplots of "'+project_directory+'"')
+	var title = project_directory.split('/');
+	title = title[title.length-1];
+	d3.select('#project_directory_title').text('SPRING subplots of "'+title+'"')
 
 	$.ajax({
 		url: "cgi-bin/list_directories_with_run_info.py",
