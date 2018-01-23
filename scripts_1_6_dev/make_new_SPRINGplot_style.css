@@ -3,11 +3,11 @@
 	top: 0;
 	left: 0;
 	width: 410px;
-	height: 482px;
 	background-color: rgba(50,50,50,.9);
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
-	overflow: hidden;
+	overflow: scroll;
+	display:block;
 }
 
 #make_new_SPRINGplot_button_bar > * {
@@ -51,7 +51,7 @@
 	font-size: 14px;
 }
 
-.make_new_SPRINGplot_input_div > label > input {
+.make_new_SPRINGplot_input_div > label > textarea, input {
 	margin-left: 20px;
 	height: 20px;
 	font-size: 14px;
@@ -62,7 +62,11 @@
 	padding-top: 3px;
 	padding-bottom: 3px;
 	width: 70px;
+	overflow: wrap;
+	vertical-align: top;
+	resize: none;
 }
+
 
 #make_new_SPRINGplot_optional_params {
 	float: left;
@@ -100,11 +104,12 @@
 	border: solid 1px rgb(110,110,110);
 	width: 88%;
 	margin-right: 15px;
-	height: 120px;
+	height: 0px;
 	float: right;
 	margin-top: 30px;
 	background-color: rgba(0,0,0,.3);
 	padding: 10px;
+	visibility: hidden;
 }
 
 #make_new_SPRINGplot_message_div > text {

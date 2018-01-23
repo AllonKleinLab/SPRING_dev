@@ -141,8 +141,8 @@ var my_origin = window.location.origin;
 //d3.select("#changeViewer_link").attr("href", "https://kleintools.hms.harvard.edu/tools/springViewer_1_5_dev.html" + name);
 d3.select("#changeViewer_link").attr("href", my_origin + "/springViewer_1_5_dev.html" + name);
 //d3.select("#all_SPRINGplots_menu").attr("href", "https://kleintools.hms.harvard.edu/tools/currentDatasetsList.html?" + name.split('/')[2]);
-base_dir_name = name.split('/');
-base_dir_name = base_dir_name.slice(1,base_dir_name.length-1).join('/');
+base_dir_name = name.slice(1,name.length).split('/');
+base_dir_name = base_dir_name.slice(0,base_dir_name.length-1).join('/');
 d3.select("#all_SPRINGplots_menu").attr("href", my_origin + "/currentDatasetsList.html?"+base_dir_name);
 
 var force_on = 1;

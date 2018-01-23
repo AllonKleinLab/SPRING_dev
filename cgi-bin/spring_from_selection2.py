@@ -108,6 +108,11 @@ try:
 except:
 	all_errors.append('Enter an integer >0 for <font color="red">number of force layout iterations</font>.<br>')
 	do_the_rest = False
+	
+try:
+	description = data.getvalue('description')
+except:
+	description = ''
 
 
 if not do_the_rest:
@@ -140,6 +145,7 @@ else:
 		params_dict['num_pc'] = num_pc
 		params_dict['num_fa2_iter'] = num_fa2_iter
 		params_dict['this_url'] = this_url
+		params_dict['description'] = description
 		#params_dict['user_email'] = user_email
 		
 		params_filename = new_dir + "/params.pickle"

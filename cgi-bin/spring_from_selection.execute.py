@@ -105,6 +105,7 @@ num_pc = params_dict['num_pc']
 num_fa2_iter = params_dict['num_fa2_iter']
 #user_email = params_dict['user_email']
 this_url = params_dict['this_url']
+description = params_dict['description']
 
 logf = new_dir + '/lognewspring2.txt'
 timef = new_dir + '/lognewspringtime.txt'
@@ -303,6 +304,7 @@ info_dict['Min_Counts'] = min_counts
 info_dict['Num_Neighbors'] = k_neigh
 info_dict['Num_PCs'] = num_pc
 info_dict['Num_Force_Iter'] = num_fa2_iter
+info_dict['Description'] = description
 start_dataset = base_name + '/' + current_dir_short
 
 with open(new_dir+'/run_info.json','w') as f:
