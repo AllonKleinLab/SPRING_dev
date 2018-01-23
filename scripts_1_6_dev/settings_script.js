@@ -80,8 +80,8 @@ function settings_setup() {
 
 	function node_size_change(val) { 
 		for (i=0; i<all_nodes.length; i++) {
-			all_nodes[i].scale.set(val/50);
-			all_outlines[i].scale.set(val/50);
+			all_nodes[i].scale.set(val/100);
+			all_outlines[i].scale.set(val/100);
 		} 
 	}
 

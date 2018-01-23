@@ -113,6 +113,9 @@ function selection_setup() {
 		.on("keydown",keydown)
 		.on("keyup", keyup);
 		
+	var base_radius = parseInt(d3.select("#settings_range_node_size").attr('value')) / 100;
+	var large_radius = base_radius * 3;
+	
 	brusher = d3.svg.brush()
 	.x(xScale)
 	.y(yScale)
@@ -145,8 +148,14 @@ function selection_setup() {
 				o.alpha = 1;
 				o.tint = '0x0000ff';
 			}
-			if (!(o.selected || o.compared)) {
+			if (o.selected || o.compared) {
+// 				all_outlines[i].scale.set(large_radius);
+// 				all_nodes[i].scale.set(large_radius);
+			}
+			else {
 				o.alpha = 0;
+// 				all_outlines[i].scale.set(base_radius);
+// 				all_nodes[i].scale.set(base_radius);
 			}	
 		}
 		update_selected_count();	
@@ -268,6 +277,8 @@ function selection_setup() {
 				all_outlines[i].alpha = 0
 				all_outlines[i].selected = false;
 				all_outlines[i].compared = false;
+// 				all_nodes[i].scale.set(base_radius);
+// 				all_outlines[i].scale.set(base_radius);
 			}
 		}
 		if (! any_selected) {
@@ -275,6 +286,8 @@ function selection_setup() {
 				all_outlines[i].alpha = 1
 				all_outlines[i].tint = '0xffff00';
 				all_outlines[i].selected = true;
+// 				all_outlines[i].scale.set(large_radius);
+// 				all_nodes[i].scale.set(large_radius);
 			}
 		}
 		count_clusters();
