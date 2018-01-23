@@ -103,7 +103,7 @@ min_counts = params_dict['min_counts']
 k_neigh = params_dict['k_neigh']
 num_pc = params_dict['num_pc']
 num_fa2_iter = params_dict['num_fa2_iter']
-#user_email = params_dict['user_email']
+user_email = params_dict['user_email']
 this_url = params_dict['this_url']
 description = params_dict['description']
 
@@ -294,7 +294,7 @@ if os.path.exists(current_dir + '/clone_map.json'):
 # Save run info
 import datetime
 info_dict = {}
-#info_dict['Email'] = user_email
+info_dict['Email'] = user_email
 info_dict['Date'] = '%s' %creation_time
 info_dict['Nodes'] = Epca.shape[0]
 info_dict['Filtered_Genes'] = len(gene_filter)
@@ -310,10 +310,11 @@ start_dataset = base_name + '/' + current_dir_short
 with open(new_dir+'/run_info.json','w') as f:
     f.write(json.dumps(info_dict,indent=4, sort_keys=True).decode('utf-8'))
 
+
 ################
-# Send email
 t11 = time.time()
 url_pref = this_url.split('?')[0]
 update_log_html(logf, 'Run complete! Done in %i seconds.<br>' %(t11-t00) + '<a target="_blank" href="%s?%s"> Click here to view.</a>' %(url_pref,new_dir.strip('/')))
-#send_confirmation_email(user_email, base_name + '/' + new_name, info_dict, start_dataset)
+if user_email != '':
+	send_confirmation_email(user_email, base_name + '/' + new_name, info_dict, start_dataset)
 ################

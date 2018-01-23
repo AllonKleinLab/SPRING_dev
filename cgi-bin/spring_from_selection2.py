@@ -52,14 +52,13 @@ if len(found_bad) > 0:
 	all_errors.append('Enter a <font color="red">name of plot</font> without the following characters: <font face="courier">%s</font><br>' %('   '.join(found_bad)))
 
 # ERROR HANDLING
-#try:
-#	user_email = data.getvalue('email')
-#	if "@" not in user_email:
-#		all_errors.append('Enter a valid <font color="red">email address</font>.<br>')
-#		do_the_rest = False
-#except:
-#	all_errors.append('Enter a valid <font color="red">email address</font>.<br>')
-#	do_the_rest = False
+try:
+	user_email = data.getvalue('email')
+	if "@" not in user_email:
+		all_errors.append('Enter a valid <font color="red">email address</font>.<br>')
+		do_the_rest = False
+except:
+	user_email = ''
 
 try:
 	min_cells = int(data.getvalue('minCells'))
@@ -146,7 +145,7 @@ else:
 		params_dict['num_fa2_iter'] = num_fa2_iter
 		params_dict['this_url'] = this_url
 		params_dict['description'] = description
-		#params_dict['user_email'] = user_email
+		params_dict['user_email'] = user_email
 		
 		params_filename = new_dir + "/params.pickle"
 		params_file = open(params_filename, 'wb')
@@ -155,6 +154,7 @@ else:
 
 		print 'Everything looks good. Now running...<br>'
 		print 'This could several minutes.<br>'
+		if user_email != '': print 'You will be notified of completion by email.<br>'
 
 		o = open(new_dir + '/lognewspring2.txt', 'w')
 		o.write('Started processing<br>\n')

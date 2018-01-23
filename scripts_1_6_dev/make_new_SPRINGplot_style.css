@@ -7,7 +7,7 @@
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
 	overflow: scroll;
-	display:block;
+	height: 520px;
 }
 
 #make_new_SPRINGplot_button_bar > * {
@@ -49,9 +49,10 @@
 	font-family: Arial, Helvetica, sans-serif;
 	user-select: none;
 	font-size: 14px;
+	margin-top: 10px;
 }
 
-.make_new_SPRINGplot_input_div > label > textarea, input {
+.make_new_SPRINGplot_input_div > label > textarea, .make_new_SPRINGplot_input_div > label > input {
 	margin-left: 20px;
 	height: 20px;
 	font-size: 14px;

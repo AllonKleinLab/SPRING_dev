@@ -22,23 +22,29 @@ function make_new_SPRINGplot_setup() {
 		.attr('value','E.g. "My_favorite_cells"')
 		.style('width','220px');
 
-//	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
-//		.append('label').text('Email address')
-//		.append('input').attr('type','text')
-//		.attr('id','input_email')
-//		.style('width','220px');
+	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
+		.append('label').text('Email address')
+		.append('input').attr('type','text')
+		.attr('id','input_email')
+		.style('width','220px');
 
 	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
+		.attr('id','newSPRING_description_box')
 		.append('label').text('Description')
 		.append('textarea')
 		.attr('id','input_description')
 		.style('width','220px')
-		.style('height','24px')
+		.style('height','22px')
 		.on('keydown', function() {
 			setTimeout(function() {
 				var o = d3.select('#input_description');
 				o.style('height','1px');
  				o.style('height',(o[0][0].scrollHeight).toString()+"px");
+ 				if ( d3.select('#make_new_SPRINGplot_message_div').style('visibility')=='hidden') {	
+ 					popup.style('height',($('#newSPRING_description_box').height() + 492.223).toString()+'px');	
+ 				} else {
+ 					popup.style('height',($('#newSPRING_description_box').height() + 650).toString()+'px');	
+ 				}			
  			}, 0);
  		});
  	
@@ -147,7 +153,7 @@ function show_make_new_SPRINGplot_popup() {
 	d3.select("#make_new_SPRINGplot_popup")
 		.style("left",(svg_width/2-mywidth/2).toString()+"px")
 		.style("top","10px").style('padding-bottom','0px')
-		.style('visibility','visible');
+		.style('visibility','visible').style('height','520px');
 
 }
 
@@ -156,16 +162,6 @@ function show_make_new_SPRINGplot_popup() {
 // }
 
 function submit_new_SPRINGplot() {
-	d3.select('#make_new_SPRINGplot_message_div')
-		.transition().duration(200)
-		.style('height','120px')
-		.each('end',function() { 
-			d3.select('#make_new_SPRINGplot_message_div')
-				.style('visibility','inherit');
-			});
-	d3.select('#make_new_SPRINGplot_popup').style('padding-bottom','30px')
-		.transition().duration(200)
-		.style('padding-bottom','30px');
 	
 	//
 	// Do cgi stuff to check for valid input
@@ -178,7 +174,7 @@ function submit_new_SPRINGplot() {
   }
   sel2text = sel2text.slice(1, sel2text.length);
 	var new_dir = $("#input_new_dir").val();
-	//var email = $("#input_email").val();
+	var email = $("#input_email").val();
 	var description = $("#input_description").val();
 	var minCells = $("#input_minCells").val();
 	var minCounts = $("#input_minCounts").val();
@@ -189,19 +185,27 @@ function submit_new_SPRINGplot() {
     var this_url = window.location.href;
 
 	var output_message = "Checking input..."
+
 	d3.select('#make_new_SPRINGplot_popup')
-		.transition(500).style('height','613px');
+		.transition().duration(200)
+		.style('height',($('#newSPRING_description_box').height() + 650).toString()+'px');
+
 	d3.select('#make_new_SPRINGplot_message_div')
-		.select('text').text(output_message);
-	
-	
+		.transition().duration(200)
+		.style('height','120px')
+		.each('end',function() { 
+			d3.select('#make_new_SPRINGplot_message_div')
+				.style('visibility','inherit');
+			d3.select('#make_new_SPRINGplot_message_div')
+				.select('text').text(output_message);
+		});
+
   $.ajax({
 		url: "cgi-bin/spring_from_selection2.py",
     type: "POST",
-    data: {base_dir:graph_directory, current_dir:sub_directory, new_dir:new_dir, selected_cells:sel2text, minCells:minCells, minCounts:minCounts, varPctl:varPctl, kneigh:kneigh, numPC:numPC, nIter:nIter, this_url:this_url, description:description},
+    data: {base_dir:graph_directory, current_dir:sub_directory, new_dir:new_dir, selected_cells:sel2text, minCells:minCells, minCounts:minCounts, varPctl:varPctl, kneigh:kneigh, numPC:numPC, nIter:nIter, this_url:this_url, description:description, email:email},
 		success: function(output_message) {
 			var orig_message = output_message;
-			console.log(orig_message);
 			d3.select('#make_new_SPRINGplot_message_div')
 				.select('text').html(orig_message);
 
@@ -216,8 +220,8 @@ function submit_new_SPRINGplot() {
 					}
 				});
 			}
-
-			if (orig_message.endsWith("several minutes.<br>\n")) {
+			console.log(orig_message);
+			if (orig_message.endsWith("minutes.<br>\n") || orig_message.endsWith("email.<br>\n")) {
 				setTimeout(checkLog, 500);
     	}
 		}
