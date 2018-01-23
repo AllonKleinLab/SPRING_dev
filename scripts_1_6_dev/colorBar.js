@@ -1066,8 +1066,8 @@ function make_legend(cat_color_map,cat_label_list) {
 				}
 			}
 						
-			var base_radius = parseInt(d3.select("#settings_range_node_size").attr('value')) / 100;
-			var large_radius = base_radius * 10;
+			var base_radius = document.getElementById("settings_range_node_size").value / 100;
+			var large_radius = base_radius * 20;
 
 			for (i=0; i<all_nodes.length; i++) {
 				if (cat_label_list[i]==d) {
