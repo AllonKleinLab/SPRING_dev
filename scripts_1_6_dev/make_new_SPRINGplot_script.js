@@ -86,6 +86,7 @@ function make_new_SPRINGplot_setup() {
 
 	popup.append('div')
 		.attr('id','make_new_SPRINGplot_message_div')
+		.on('mousedown',function() { d3.event.stopPropagation(); })
 		.style('overflow', 'scroll')
 		.append('text');
 

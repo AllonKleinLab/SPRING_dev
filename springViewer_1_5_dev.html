@@ -134,7 +134,9 @@ function callback() {
 var name = window.location.search;
 var my_origin = window.location.origin;
 d3.select("#changeViewer_link").attr("href", my_origin + "/springViewer_1_6_dev.html" + name);
-d3.select("#all_SPRINGplots_menu").attr("href", my_origin + "/currentDatasetsList.html?" + name.split('/')[2]);
+base_dir_name = name.split('/');
+base_dir_name = base_dir_name.slice(1,base_dir_name.length-1).join('/');
+d3.select("#all_SPRINGplots_menu").attr("href", my_origin + "/currentDatasetsList.html?"+base_dir_name);
 
 
 var force_on = 1;

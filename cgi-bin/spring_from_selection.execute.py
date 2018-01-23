@@ -271,6 +271,23 @@ base_name = base_dir.strip('/').split('/')[-1]
 new_name = new_dir.strip('/').split('/')[-1]
 np.savetxt(new_dir + '/' +  'coordinates.txt', np.hstack((np.arange(E.shape[0])[:,None], positions)), fmt='%i,%.5f,%.5f')
 
+################
+# Save new clone data if it exists in base dir
+if os.path.exists(current_dir + '/clone_map.json'):
+	clone_map = json.load(open(current_dir + '/clone_map.json'))
+	extra_filter_map = {i:j for j,i in enumerate(extra_filter)}
+	new_clone_map = {}
+	for i,clone in clone_map.items():
+		i = int(i)
+		new_clone = [extra_filter_map[j] for j in clone if j in extra_filter_map]
+		if i in extra_filter_map and len(new_clone) > 0:
+			new_clone_map[extra_filter_map[i]] = new_clone
+	json.dump(new_clone_map,open(new_dir+'/clone_map.json','w'))
+	
+	
+	
+	
+
 
 ################
 # Save run info
