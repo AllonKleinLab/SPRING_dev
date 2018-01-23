@@ -12,6 +12,8 @@ div {
 ol {
   list-style-type: none;
   width: 600px;
+  float: top;
+  overflow: hidden;
 }
 
 h2 {
@@ -73,6 +75,17 @@ li > div > tspan {
 
 }
 
+.delete_button {
+	position: absolute;
+	top: 5px;
+	right: 10px;
+	color: #7e7e7e;
+}
+
+
+.delete_button:hover {
+	color: #2a2a2a;
+}
 
 
 
