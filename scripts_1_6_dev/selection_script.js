@@ -25,11 +25,11 @@ function selection_setup() {
 
 	var pos_select_count_rect = d3.select("svg").append("rect")
 		.attr("class","selection_option")
-		.attr("x", svg_width).attr("y", 96).attr("fill-opacity",.25).attr("width", 200).attr("height", 24)
+		.attr("x", svg_width).attr("y", 103).attr("fill-opacity",.25).attr("width", 200).attr("height", 24)
 
 	var neg_select_count_rect = d3.select("svg").append("rect")
 		.attr("class","selection_option")
-		.attr("x", svg_width).attr("y", 120).attr("fill-opacity",.25).attr("width", 200).attr("height", 24)
+		.attr("x", svg_width).attr("y", 127).attr("fill-opacity",.25).attr("width", 200).attr("height", 24)
 
 		
 	d3.select("svg")
@@ -55,12 +55,12 @@ function selection_setup() {
 	var pos_select_count_text = d3.select("svg")	
 		.append("text").attr("pointer-events","none")
 		.attr("class","selection_option")
-		.attr("x", svg_width).attr("y", 112).attr("font-family", "sans-serif")
+		.attr("x", svg_width).attr("y", 119).attr("font-family", "sans-serif")
 		.attr("font-size", "12px").attr("fill", "yellow").text("0 cells selected")
 	var neg_select_count_text = d3.select("svg")	
 		.append("text").attr("pointer-events","none")
 		.attr("class","selection_option")
-		.attr("x", svg_width).attr("y", 136).attr("font-family", "sans-serif")
+		.attr("x", svg_width).attr("y", 143).attr("font-family", "sans-serif")
 		.attr("font-size", "12px").attr("fill", "blue").text("0 cells selected")
 
 	
@@ -158,13 +158,13 @@ function selection_setup() {
 // 				all_nodes[i].scale.set(base_radius);
 			}	
 		}
-		update_selected_count();	
+		update_selected_count();
+		count_clusters();	
 					
 	})
 	.on("brushend", function() {
 		d3.event.target.clear();	
 		d3.select(this).call(d3.event.target);
-		count_clusters();
 		if (d3.selectAll(".selected")[0].length == 0) { 
 			rotation_hide();
 		}
@@ -225,7 +225,8 @@ function selection_setup() {
 					pos_select_count_text.transition(500).attr('x',svg_width-167);
 				}
 			}
-			pos_select_count_text.text(num_selected.toString()+' cells selected');
+			var pct = Math.floor(num_selected / all_nodes.length * 100);
+			pos_select_count_text.text(num_selected.toString()+' cells selected   ('+pct.toString()+'%)');
 		}
 		if (num_compared==0 && neg_count_extended) {
 			neg_count_extended = false;
@@ -250,7 +251,8 @@ function selection_setup() {
 					neg_select_count_text.transition(500).attr('x',svg_width-167);				
 				}
 			}
-			neg_select_count_text.text(num_compared.toString()+' cells selected');
+			var pct = Math.floor(num_compared / all_nodes.length * 100);
+			neg_select_count_text.text(num_compared.toString()+' cells selected   ('+pct.toString()+'%)');
 		}
 	}
 	

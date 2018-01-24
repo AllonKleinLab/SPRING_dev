@@ -106,3 +106,7 @@ select {
   stroke-opacity: 0.5;
   stroke-width: 1.25px;
 }
+
+#count_column > div {
+	background-color: rgba(0,0,0,.3);
+}

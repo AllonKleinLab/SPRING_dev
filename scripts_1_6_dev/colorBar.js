@@ -1030,8 +1030,19 @@ function make_legend(cat_color_map,cat_label_list) {
             .style("margin-left","-1px")
 			.style("width","44px")
 			.style("overflow","hidden")
-			.style("background-color","rgba(0,0,0,0)")
 			.append("p").text("");
+
+	d3.select("#count_column")
+		.on('mouseenter',function() {
+			d3.selectAll('.text_count_div').each(function() {
+				var pct = Math.floor(parseInt(d3.select(this).attr('count')) / all_nodes.length * 1000)/10;
+				d3.select(this).select('p').text(pct+'%');
+			});
+		}).on('mouseleave',function() {
+			d3.selectAll('.text_count_div').each(function() {
+				d3.select(this).select('p').text(d3.select(this).attr('count'));
+			});		
+		});
 
 	d3.select("#label_column").selectAll("div")
 		.data(Object.keys(cat_color_map)).enter().append("div")
@@ -1067,7 +1078,7 @@ function make_legend(cat_color_map,cat_label_list) {
 			}
 						
 			var base_radius = document.getElementById("settings_range_node_size").value / 100;
-			var large_radius = base_radius * 20;
+			var large_radius = base_radius * 15;
 
 			for (i=0; i<all_nodes.length; i++) {
 				if (cat_label_list[i]==d) {
@@ -1084,7 +1095,7 @@ function make_legend(cat_color_map,cat_label_list) {
 					}
 				}
 			}
-			var stepsize = (large_radius - base_radius) / 10;
+			var stepsize = (large_radius - base_radius) / 8;
 			shrinkNodes(base_radius,large_radius,stepsize);
 			
 			function shrinkNodes(base_radius,current_radius,stepsize) {
@@ -1096,7 +1107,7 @@ function make_legend(cat_color_map,cat_label_list) {
 							all_nodes[i].scale.set(current_radius);
 						}
 					}
-					setTimeout(function() { shrinkNodes(base_radius,current_radius,stepsize); }, 1);
+					setTimeout(function() { shrinkNodes(base_radius,current_radius,stepsize); }, 0);
 				}
 			}
 
@@ -1123,11 +1134,12 @@ function count_clusters() {
 
 		d3.select("#count_column").selectAll("div").each(function(d) {
 			d3.select(this)
-				.style("background-color","rgba(0,0,0,0)")
+				.style('visibility','hidden')
 				.select("p").text("")
 			if (counts[d] > 0) {
 				d3.select(this)
-					.style("background-color","rgba(0,0,0,.3)")
+					.attr('count',counts[d])
+					.style('visibility','visible')
 					.select("p").text(counts[d]);
 			}
 		});
