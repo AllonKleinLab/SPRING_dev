@@ -94,14 +94,12 @@ function forceLayout(project_directory, sub_directory, callback) {
 	.style("stroke","rgb(100,100,100)")
 	.selectAll("line");
 	
-	d3.select("#vis").append("circle").attr("id","rotation_outer_circ");
-	d3.select("#vis").append("circle").attr("id","rotation_inner_circ");
 	
 	node = vis.append("g")
 	.attr("class", "node")
 	.selectAll("circle");
 	
-	d3.select("#vis").append("circle").attr("id","rotation_pivot");
+	
 
 	var svg_width = parseInt(d3.select("svg").attr("width"));
 

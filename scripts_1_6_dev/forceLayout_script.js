@@ -184,6 +184,9 @@ function forceLayout(project_directory, sub_directory, callback) {
 		
 		loadColors();	
 		load_edges();
+		
+		d3.select("#force_svg").append('g').attr('id','vis')
+			
         
 	});
 
@@ -590,6 +593,7 @@ function redraw() {
 		clone_sprites.position = sprites.position;
 		clone_sprites.scale = sprites.scale;
 		
+		
 	}
 }
 
@@ -648,9 +652,24 @@ function center_view() {
 			setTimeout(move,10);
 		}
 	})();
-
-
-
-
 }
+
+function save_coords() {
+	if (mutable.slice(0,5) != 'false') {
+		var text = ""
+		for (i in coordinates) {
+			text = text + [i.toString(),all_nodes[i].x.toString(),all_nodes[i].y.toString()].join(',') + '\n';
+		}
+		var name = window.location.search;
+		console.log(text);
+		path = name.slice(1,name.length) + "/coordinates.txt";
+		console.log(path)
+		$.ajax({
+		  url: "cgi-bin/save_data.py",
+		  type: "POST",
+		  data: {path:path, content:text},
+		});
+	}
+}
+
 

@@ -165,7 +165,10 @@ function selection_setup() {
 	.on("brushend", function() {
 		d3.event.target.clear();	
 		d3.select(this).call(d3.event.target);
-		if (d3.selectAll(".selected")[0].length == 0) { 
+		selected = [];
+		for (i in all_outlines) {
+			if (all_outlines.selected) { selected.push(i); }
+		} if (selected.length == 0) { 
 			rotation_hide();
 		}
 		brush.call(brusher)
@@ -267,37 +270,40 @@ function selection_setup() {
 		d3.select('#show_edges_rect').transition(400).attr('x',svg_width);
 		d3.select('#edge_text').selectAll('tspan').transition(400).attr('x',svg_width).each('end',callback);
 	}
+}
 	
-	function deselect_all() {
-		any_selected = false;
-		for (i=0; i<all_nodes.length; i++) {
-			if (all_outlines[i].selected) { any_selected = true; }
-			if (all_outlines[i].compared) { any_selected = true; }
-		}
-		if (any_selected) {
-			for (i=0; i<all_nodes.length; i++) { 
-				all_outlines[i].alpha = 0
-				all_outlines[i].selected = false;
-				all_outlines[i].compared = false;
+function deselect_all() {
+	any_selected = false;
+	for (i=0; i<all_nodes.length; i++) {
+		if (all_outlines[i].selected) { any_selected = true; }
+		if (all_outlines[i].compared) { any_selected = true; }
+	}
+	if (any_selected) {
+		rotation_hide();
+		for (i=0; i<all_nodes.length; i++) { 
+			all_outlines[i].alpha = 0
+			all_outlines[i].selected = false;
+			all_outlines[i].compared = false;
+			
 // 				all_nodes[i].scale.set(base_radius);
 // 				all_outlines[i].scale.set(base_radius);
-			}
 		}
-		if (! any_selected) {
-			for (i=0; i<all_nodes.length; i++) { 
-				all_outlines[i].alpha = 1
-				all_outlines[i].tint = '0xffff00';
-				all_outlines[i].selected = true;
+	}
+	if (! any_selected) {
+		for (i=0; i<all_nodes.length; i++) { 
+			all_outlines[i].alpha = 1
+			all_outlines[i].tint = '0xffff00';
+			all_outlines[i].selected = true;
 // 				all_outlines[i].scale.set(large_radius);
 // 				all_nodes[i].scale.set(large_radius);
-			}
 		}
-		count_clusters();
-		update_selected_count();	
+	}
+	count_clusters();
+	update_selected_count();	
 }
 
 
-}
+
 
 
 function loadSelectedCells(project_directory) {

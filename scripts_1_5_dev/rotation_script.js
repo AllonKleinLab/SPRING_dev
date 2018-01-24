@@ -1,7 +1,12 @@
 
 
 function rotation_update() {
-	
+
+	vis = d3.select('#vis')
+	vis.append("circle").attr("id","rotation_outer_circ");
+	vis.append("circle").attr("id","rotation_inner_circ");
+	vis.append("circle").attr("id","rotation_pivot");
+
 	rotation_show();
 	
 	if (d3.selectAll(".selected")[0].length == 0) {
@@ -28,7 +33,6 @@ function rotation_update() {
 		dels.push(Math.sqrt(Math.pow(all_xs[i] - cx,2)+Math.pow(all_ys[i] - cy,2)));
 	}
 	rotator_radius = d3.max(dels);
-	console.log([cx,cy])
 	d3.select("#rotation_pivot")
 		.attr("r",d3.min([13/zoomer.scale(),(rotator_radius+30)/3]))
 		.style("stroke-width",d3.min([3/zoomer.scale(),10]))
@@ -83,8 +87,9 @@ function rotation_update() {
 		d3.selectAll(".selected").each(function(d) {
 			d.beingDragged = true;
 		});
-		node.filter(function(p) { return p.beingDragged; })
-		.each(function(p) { p.fixed |= 2; })
+		
+		node.each(function(p) { p.fixedBefore = p.fixed; });
+		node.each(function(p) { p.fixed |= 2; });
 	}
 	
 	function handle_dragged() {
@@ -112,17 +117,16 @@ function rotation_update() {
 				d.py = cy + ddy;
 			})
 		}
-
 		force.resume();
 	}
 	
 	function handle_dragended() {
 		d3.select("#rotation_outer_circ").style("opacity",0);
 		node.each(function(d) {
-			node.filter(function(d) { return d.beingDragged; })
-			.each(function(d) { d.fixed &= ~6; })
+			d.fixed = d.fixedBefore; 
 			d.beingDragged = false;
 		});
+		if (force_on == 0) { force.stop() }
 	}
 
 }
