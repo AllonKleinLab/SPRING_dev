@@ -144,14 +144,10 @@ var n_nodes = 0;
 var colors_loaded = 0;
 graph_directory = name.slice(1,name.length);
 var tmp = graph_directory.split('/');
-if (tmp.length == 3) {
-    graph_directory = tmp.join('/');
-    sub_directory = "";
-} 
-else {
-    graph_directory = tmp.slice(0,tmp.length-1).join('/');
-    sub_directory = tmp[tmp.length-1];
-}; 
+
+graph_directory = tmp.slice(0,tmp.length-1).join('/');
+sub_directory = tmp[tmp.length-1];
+
 
 d3.select("#force_layout").select("svg").remove()
 d3.select("#color_chooser").selectAll("div").remove()

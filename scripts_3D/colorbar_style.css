@@ -34,8 +34,9 @@ select {
     font: 13px sans-serif;
 }
 
-#ticks {
+#ticks > text {
   font: 10px sans-serif;
+  color: white;
 }
 
 #track,

@@ -550,9 +550,9 @@ function colorBar(project_directory, color_menu_genes) {
 			
 			
 			if (document.getElementById('gradient_button').checked) {
-				d3.select(".ticks").append("text").attr("x",svg_width/3+10).text("Z-score");
+				d3.select("#ticks").append("text").attr("x",svg_width/3+10).text("Z-score");
 			} else {
-				d3.select(".ticks").append("text").attr("x",svg_width/3+10).text("UMIs");
+				d3.select("#ticks").append("text").attr("x",svg_width/3+10).text("UMIs");
 			}
 		
 		}

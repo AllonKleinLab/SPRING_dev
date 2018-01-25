@@ -349,7 +349,7 @@ function colorBar(project_directory, color_menu_genes) {
 
 
 	d3.select("#legend")
-		.style("left",(svg_width-220).toString()+"px")
+		.style("left",(svg_width-224).toString()+"px")
 		.style("height",(svg_height-158).toString()+"px");
 
 	var legendMask = d3.select("svg").append("rect")
@@ -592,6 +592,13 @@ function colorBar(project_directory, color_menu_genes) {
 	// open json file containing gene sets and populate drop down menu
 	d3.json(project_directory+"/categorical_coloring_data.json", function(data) {
 		categorical_coloring_data = data;
+		Object.keys(categorical_coloring_data).forEach(function(k) {
+			var label_counts = {}
+			Object.keys(categorical_coloring_data[k].label_colors).forEach(function(n) { label_counts[n] = 0; });
+			categorical_coloring_data[k].label_list.forEach(function(n) { label_counts[n] += 1; });
+			categorical_coloring_data[k]['label_counts'] = label_counts;
+		});
+		
 		dispatch.load(categorical_coloring_data,"cell_labels");
 		update_slider();
 	});
@@ -1027,16 +1034,15 @@ function make_legend(cat_color_map,cat_label_list) {
 			.attr("class","text_count_div")
 			.style("height","25px")
 			.style("margin-top","0px")
-            .style("margin-left","-1px")
-			.style("width","44px")
+			.style("width","48px")
 			.style("overflow","hidden")
 			.append("p").text("");
 
 	d3.select("#count_column")
 		.on('mouseenter',function() {
 			d3.selectAll('.text_count_div').each(function() {
-				var pct = Math.floor(parseInt(d3.select(this).attr('count')) / all_nodes.length * 1000)/10;
-				d3.select(this).select('p').text(pct+'%');
+				var pct = 
+				d3.select(this).select('p').text(d3.select(this).attr('pct')+'%');
 			});
 		}).on('mouseleave',function() {
 			d3.selectAll('.text_count_div').each(function() {
@@ -1123,6 +1129,7 @@ function count_clusters() {
 	if (name.length > 0) {
 		var cat_color_map = categorical_coloring_data[name]['label_colors'];
 		var cat_label_list = categorical_coloring_data[name]['label_list'];
+		var cat_counts = categorical_coloring_data[name]['label_counts'];
 
 		counts = {}
 		Object.keys(cat_color_map).forEach(function(d) { counts[d]=0; });
@@ -1139,6 +1146,7 @@ function count_clusters() {
 			if (counts[d] > 0) {
 				d3.select(this)
 					.attr('count',counts[d])
+					.attr('pct', Math.floor(counts[d] / cat_counts[d] * 1000)/10)
 					.style('visibility','visible')
 					.select("p").text(counts[d]);
 			}
