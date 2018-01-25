@@ -1,0 +1,20 @@
+.brush .extent {
+  fill-opacity: .1;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.node {
+  stroke: white;
+  stroke-width: 0px;
+}
+
+.node .selected {
+  stroke: yellow;
+  stroke-width: 4px;
+}
+
+.node .compared {
+  stroke: blue;
+  stroke-width: 4px;
+}

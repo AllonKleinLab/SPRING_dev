@@ -1,0 +1,59 @@
+#settings_dropdown {
+	background-color: rgba(0,0,0,.3);
+	position: absolute;
+	width: 200px;
+	z-index: 100;
+	left: 154px;
+	top: 38px; 
+	padding-top: 10px; 
+	overflow: hidden;
+	border: solid 1px rgb(100,100,100);
+	height: 0px;
+	visibility: hidden;
+	
+}
+
+#settings_slider_scroller {
+	height: 450px;
+	overflow: scroll;
+	margin-bottom: -14px;
+}
+
+
+.settings_slider_box {
+	height: 55px;
+	border: 1px solid rgb(110,110,110);
+}
+
+
+input[type=range] {
+    -webkit-appearance: none;
+    background-color: #696969;
+    width: 150px;
+    height:5px;
+    margin-left: 25px;
+    margin-top: 13px;
+}
+
+.settings_slider_box > p {
+    text-align: center;
+    font: 14px sans-serif; 
+    margin-top: 8px;
+    color: white;
+}
+
+#settings_restore_defaults_button {
+	position: absolute;
+	bottom: 10px;
+	left:46.5px;
+}
+
+#settings_slider_scroller::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+#settings_slider_scroller::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}

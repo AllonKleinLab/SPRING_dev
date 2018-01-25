@@ -661,6 +661,7 @@ function save_coords() {
 			text = text + [i.toString(),all_nodes[i].x.toString(),all_nodes[i].y.toString()].join(',') + '\n';
 		}
 		var name = window.location.search;
+		console.log(text);
 		path = name.slice(1,name.length) + "/coordinates.txt";
 		$.ajax({
 		  url: "cgi-bin/save_data.py",
@@ -669,3 +670,5 @@ function save_coords() {
 		});
 	}
 }
+
+
