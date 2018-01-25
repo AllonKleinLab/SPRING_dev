@@ -1067,7 +1067,7 @@ function make_legend(cat_color_map,cat_label_list) {
 			.style("height","25px")
 			.style("margin-top","0px")
 			.style("width","40px")
-			.style("overflow","scroll")
+			.style("overflow","hidden")
 			.style("background-color","rgba(0,0,0,0)")
 			.append("p").text("");
 	
@@ -1077,8 +1077,8 @@ function make_legend(cat_color_map,cat_label_list) {
 			.attr("class","legend_row")
 			.style("height","25px")
 			.style("margin-top","0px")
-			.style("width","152px")
-			.style("overflow","scroll");
+			.style("width","152px");
+			//.style("overflow","scroll");
 
 	d3.select("#label_column").selectAll("div").each(function(d) {
 		d3.select(this).append("div")
