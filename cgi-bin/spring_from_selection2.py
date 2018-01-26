@@ -113,6 +113,11 @@ try:
 except:
 	description = ''
 
+try:
+	animate = data.getvalue('animate')
+except:
+	animate = 'No'
+
 
 if not do_the_rest:
 	#os.rmdir(new_dir)
@@ -146,6 +151,7 @@ else:
 		params_dict['this_url'] = this_url
 		params_dict['description'] = description
 		params_dict['user_email'] = user_email
+		params_dict['animate'] = animate
 		
 		params_filename = new_dir + "/params.pickle"
 		params_file = open(params_filename, 'wb')

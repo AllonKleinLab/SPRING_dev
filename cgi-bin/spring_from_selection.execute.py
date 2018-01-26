@@ -8,7 +8,7 @@ import json
 import time
 from wolkit import *
 import networkx as nx
-from fa2 import ForceAtlas2
+from fa2_anim import ForceAtlas2
 import pickle
 import datetime
 
@@ -106,6 +106,7 @@ num_fa2_iter = params_dict['num_fa2_iter']
 user_email = params_dict['user_email']
 this_url = params_dict['this_url']
 description = params_dict['description']
+animate = params_dict['animate']
 
 logf = new_dir + '/lognewspring2.txt'
 timef = new_dir + '/lognewspringtime.txt'
@@ -255,7 +256,13 @@ forceatlas2 = ForceAtlas2(
                           # Log
                           verbose=False)
 
-positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter)
+if animate=='Yes': 
+	f = open(new_dir+'/animation.txt','w')
+	f = open(new_dir+'/animation.txt','a')
+else: 
+	f = None
+
+positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter, writefile=f)
 positions = np.array([positions[i] for i in sorted(positions.keys())])
 positions = positions / 5.0
 positions = positions - np.min(positions, axis = 0) - np.ptp(positions, axis = 0) / 2.0

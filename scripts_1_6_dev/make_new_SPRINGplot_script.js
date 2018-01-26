@@ -41,9 +41,9 @@ function make_new_SPRINGplot_setup() {
 				o.style('height','1px');
  				o.style('height',(o[0][0].scrollHeight).toString()+"px");
  				if ( d3.select('#make_new_SPRINGplot_message_div').style('visibility')=='hidden') {	
- 					popup.style('height',($('#newSPRING_description_box').height() + 492.223).toString()+'px');	
+ 					popup.style('height',($('#newSPRING_description_box').height() + 532.223).toString()+'px');	
  				} else {
- 					popup.style('height',($('#newSPRING_description_box').height() + 650).toString()+'px');	
+ 					popup.style('height',($('#newSPRING_description_box').height() + 680).toString()+'px');	
  				}			
  			}, 0);
  		});
@@ -93,6 +93,15 @@ function make_new_SPRINGplot_setup() {
 		.append('input').attr('type','text')
 		.attr('id','input_nIter')
 		.attr('value','500')
+		
+	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
+		.append('label').text('Save force layout animation')
+		.append('button').text('No')
+		.attr('id','input_animation')
+		.on('click', function() {
+			if (d3.select(this).text()=='Yes') { d3.select(this).text('No'); }
+			else { d3.select(this).text('Yes'); }
+		});
 
 	popup.append('div')
 		.attr('id','make_new_SPRINGplot_submission_div')
@@ -153,7 +162,7 @@ function show_make_new_SPRINGplot_popup() {
 	d3.select("#make_new_SPRINGplot_popup")
 		.style("left",(svg_width/2-mywidth/2).toString()+"px")
 		.style("top","10px").style('padding-bottom','0px')
-		.style('visibility','visible').style('height','520px');
+		.style('visibility','visible').style('height','560px');
 
 }
 
@@ -182,13 +191,14 @@ function submit_new_SPRINGplot() {
 	var kneigh = $("#input_kneigh").val();
 	var numPC = $("#input_numPC").val();
 	var nIter = $("#input_nIter").val();
+	var animate = d3.select('#input_animation').text();
     var this_url = window.location.href;
 
 	var output_message = "Checking input..."
 
 	d3.select('#make_new_SPRINGplot_popup')
 		.transition().duration(200)
-		.style('height',($('#newSPRING_description_box').height() + 650).toString()+'px');
+		.style('height',($('#newSPRING_description_box').height() + 680).toString()+'px');
 
 	d3.select('#make_new_SPRINGplot_message_div')
 		.transition().duration(200)
@@ -203,7 +213,7 @@ function submit_new_SPRINGplot() {
   $.ajax({
 		url: "cgi-bin/spring_from_selection2.py",
     type: "POST",
-    data: {base_dir:graph_directory, current_dir:sub_directory, new_dir:new_dir, selected_cells:sel2text, minCells:minCells, minCounts:minCounts, varPctl:varPctl, kneigh:kneigh, numPC:numPC, nIter:nIter, this_url:this_url, description:description, email:email},
+    data: {base_dir:graph_directory, current_dir:sub_directory, new_dir:new_dir, selected_cells:sel2text, minCells:minCells, minCounts:minCounts, varPctl:varPctl, kneigh:kneigh, numPC:numPC, nIter:nIter, this_url:this_url, description:description, email:email, animate:animate},
 		success: function(output_message) {
 			var orig_message = output_message;
 			d3.select('#make_new_SPRINGplot_message_div')

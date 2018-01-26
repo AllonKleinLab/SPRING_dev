@@ -120,6 +120,11 @@ d3.select("#sound_toggle").append('img')
 
 
 function callback() {
+
+	sprites.visible = false;
+	edge_container.visible = false;
+	console.log('HEY!!!');
+	animation();
 	
 	settings_setup();
 	selection_setup();
@@ -132,7 +137,7 @@ function callback() {
 	initiateButtons();
 	make_new_SPRINGplot_setup();
 	clone_viewer_setup();
-	center_view();
+
 	
 
 	window.onclick = function(event) {

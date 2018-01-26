@@ -6,7 +6,7 @@ function colorBar(project_directory, color_menu_genes) {
 	var color_profiles = {};
 	var color_option = "gradient"
 	var color_max = 1;
-	var color_stats = null;
+	color_stats = null;
 	var menuBar = d3.select("#color_chooser");
     var enrich_script = 'get_gene_zscores.from_npz.dev.py';
 
@@ -21,7 +21,6 @@ function colorBar(project_directory, color_menu_genes) {
 		.attr("id","channels_button")
 		.style("margin-left", "2px")
 		.attr("type","radio")
-		.attr("checked",true)
 		.on("click", function() {
 			document.getElementById("gradient_button").checked = false;
 			document.getElementById("labels_button").checked = false;
@@ -48,6 +47,7 @@ function colorBar(project_directory, color_menu_genes) {
 		.style("margin-left", "2px")
 		.attr("id","labels_button")
 		.attr("type","radio")
+		.attr("checked",true)
 		.on("click", function() {
 			document.getElementById("channels_button").checked = false;
 			document.getElementById("gradient_button").checked = false;

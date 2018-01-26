@@ -7,7 +7,7 @@
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
 	overflow: scroll;
-	height: 520px;
+	height: 560px;
 }
 
 #make_new_SPRINGplot_button_bar > * {
@@ -68,6 +68,23 @@
 	resize: none;
 }
 
+.make_new_SPRINGplot_input_div > label > textarea, .make_new_SPRINGplot_input_div > label > button {
+	margin-left: 20px;
+	height: 24px;
+	font-size: 14px;
+	color: white;
+	background-color: rgba(0,0,0,.7);
+	border: solid 0px;
+	padding-left: 13px;
+	text-align: left;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	width: 82px;
+	vertical-align: top;
+	resize: none;
+}
+
+
 
 #make_new_SPRINGplot_optional_params {
 	float: left;
@@ -119,6 +136,8 @@
 	font-size: 14px;
     overflow: auto;
 }
+
+
 
 #make_new_SPRINGplot_message_div a:link { color: #00ff00; }
 #make_new_SPRINGplot_message_div a:visited { color: #00ff00; }

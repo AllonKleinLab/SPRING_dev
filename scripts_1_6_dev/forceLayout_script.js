@@ -182,9 +182,10 @@ function forceLayout(project_directory, sub_directory, callback) {
 			.on("drag", dragged)
 			.on("dragend", dragended));
 		
+		
 		loadColors();	
 		load_edges();
-		
+		center_view_instant();
 		d3.select("#force_svg").append('g').attr('id','vis')
 			
         
@@ -286,15 +287,82 @@ function forceLayout(project_directory, sub_directory, callback) {
 			all_nodes[i].beingDragged = false;
 		}
 	}
-
 }
+
+
+function animation() {
+	console.log('ANIM');
+	// check if animation exists. if so, hide sprites and load it
+	
+	$.get(graph_directory + '/' + sub_directory+'/animation.txt')
+		.done(function(data) { 
+			animation_frames = [];
+			data.split('\n').forEach(function(line) {
+				if (line.length>0) {
+					var aframe = [];
+					var xx = line.split(';')[0].split(',');
+					var yy = line.split(';')[1].split(',');
+					for (i in xx) { aframe.push([xx[i],yy[i]]); }
+					animation_frames.push(aframe);					
+				}
+			});
+			
+			sprites.visible = true;
+			var current_frame = -1;
+			
+			coordinates = animation_frames[animation_frames.length-1];
+			for (i=0; i<all_nodes.length; i++) {
+				all_nodes[i].x = coordinates[i][0];
+				all_nodes[i].y = coordinates[i][1];
+			}
+			center_view_instant();
+			
+			function next_frame() {
+				current_frame += 1;
+				coordinates = animation_frames[current_frame];
+				
+				for (i=0; i<all_nodes.length; i++) {
+					all_nodes[i].x = coordinates[i][0];
+					all_nodes[i].y = coordinates[i][1];
+					all_outlines[i].x = coordinates[i][0];
+					all_outlines[i].y =  coordinates[i][1];
+				}
+				/*
+				for (i=0; i<all_edges.length; i++) {
+					all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
+					all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
+					all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
+					all_edges[i].y2 = all_nodes[all_edge_ends[i].target].y;
+					all_edges[i].updatePosition();
+				}
+				*/
+				if (current_frame+1 < animation_frames.length) {
+					setTimeout(next_frame,1);
+				} else {
+					edge_container.visible = true;
+				}
+				
+			}
+			next_frame();
+				
+		}).fail(function() { 
+			sprites.visible = true;
+			edge_container.visible = true;
+			center_view();
+
+		})
+}
+
 
 function UrlExists(url) {
-	var http = new XMLHttpRequest();
-	http.open('HEAD', url, false);
-	http.send();
-	return http.status!=404;
+	$.get(url)
+		.done(function() { 
+			console.log('yes');
+		}).fail(function() { 
+			console.log('no');
+		})
 }
+
 
 function toggleForce() {
 	if (force_on == 1) {
@@ -585,9 +653,7 @@ function redraw() {
 	}
 }
 
-
-function center_view() {
-
+function get_center_view_transform() {
 
 	var all_xs = [];
 	var all_ys = [];
@@ -613,13 +679,37 @@ function center_view() {
 		dy = maxy - miny + 50,
 		x = (maxx + minx) / 2,
 		y = (maxy + miny) / 2;
-	var scale = .85 / Math.max(dx / width, dy / height);
 
-	// perform transition in 750 ms with 25ms steps
-	var N_STEPS = 5;
-	var delta_x = (width/2-(maxx+minx)/2 * scale - sprites.position.x) / N_STEPS;
-	var delta_y = (height/2+30-(maxy+miny)/2 * scale - sprites.position.y) / N_STEPS;
-	var delta_scale = (scale - sprites.scale.x) / N_STEPS;
+	var scale = .85 / Math.max(dx / width, dy / height);
+	var new_x = width/2-(maxx+minx)/2 * scale;
+	var new_y = height/2+30-(maxy+miny)/2 * scale;
+	return {'scale':scale, 'new_x':new_x, 'new_y' :new_y};
+
+}
+
+function center_view_instant() {
+	var c = get_center_view_transform();
+	sprites.position.x = c.new_x;
+	sprites.position.y = c.new_y;
+	sprites.scale.x = c.scale;
+	sprites.scale.y = c.scale;
+	edge_container.position = sprites.position;
+	edge_container.scale = sprites.scale;
+	if (typeof clone_edge_container !== 'undefined') { clone_edge_container.position = sprites.position; }
+	if (typeof clone_edge_container !== 'undefined') { clone_edge_container.scale = sprites.scale; }
+	if (typeof clone_sprites !== 'undefined') { clone_sprites.position = sprites.position; }
+	if (typeof clone_sprites !== 'undefined') { clone_sprites.scale = sprites.scale; }
+	zoomer.scale(sprites.scale.x);
+}
+
+
+function center_view() {
+	
+	var c = get_center_view_transform();
+	var N_STEPS = 10;
+	var delta_x = (c.new_x - sprites.position.x) / N_STEPS;
+	var delta_y = (c.new_y - sprites.position.y) / N_STEPS;
+	var delta_scale = (c.scale - sprites.scale.x) / N_STEPS;
 
 	var step = 0;
 	(function move() {
