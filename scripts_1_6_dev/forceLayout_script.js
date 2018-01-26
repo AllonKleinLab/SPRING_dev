@@ -418,58 +418,46 @@ function initiateButtons() {
 			});
 		}
 	});
-
+	
+	d3.select('#download_png')
+		.on('click',download_png)
+		.on('mouseenter',function() {
+			d3.select('#container').append('div')
+				.attr('id','screenshot_tooltip')
+				.style('position','absolute')
+				.style('padding-top','8px')
+				.style('padding-bottom','8px')
+				.style('padding-left','10px')
+				.style('padding-right','10px')
+				.style('width','150px')
+				.style('left',(parseInt(d3.select('#download_dropdown').style('left').split('px')[0])-8).toString()+'px')
+				.style('top',d3.select('#download_dropdown').style('height'))
+				.style('background-color','rgba(0,0,0,.4)')
+				.append('p').text('Zoom in on plot for higher resolution download')
+				.style('margin','0px').style('color','white')
+				.style('font-family','sans-serif').style('font-size','13px');
+		})
+		.on('mouseleave',function() {
+			d3.select('#screenshot_tooltip').remove();
+		});
 }
 
 
-function downloadSVG() {
-
-	hideAccessories();
-	var svg = d3.select("svg")[0][0];
-
-	//get svg source.
-	var serializer = new XMLSerializer();
-	var source = serializer.serializeToString(svg);
-	//add name spaces.
-	if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
-		source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-	}
-	if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
-		source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-	}
-	//add xml declaration
-	//source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-	downloadFile(source,"screenshot.svg")
-	showAccessories();
+function download_png() {
+	var path = window.location.search.split('/');
+	path = path[path.length-2] + '_' + path[path.length-1] + '.png';
+	download_sprite_as_png(app.renderer, app.stage, path) 
 }
 
-function downloadPNG() {
-	if (d3.select("#sound_toggle").select("img").attr("src") == "scripts_1_6_dev/sound_effects/icon_speaker.svg") {
-		var snd = new Audio("scripts_1_6_dev/sound_effects/download_sound.wav"); snd.play(); }
-	hideAccessories();
-	var svgElement = d3.select('svg')[0][0];
-	var simg = new Simg(svgElement);
-	simg.download('screenshot');
-	showAccessories();
-}
-
-function downloadPDF() {
-	//Get svg markup as string
-
-	var svg = d3.select("svg")[0][0].innerHTML;
-	//svg = svg.replace(/\r?\n|\r/g, '').trim();
-
-	var canvas = d3.select('canvas')[0][0];
-	var context = canvas.getContext('2d');
-	context.clearRect(0, 0, canvas.width, canvas.height);
-	canvg(canvas, svg);
-
-	var imgData = canvas.toDataURL('image/png');
-
-	// Generate PDF
-	var doc = new jsPDF('p', 'pt', 'a4');
-	doc.addImage(imgData, 'PNG', 40, 40, 75, 75);
-	doc.save('test.pdf');
+function download_sprite_as_png(renderer, sprite, fileName) {
+	renderer.extract.canvas(sprite).toBlob(function(b){
+		var a = document.createElement('a');
+		document.body.append(a);
+		a.download = fileName;
+		a.href = URL.createObjectURL(b);
+		a.click();
+		a.remove();
+	}, 'image/png');
 }
 
 function showGotoDropdown() {
