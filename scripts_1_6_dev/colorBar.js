@@ -873,26 +873,28 @@ function colorBar(project_directory, color_menu_genes) {
 
 
 	function getRankedText(tracks, version) {
-		console.log('running this');
-		var selected_nodes  = d3.selectAll(".selected");
-		var compared_nodes  = d3.selectAll(".compared");
+		var selected_nodes  = [];
+		var compared_nodes  = [];
+		for (i in all_outlines) {
+			if (all_outlines[i].selected) { selected_nodes.push(i); }
+			if (all_outlines[i].compared) { compared_nodes.push(i); }
+		}
 		scoremap = d3.map();
 		var scoretotal = 0;
 	    var selected_score; var compared_score;
         if (version == 0) {
 	    	for (var term in tracks) {
-	    		if (selected_nodes[0].length > 0 || compared_nodes[0].length > 0) {
+	    		if (selected_nodes.length > 0 || compared_nodes.length > 0) {
                     dat = tracks[term];
 	    		}
-
-	    		if (selected_nodes[0].length == 0) { selected_score = 0; }
+	    		if (selected_nodes.length == 0) { selected_score = 0; }
 	    		else {
-	    			selected_score = getTermScore(dat, selected_nodes) / selected_nodes[0].length;
+	    			selected_score = getTermScore(dat, selected_nodes) / selected_nodes.length;
 	    			selected_score = (selected_score - color_stats[term][0]) / (color_stats[term][1] + .02)
 	    		}
-	    		if (compared_nodes[0].length == 0) { compared_score = 0; }
+	    		if (compared_nodes.length == 0) { compared_score = 0; }
 	    		else {
-	    			compared_score = getTermScore(dat, compared_nodes) / compared_nodes[0].length;
+	    			compared_score = getTermScore(dat, compared_nodes) / compared_nodes.length;
 	    			compared_score = (compared_score - color_stats[term][0]) / (color_stats[term][1] + .02)
 	    		}
 	    		scoremap[term] = (selected_score - compared_score)
@@ -958,8 +960,8 @@ function colorBar(project_directory, color_menu_genes) {
 
 	function getTermScore(a, nodes) {
 		var score = 0
-		nodes.each(function(d) {
-			score = score + (a[d.number]+.01);
+		nodes.forEach(function(i) {
+			score = score + (a[i]+.01);
 		});
 		return score;
 	}
