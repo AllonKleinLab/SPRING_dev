@@ -302,7 +302,7 @@ function animation() {
 					var aframe = [];
 					var xx = line.split(';')[0].split(',');
 					var yy = line.split(';')[1].split(',');
-					for (i in xx) { aframe.push([xx[i],yy[i]]); }
+					for (i in xx) { aframe.push([parseFloat(xx[i]),parseFloat(yy[i])]); }
 					animation_frames.push(aframe);					
 				}
 			});
@@ -315,7 +315,7 @@ function animation() {
 				all_nodes[i].x = coordinates[i][0];
 				all_nodes[i].y = coordinates[i][1];
 			}
-			center_view_instant();
+			
 			
 			function next_frame() {
 				current_frame += 1;
@@ -327,15 +327,15 @@ function animation() {
 					all_outlines[i].x = coordinates[i][0];
 					all_outlines[i].y =  coordinates[i][1];
 				}
-				/*
-				for (i=0; i<all_edges.length; i++) {
-					all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
-					all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
-					all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
-					all_edges[i].y2 = all_nodes[all_edge_ends[i].target].y;
-					all_edges[i].updatePosition();
-				}
-				*/
+				
+// 				for (i=0; i<all_edges.length; i++) {
+// 					all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
+// 					all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
+// 					all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
+// 					all_edges[i].y2 = all_nodes[all_edge_ends[i].target].y;
+// 					all_edges[i].updatePosition();
+// 				}
+				
 				if (current_frame+1 < animation_frames.length) {
 					setTimeout(next_frame,1);
 				} else {
@@ -344,6 +344,7 @@ function animation() {
 				
 			}
 			next_frame();
+			
 				
 		}).fail(function() { 
 			sprites.visible = true;
