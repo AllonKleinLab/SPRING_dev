@@ -42,7 +42,7 @@ def update_log(fname, logdat, overwrite=False):
 	o.write(logdat + '\n')
 	o.close()
 
-def send_confirmation_email(email, name, info_dict, start_dataset):
+def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 
     import smtplib
     from email.MIMEMultipart import MIMEMultipart
@@ -64,7 +64,7 @@ def send_confirmation_email(email, name, info_dict, start_dataset):
     body += 'Number of nearest neighbors: ' + str(info_dict['Num_Neighbors']) + '\n'
     body += 'Number of force layout iterations: ' + str(info_dict['Num_Force_Iter']) + '\n\n'
     body += 'Used %i cells and %i genes to build the SPRING plot.\n\n' %(info_dict['Nodes'], info_dict['Filtered_Genes'])
-    body += 'You can view the results at\nhttps://kleintools.hms.harvard.edu/tools/springViewer_1_6_dev.html?cgi-bin/client_datasets/'+name
+    body += 'You can view the results at\n' + new_url + '\n'
     msg.attach(MIMEText(body, 'plain'))
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -323,5 +323,6 @@ t11 = time.time()
 url_pref = this_url.split('?')[0]
 update_log_html(logf, 'Run complete! Done in %i seconds.<br>' %(t11-t00) + '<a target="_blank" href="%s?%s"> Click here to view.</a>' %(url_pref,new_dir.strip('/')))
 if user_email != '':
-	send_confirmation_email(user_email, base_name + '/' + new_name, info_dict, start_dataset)
+    new_url_full = url_pref + '?' + new_dir.strip('/')
+    send_confirmation_email(user_email, base_name + '/' + new_name, info_dict, start_dataset, new_url_full)
 ################
