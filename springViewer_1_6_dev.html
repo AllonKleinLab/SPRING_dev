@@ -22,7 +22,7 @@
 			<button>(De)select All</button>
 		</div>
 		<div id="layout_tools">
-			<button id="layout_dropdown_button">Layout tools:</button> 
+			<button id="layout_dropdown_button">Layout tools:</button>
 			<div id="layout_dropdown" class="dropdown-content">
 				<a href="javascript:save_coords()">Save coordinates</a>
 				<a id="center_view">Center view</a>
@@ -31,11 +31,11 @@
 			</div>
 		</div>
 
-		
+
 		<div id="settings">
 			<button>Settings:</button>
 		</div>
-	
+
 		<div class="dropdown">
 		  <button id="download_dropdown_button">Download:</button>
 		  <div id="download_dropdown" class="dropdown-content">
@@ -125,7 +125,7 @@ function callback() {
 	edge_container.visible = false;
 	console.log('HEY!!!');
 	animation();
-	
+
 	settings_setup();
 	selection_setup();
 	setup_layout_dropdown();
@@ -138,7 +138,7 @@ function callback() {
 	make_new_SPRINGplot_setup();
 	clone_viewer_setup();
 
-	
+
 
 	window.onclick = function(event) {
 		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }
@@ -150,12 +150,18 @@ function callback() {
 
 var name = window.location.search;
 var my_origin = window.location.origin;
+var my_pathname = window.location.pathname;
+var path_split = my_pathname.split("/")
+var path_start = path_split.slice(0, path_split.length-1).join("/")
+path_split[path_split.length-1] = "springViewer_1_5_dev.html"
+var dynamic_path = path_split.join("/")
+
 //d3.select("#changeViewer_link").attr("href", "https://kleintools.hms.harvard.edu/tools/springViewer_1_5_dev.html" + name);
-d3.select("#changeViewer_link").attr("href", my_origin + "/springViewer_1_5_dev.html" + name);
+d3.select("#changeViewer_link").attr("href", my_origin + dynamic_path + name);
 //d3.select("#all_SPRINGplots_menu").attr("href", "https://kleintools.hms.harvard.edu/tools/currentDatasetsList.html?" + name.split('/')[2]);
 base_dir_name = name.slice(1,name.length).split('/');
 base_dir_name = base_dir_name.slice(0,base_dir_name.length-1).join('/');
-d3.select("#all_SPRINGplots_menu").attr("href", my_origin + "/currentDatasetsList.html?"+base_dir_name);
+d3.select("#all_SPRINGplots_menu").attr("href", my_origin + path_start + "/currentDatasetsList.html?"+base_dir_name);
 
 var force_on = 1;
 var n_nodes = 0;
