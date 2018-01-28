@@ -156,9 +156,7 @@ var path_start = path_split.slice(0, path_split.length-1).join("/")
 path_split[path_split.length-1] = "springViewer_1_5_dev.html"
 var dynamic_path = path_split.join("/")
 
-//d3.select("#changeViewer_link").attr("href", "https://kleintools.hms.harvard.edu/tools/springViewer_1_5_dev.html" + name);
 d3.select("#changeViewer_link").attr("href", my_origin + dynamic_path + name);
-//d3.select("#all_SPRINGplots_menu").attr("href", "https://kleintools.hms.harvard.edu/tools/currentDatasetsList.html?" + name.split('/')[2]);
 base_dir_name = name.slice(1,name.length).split('/');
 base_dir_name = base_dir_name.slice(0,base_dir_name.length-1).join('/');
 d3.select("#all_SPRINGplots_menu").attr("href", my_origin + path_start + "/currentDatasetsList.html?"+base_dir_name);
