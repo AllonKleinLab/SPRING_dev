@@ -19,7 +19,7 @@ function add_list_item(project_directory,sub_directory,order) {
 			.style('width','480px');
 
 		if ('Description' in data) {
-			if (data['Description'].length > 0) {
+			if (data['Description'] != null) {
 				info_box.append('tspan').append('text')
 				.text(data['Description'])
 				.style('color','rgb(140,140,140)');
@@ -27,7 +27,9 @@ function add_list_item(project_directory,sub_directory,order) {
 		}
 		var date_email = ''
 		if ('Email' in data) {
-			date_email += data['Email']+' - ';
+			if (data['Email'].length > 0) {
+				date_email += data['Email']+' - ';
+			}
 		}
 		date_email += data['Date'];
 
