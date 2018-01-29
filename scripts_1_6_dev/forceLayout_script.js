@@ -185,7 +185,7 @@ function forceLayout(project_directory, sub_directory, callback) {
 		
 		loadColors();	
 		load_edges();
-		center_view_instant();
+		center_view();
 		d3.select("#force_svg").append('g').attr('id','vis')
 			
         
@@ -705,7 +705,6 @@ function center_view_instant() {
 
 
 function center_view() {
-	
 	var c = get_center_view_transform();
 	var N_STEPS = 10;
 	var delta_x = (c.new_x - sprites.position.x) / N_STEPS;
@@ -728,7 +727,7 @@ function center_view() {
 			
 			zoomer.scale(sprites.scale.x);
 			step += 1;
-			setTimeout(move,10);
+			setTimeout(move,2);
 		}
 	})();
 }

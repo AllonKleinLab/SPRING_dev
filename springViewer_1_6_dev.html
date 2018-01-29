@@ -121,11 +121,11 @@ d3.select("#sound_toggle").append('img')
 
 function callback() {
 
-	sprites.visible = false;
-	edge_container.visible = false;
-	console.log('HEY!!!');
-	animation();
-	
+// 	sprites.visible = false;
+// 	edge_container.visible = false;
+// 	console.log('HEY!!!');
+// 	animation();
+	center_view();
 	settings_setup();
 	selection_setup();
 	setup_layout_dropdown();
@@ -165,6 +165,8 @@ var tmp = graph_directory.split('/');
 graph_directory = tmp.slice(0,tmp.length-1).join('/');
 sub_directory = tmp[tmp.length-1];
 
+clone_sprites = {};
+clone_edge_container = {};
 
 d3.select("#force_layout").select("svg").remove()
 d3.select("#color_chooser").selectAll("div").remove()
