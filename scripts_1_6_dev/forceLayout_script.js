@@ -185,7 +185,6 @@ function forceLayout(project_directory, sub_directory, callback) {
 		
 		loadColors();	
 		load_edges();
-		center_view();
 		d3.select("#force_svg").append('g').attr('id','vis')
 			
         
@@ -248,6 +247,14 @@ function forceLayout(project_directory, sub_directory, callback) {
 					being_dragged = true;
 					for (i=0; i<all_nodes.length; i++) {
 						if (all_outlines[i].selected) {
+							all_nodes[i].beingDragged = true;
+						}
+					}
+				}
+				if (all_outlines[clicked_node].compared) {
+					being_dragged = true;
+					for (i=0; i<all_nodes.length; i++) {
+						if (all_outlines[i].compared) {
 							all_nodes[i].beingDragged = true;
 						}
 					}
@@ -349,7 +356,7 @@ function animation() {
 		}).fail(function() { 
 			sprites.visible = true;
 			edge_container.visible = true;
-			center_view();
+			//center_view();
 
 		})
 }
@@ -671,7 +678,10 @@ function redraw() {
 	}
 }
 
-function get_center_view_transform() {
+
+
+function center_view() {
+
 
 	var all_xs = [];
 	var all_ys = [];
@@ -697,36 +707,13 @@ function get_center_view_transform() {
 		dy = maxy - miny + 50,
 		x = (maxx + minx) / 2,
 		y = (maxy + miny) / 2;
-
 	var scale = .85 / Math.max(dx / width, dy / height);
-	var new_x = width/2-(maxx+minx)/2 * scale;
-	var new_y = height/2+30-(maxy+miny)/2 * scale;
-	return {'scale':scale, 'new_x':new_x, 'new_y' :new_y};
 
-}
-
-function center_view_instant() {
-	var c = get_center_view_transform();
-	sprites.position.x = c.new_x;
-	sprites.position.y = c.new_y;
-	sprites.scale.x = c.scale;
-	sprites.scale.y = c.scale;
-	edge_container.position = sprites.position;
-	edge_container.scale = sprites.scale;
-	if (typeof clone_edge_container !== 'undefined') { clone_edge_container.position = sprites.position; }
-	if (typeof clone_edge_container !== 'undefined') { clone_edge_container.scale = sprites.scale; }
-	if (typeof clone_sprites !== 'undefined') { clone_sprites.position = sprites.position; }
-	if (typeof clone_sprites !== 'undefined') { clone_sprites.scale = sprites.scale; }
-	zoomer.scale(sprites.scale.x);
-}
-
-
-function center_view() {
-	var c = get_center_view_transform();
-	var N_STEPS = 10;
-	var delta_x = (c.new_x - sprites.position.x) / N_STEPS;
-	var delta_y = (c.new_y - sprites.position.y) / N_STEPS;
-	var delta_scale = (c.scale - sprites.scale.x) / N_STEPS;
+	// perform transition in 750 ms with 25ms steps
+	var N_STEPS = 5;
+	var delta_x = (width/2-(maxx+minx)/2 * scale - sprites.position.x) / N_STEPS;
+	var delta_y = (height/2+30-(maxy+miny)/2 * scale - sprites.position.y) / N_STEPS;
+	var delta_scale = (scale - sprites.scale.x) / N_STEPS;
 
 	var step = 0;
 	(function move() {
@@ -744,10 +731,11 @@ function center_view() {
 			
 			zoomer.scale(sprites.scale.x);
 			step += 1;
-			setTimeout(move,2);
+			setTimeout(move,10);
 		}
 	})();
 }
+
 
 function save_coords() {
 	if (mutable.slice(0,5) != 'false') {
@@ -756,7 +744,6 @@ function save_coords() {
 			text = text + [i.toString(),all_nodes[i].x.toString(),all_nodes[i].y.toString()].join(',') + '\n';
 		}
 		var name = window.location.search;
-		console.log(text);
 		path = name.slice(1,name.length) + "/coordinates.txt";
 		$.ajax({
 		  url: "cgi-bin/save_data.py",

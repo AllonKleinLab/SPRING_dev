@@ -56,7 +56,7 @@ function make_new_SPRINGplot_setup() {
 		.style('width','320px').style('margin-top','25px')
 		
 	batch_correction_blurb.append('text').text('Use cell projection to avoid batch effects. ').style('color','rgb(220,220,220)');
-	batch_correction_blurb.append('text').text('Negatively selected ').style('color','blue').style('font-weight','900');
+	batch_correction_blurb.append('text').text('Negatively selected ').style('color','rgb(80,80,255)').style('font-weight','900');
 	batch_correction_blurb.append('text').text('cells will be projected onto ').style('color','rgb(220,220,220)');
 	batch_correction_blurb.append('text').text('positively selected ').style('color','yellow').style('font-weight','900');
 	batch_correction_blurb.append('text').text('cells.').style('color','white');
@@ -187,13 +187,18 @@ function submit_new_SPRINGplot() {
 	//
 	// Do cgi stuff to check for valid input
 	// When finished...
-  var sel2text = "";
-  for (i=0; i<all_outlines.length; i++) {
-    if (all_outlines[i].selected) {
+	var sel2text = "";
+	var com2text = "";
+	for (i=0; i<all_outlines.length; i++) {
+		if (all_outlines[i].selected) {
 			sel2text = sel2text + "," + i.toString();
-    }
-  }
-  sel2text = sel2text.slice(1, sel2text.length);
+		}
+		if (all_outlines[i].compared) {
+			com2text = com2text + "," + i.toString();
+		}
+	}
+	sel2text = sel2text.slice(1, sel2text.length);
+	com2text = com2text.slice(1, com2text.length);
 	var new_dir = $("#input_new_dir").val();
 	var email = $("#input_email").val();
 	var description = $("#input_description").val();
@@ -204,7 +209,7 @@ function submit_new_SPRINGplot() {
 	var numPC = $("#input_numPC").val();
 	var nIter = $("#input_nIter").val();
 	var animate = d3.select('#input_animation').text();
-    var this_url = window.location.href;
+	var this_url = window.location.href;
     
 	var output_message = "Checking input..."
 
@@ -227,7 +232,22 @@ function submit_new_SPRINGplot() {
   $.ajax({
 		url: "cgi-bin/spring_from_selection2.py",
     type: "POST",
-    data: {base_dir:graph_directory, current_dir:sub_directory, new_dir:new_dir, selected_cells:sel2text, minCells:minCells, minCounts:minCounts, varPctl:varPctl, kneigh:kneigh, numPC:numPC, nIter:nIter, this_url:this_url, description:description, email:email, animate:animate},
+    data: {
+			base_dir:graph_directory, 
+			current_dir:sub_directory, 
+			new_dir:new_dir, 
+			selected_cells:sel2text, 
+			compared_cells:com2text, 
+			minCells:minCells, 
+			minCounts:minCounts, 
+			varPctl:varPctl, 
+			kneigh:kneigh, 
+			numPC:numPC, 
+			nIter:nIter, 
+			this_url:this_url, 
+			description:description, 
+			email:email, animate:animate
+	   	},
 		success: function(output_message) {
 			var orig_message = output_message;
 			d3.select('#make_new_SPRINGplot_message_div')

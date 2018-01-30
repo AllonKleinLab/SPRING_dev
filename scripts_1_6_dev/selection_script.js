@@ -171,13 +171,6 @@ function selection_setup() {
 		} if (selected.length == 0) { 
 			rotation_hide();
 		}
-		brush.call(brusher)
-		.on("mousedown.brush", null)
-		.on("touchstart.brush", null)																	  
-		.on("touchmove.brush", null)																	   
-		.on("touchend.brush", null);																	   
-		brush.select('.background').style('cursor', 'auto')
-
 
 	});
 	

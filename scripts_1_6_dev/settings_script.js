@@ -101,6 +101,7 @@ function settings_setup() {
 
 	function edge_opacity_change(val) { 
 		edge_container.alpha = val / 100;
+		
 	}
 
 	function rgb_string(val) { return "rgb("+val.toString()+","+val.toString()+","+val.toString()+")"; }
@@ -143,7 +144,7 @@ function settings_setup() {
 		//edge_thickness_change(120);
 		
 		document.getElementById("settings_range_edge_opacity").value = 50;
-		edge_opacity_change(100);
+		edge_opacity_change(50);
 		
 		
 	}

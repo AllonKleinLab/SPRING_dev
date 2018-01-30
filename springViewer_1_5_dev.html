@@ -149,6 +149,7 @@ var tmp = graph_directory.split('/');
 graph_directory = tmp.slice(0,tmp.length-1).join('/');
 sub_directory = tmp[tmp.length-1];
 
+document.title = 'SPRING: ' + tmp[tmp.length-2]+'/'+tmp[tmp.length-1];
 
 d3.select("#force_layout").select("svg").remove()
 d3.select("#color_chooser").selectAll("div").remove()

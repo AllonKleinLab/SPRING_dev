@@ -92,6 +92,7 @@ def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 params_dict = pickle.load(open(sys.argv[1], 'rb'))
 
 extra_filter = params_dict['extra_filter']
+base_ix = params_dict['base_ix']
 base_dir = params_dict['base_dir']
 current_dir = params_dict['current_dir']
 new_dir = params_dict['new_dir']
@@ -190,7 +191,7 @@ update_log(timef, 'Saved cell labels -- %.2f' %(t1-t0))
 # Gene filtering
 t0 = time.time()
 update_log_html(logf, 'Filtering genes...')
-gene_filter = filter_genes(E, min_counts, min_cells, min_vscore_pctl)
+gene_filter = filter_genes(E[base_ix,:], min_counts, min_cells, min_vscore_pctl)
 t1 = time.time()
 update_log(timef, 'Using %i genes -- %.2f' %(len(gene_filter), t1-t0))
 
@@ -198,7 +199,7 @@ update_log(timef, 'Using %i genes -- %.2f' %(len(gene_filter), t1-t0))
 # PCA
 t0 = time.time()
 update_log_html(logf, 'Running PCA...')
-Epca = get_PCA_sparseInput(E[:,gene_filter], numpc=num_pc, method='')
+Epca = get_PCA_sparseInput(E[:,gene_filter], numpc=num_pc, method='', base_ix=base_ix)
 t1 = time.time()
 update_log(timef, 'PCA done -- %.2f' %(t1-t0))
 

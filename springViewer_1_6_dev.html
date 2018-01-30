@@ -128,11 +128,6 @@ function callback() {
 	settings_setup();
 	selection_setup();
 	setup_layout_dropdown();
-	//colorBar(graph_directory, sub_directory);
-    //loadColors();
-	loadSelectedCells(graph_directory);
-	//coexpression_setup(graph_directory);
-	//diffex_setup(graph_directory);
 	initiateButtons();
 	make_new_SPRINGplot_setup();
 	clone_viewer_setup();
@@ -168,8 +163,11 @@ var tmp = graph_directory.split('/');
 graph_directory = tmp.slice(0,tmp.length-1).join('/');
 sub_directory = tmp[tmp.length-1];
 
+document.title = 'SPRING: ' + tmp[tmp.length-2]+'/'+tmp[tmp.length-1];
+
 clone_sprites = {};
 clone_edge_container = {};
+edge_container = [];
 
 d3.select("#force_layout").select("svg").remove()
 d3.select("#color_chooser").selectAll("div").remove()

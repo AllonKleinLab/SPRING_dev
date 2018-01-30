@@ -24,14 +24,14 @@ current_dir_short = data.getvalue('current_dir').strip('/')
 new_dir_short = data.getvalue('new_dir').strip('/')
 
 # ERROR HANDLING HERE
-extra_filter = data.getvalue('selected_cells')
+base_filter = data.getvalue('selected_cells')
 current_dir = base_dir + '/' + current_dir_short
 new_dir = base_dir + '/' + new_dir_short
 this_url = data.getvalue('this_url')
 
 all_errors = []
 
-if extra_filter is None:
+if base_filter is None:
 	all_errors.append('No cells selected.<br>')
 	do_the_rest = False
 
@@ -118,6 +118,12 @@ try:
 except:
 	animate = 'No'
 
+try:
+	project_filter = data.getvalue('compared_cells')
+	project_filter = np.sort(np.array(map(int,project_filter.split(','))))
+except:
+	project_filter = np.array([])
+
 
 if not do_the_rest:
 	#os.rmdir(new_dir)
@@ -133,10 +139,13 @@ else:
 			shutil.rmtree(new_dir)
 		os.makedirs(new_dir)
 		
-		extra_filter = np.sort(np.array(map(int,extra_filter.split(','))))
+		base_filter = np.sort(np.array(map(int,base_filter.split(','))))
+		extra_filter = np.array(np.sort(np.hstack((base_filter,project_filter))),dtype=int)
+		base_ix = np.nonzero([(i in base_filter) for i in extra_filter])[0]
 		
 		params_dict = {}
 		params_dict['extra_filter'] = extra_filter
+		params_dict['base_ix'] = base_ix
 		params_dict['base_dir'] = base_dir
 		params_dict['current_dir'] = current_dir
 		params_dict['new_dir'] = new_dir

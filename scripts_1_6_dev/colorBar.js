@@ -585,7 +585,7 @@ function colorBar(project_directory, color_menu_genes) {
 
         //gradientMenu.selectAll("option").remove();
 		dispatch.load(gene_set_color_array,"gene_sets")	;
-		update_slider();
+		//update_slider();
 	});
 
 
@@ -1086,7 +1086,7 @@ function make_legend(cat_color_map,cat_label_list) {
 			}
 						
 			var base_radius = document.getElementById("settings_range_node_size").value / 100;
-			var large_radius = base_radius * 15;
+			var large_radius = base_radius * 6;
 
 			for (i=0; i<all_nodes.length; i++) {
 				if (cat_label_list[i]==d) {
@@ -1125,8 +1125,8 @@ function make_legend(cat_color_map,cat_label_list) {
 					setTimeout(function() { shrinkNodes(base_radius,current_radius,stepsize); }, 10);
 				}
 			}
-
-			
+			console.log('heyhey');
+			update_selected_count();
 			count_clusters();
 		});
 	count_clusters();
