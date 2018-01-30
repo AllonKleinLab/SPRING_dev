@@ -17,9 +17,9 @@ function add_list_item(project_directory,sub_directory,order) {
 
 		var info_box = list_item.append('div').attr('class','dataset_key_info')
 			.style('width','480px');
-			
+
 		if ('Description' in data) {
-			if (data['Description'].length > 0) {		
+			if (data['Description'] != null) {
 				info_box.append('tspan').append('text')
 				.text(data['Description'])
 				.style('color','rgb(140,140,140)');
@@ -27,24 +27,26 @@ function add_list_item(project_directory,sub_directory,order) {
 		}
 		var date_email = ''
 		if ('Email' in data) {
-			date_email += data['Email']+' - ';
+			if (data['Email'].length > 0) {
+				date_email += data['Email']+' - ';
+			}
 		}
 		date_email += data['Date'];
-		
+
 		info_box
 			.append('tspan').style('margin-top','8px')
 			.append('text').text(date_email)
 			.style('color','rgb(110,110,110)')
 			.style('font-weight','530');
-					
-				
+
+
 		var o = $(info_box[0][0]);
 		var new_height = o.offset().top - o.parent().offset().top - o.parent().scrollTop() + o.height();
 
 		var show_less_height = (new_height + 8).toString() + 'px';
 		var show_more_height = (new_height + 170).toString() + 'px';
 		list_item.style('height',show_less_height);
-		
+
 		var info_box = list_item.append('div').attr('class','dataset_params');
 		var keys = ['Nodes','Filtered_Genes','Min_Cells','Min_Counts','Gene_Var_Pctl','Num_PCs','Num_Neighbors','Num_Force_Iter'];
 		for (s in keys) {
@@ -52,35 +54,35 @@ function add_list_item(project_directory,sub_directory,order) {
 				.append('text').text(display_names[keys[s]]+': ').style('font-weight','normal')
 				.append('text').text(data[keys[s]]).style('font-weight','bold');
 		}
-	
+
 		list_item.selectAll('div').selectAll('tspan').selectAll('text')
-			.on('click',function() { 
-				d3.event.stopPropagation(); 
+			.on('click',function() {
+				d3.event.stopPropagation();
 			});
-	
+
 		list_item.append('text').attr('class','show_more_less_text').text('Show more')
 		.on('click',function() {
 			d3.event.stopPropagation();
-			if (d3.select(this).text() == 'Show more') { 
+			if (d3.select(this).text() == 'Show more') {
 				list_item.transition(200).style('height',show_more_height);
 				d3.select(this).text('Show less');
 			} else {
-				list_item.transition(200).style('height',show_less_height); 
+				list_item.transition(200).style('height',show_less_height);
 				d3.select(this).text('Show more');
 			}
 		});
-		
+
 		list_item.append('text').attr('class','delete_button').text('Delete')
-			.on('click',function() { 
-				d3.event.stopPropagation();				
-				
+			.on('click',function() {
+				d3.event.stopPropagation();
+
 				list_item
 					.style('z-index','-10')
 					.transition().duration(700).style('margin-top','-115px')
-					.each('end',function() { 
+					.each('end',function() {
 						list_item.remove();
 					});
-				
+
 				$.ajax({
 					url:"cgi-bin/delete_subdirectory.py",
 					type:"POST",
@@ -89,20 +91,22 @@ function add_list_item(project_directory,sub_directory,order) {
 						console.log(python_data);
 					},
 				});
-				
+
 			});
 
-		
-	
+
+
 		list_item.on('click',function() {
-			var my_url = [window.location.href.split('/')[0]];
-			my_url.push('springViewer_1_6_dev.html?'); 
-			my_url.push(project_directory);
-			my_url.push(sub_directory);
-			openInNewTab(my_url.join('/'));
+			var my_origin = window.location.origin;
+			var my_pathname_split = window.location.pathname.split("/");
+			var my_pathname_new = my_pathname_split.slice(0,my_pathname_split.length-1).join("/") + "/springViewer_1_6_dev.html"
+			var my_url_new = my_origin + my_pathname_new + "?" + project_directory + "/" + sub_directory;
+			console.log(my_url_new);
+			openInNewTab(my_url_new);
+
 		});
-		
-		
+
+
 	});
 }
 
@@ -130,14 +134,3 @@ function openInNewTab(url) {
   var win = window.open(url, '_blank');
   win.focus();
 }
-
-
-
-
-
-
-
-
-
-
-
