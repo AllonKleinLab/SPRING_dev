@@ -301,6 +301,7 @@ function animation() {
 	console.log('ANIM');
 	// check if animation exists. if so, hide sprites and load it
 	
+
 	$.get(graph_directory + '/' + sub_directory+'/animation.txt')
 		.done(function(data) { 
 			animation_frames = [];
@@ -313,26 +314,23 @@ function animation() {
 					animation_frames.push(aframe);					
 				}
 			});
-			
-			sprites.visible = true;
-			var current_frame = -1;
-			
-			coordinates = animation_frames[animation_frames.length-1];
-			for (i=0; i<all_nodes.length; i++) {
-				all_nodes[i].x = coordinates[i][0];
-				all_nodes[i].y = coordinates[i][1];
+			var any_diff = false;
+			for (i=0; i<coordinates.length; i++) {
+				if (Math.abs(coordinates[i][0] - animation_frames[animation_frames.length-1][i][0])>5) { any_diff = true; }
+				if (Math.abs(coordinates[i][1] - animation_frames[animation_frames.length-1][i][1])>5) { any_diff = true; }
 			}
 			
-			
-			function next_frame() {
+			sprites.visible = true;
+				
+			function next_frame_anim(current_frame) {
 				current_frame += 1;
-				coordinates = animation_frames[current_frame];
+				tmp_coordinates = animation_frames[current_frame];
 				
 				for (i=0; i<all_nodes.length; i++) {
-					all_nodes[i].x = coordinates[i][0];
-					all_nodes[i].y = coordinates[i][1];
-					all_outlines[i].x = coordinates[i][0];
-					all_outlines[i].y =  coordinates[i][1];
+					all_nodes[i].x = tmp_coordinates[i][0];
+					all_nodes[i].y = tmp_coordinates[i][1];
+					all_outlines[i].x = tmp_coordinates[i][0];
+					all_outlines[i].y =  tmp_coordinates[i][1];
 				}
 				
 // 				for (i=0; i<all_edges.length; i++) {
@@ -344,13 +342,32 @@ function animation() {
 // 				}
 				
 				if (current_frame+1 < animation_frames.length) {
-					setTimeout(next_frame,1);
+					setTimeout(function() { next_frame_anim(current_frame); },1);
 				} else {
-					blend_edges();
+					next_frame_interp(-1,10);
 				}
 				
 			}
-			next_frame();
+			
+			function next_frame_interp(current_frame,steps) {
+				console.log(current_frame);
+				current_frame += 1;
+				if (current_frame+1 > steps || (! any_diff)) {
+					blend_edges();
+				}
+				else {
+					var last_frame = animation_frames[animation_frames.length-1];
+					for (i=0; i<all_nodes.length; i++) {
+						all_nodes[i].x += (coordinates[i][0] - last_frame[i][0]) / steps;
+						all_nodes[i].y += (coordinates[i][1] - last_frame[i][1]) / steps;
+						all_outlines[i].x += (coordinates[i][0] - last_frame[i][0]) / steps;
+						all_outlines[i].y +=  (coordinates[i][1] - last_frame[i][1]) / steps;
+					}
+					setTimeout(function() { next_frame_interp(current_frame,steps); },1);
+				}
+			}
+			
+			next_frame_anim(-1);
 			
 				
 		}).fail(function() { 
