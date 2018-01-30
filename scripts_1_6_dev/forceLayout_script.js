@@ -191,40 +191,44 @@ function forceLayout(project_directory, sub_directory, callback) {
 	});
 
 	function load_edges() {
-		d3.text(project_directory+'/'+sub_directory+'/edges.csv', function(text) {
-			
-			edge_container = new PIXI.ParticleContainer(all_nodes.length * 20, {scale: true, position: true, rotation: true, uvs: true, alpha: true});
-			edge_container.position = sprites.position;
-			edge_container.scale = sprites.scale;
-			edge_container.alpha=0.5
+		edge_container = new PIXI.ParticleContainer(all_nodes.length * 20, {scale: true, position: true, rotation: true, uvs: true, alpha: true});
+		edge_container.position = sprites.position;
+		edge_container.scale = sprites.scale;
+		edge_container.alpha=0.5
 
-			app.stage.addChild(edge_container);
-			app.stage.addChild(sprites);
+		$.get(project_directory+'/'+sub_directory+'/edges.csv')
+			.done(function(text) { 
 
-			all_edges = [];
-			all_edge_ends = []
-			text.split('\n').forEach(function(entry,index) {
-				if (entry.length > 0) {
-					items = entry.split(';')
-					var source = parseInt(items[0]);
-					var target = parseInt(items[1]);
-					var x1 = all_nodes[source].x;
-					var y1 = all_nodes[source].y;
-					var x2 = all_nodes[target].x;
-					var y2 = all_nodes[target].y;
+				all_edges = [];
+				all_edge_ends = [];
+				text.split('\n').forEach(function(entry,index) {
+					if (entry.length > 0) {
+						items = entry.split(';')
+						var source = parseInt(items[0]);
+						var target = parseInt(items[1]);
+						var x1 = all_nodes[source].x;
+						var y1 = all_nodes[source].y;
+						var x2 = all_nodes[target].x;
+						var y2 = all_nodes[target].y;
 					
 					
-					var color = 6579301;			
-					var s = new LineSprite(4, color, x1, y1, x2, y2);
-					s.color = color;
-					edge_container.addChild(s);
-					all_edges.push(s);
-					all_edge_ends.push({source:source, target:target});
-				}
+						var color = 6579301;			
+						var s = new LineSprite(4, color, x1, y1, x2, y2);
+						s.color = color;
+						edge_container.addChild(s);
+						all_edges.push(s);
+						all_edge_ends.push({source:source, target:target});
+					}
+				});
+				app.stage.addChild(edge_container);
+				app.stage.addChild(sprites);
+				callback();
+				
+			}).fail(function() { 
+				app.stage.addChild(edge_container);
+				app.stage.addChild(sprites);
+				callback();
 			});
-			
-			callback();
-		});
 	}
 
 	function dragstarted() {
