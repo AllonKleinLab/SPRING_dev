@@ -7,7 +7,8 @@
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
 	overflow: scroll;
-	height: 560px;
+	height: 620px;
+	padding-bottom: 15px;
 }
 
 #make_new_SPRINGplot_button_bar > * {
@@ -84,12 +85,16 @@
 	resize: none;
 }
 
-
+#batch_correction_blurb > text {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-style: italic;
+}
 
 #make_new_SPRINGplot_optional_params {
 	float: left;
 	margin-left: 28px;
-	margin-top: 40px;
+	margin-top: 25px;
 	margin-bottom: 15px;
 }
 
@@ -128,6 +133,7 @@
 	background-color: rgba(0,0,0,.3);
 	padding: 10px;
 	visibility: hidden;
+	margin-bottom: 15px;
 }
 
 #make_new_SPRINGplot_message_div > text {

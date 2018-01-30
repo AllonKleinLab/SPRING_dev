@@ -339,7 +339,7 @@ function animation() {
 				if (current_frame+1 < animation_frames.length) {
 					setTimeout(next_frame,1);
 				} else {
-					edge_container.visible = true;
+					blend_edges();
 				}
 				
 			}
@@ -353,6 +353,23 @@ function animation() {
 
 		})
 }
+
+function blend_edges() {
+	edge_container.alpha = 0;
+	edge_container.visible = true;
+	
+	function next_frame(current_frame,min,max,steps) {
+		current_frame += 1;
+		var alpha = current_frame * (max-min)/steps + min;
+		edge_container.alpha = alpha;
+		if (alpha < max) {
+			setTimeout(function() { next_frame(current_frame,min,max,steps); }, 5);
+		}
+	}
+	
+	next_frame(-1,0,0.5,10);
+}
+
 
 
 function UrlExists(url) {
