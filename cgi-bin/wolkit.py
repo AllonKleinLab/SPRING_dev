@@ -42,7 +42,7 @@ def tot_counts_norm_sparse(E, exclude_dominant_frac = 1, included = [], target_m
             tots = E.sum(axis=1)
             wtmp = scipy.sparse.lil_matrix((ncell, ncell))
             wtmp.setdiag(1. / tots)
-            included = np.asarray(~(((wtmp * E) > 0.1).sum(axis=0) > 0))[0,:]
+            included = np.asarray(~(((wtmp * E) > exclude_dominant_frac).sum(axis=0) > 0))[0,:]
             tots_use = E[:,included].sum(axis = 1)
             #print 'Excluded %i genes from normalization' %(np.sum(~included))
     else:
