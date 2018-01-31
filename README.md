@@ -1,12 +1,12 @@
 ### A. Installing Python libraries
 
 Prior to running SPRING viewer locally, you'll need to make sure Python 2.7 and the following Python libraries are installed:<br>
-scikit-learn  
-numpy  
-scipy  
-h5py  
-networkx  
-fa2  
+`scikit-learn  `
+`numpy  `
+`scipy  `
+`h5py  `
+`networkx  `
+`fa2  `
 
 We recommend using Anaconda to manage your Python libraries. You can download it here (be sure to get the Python 2.7 version):  
 https://conda.io/miniconda.html
