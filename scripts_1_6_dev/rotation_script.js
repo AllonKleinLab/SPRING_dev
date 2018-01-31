@@ -9,7 +9,10 @@ function rotation_update() {
 		if (all_outlines[i].selected) { selected.push(i); }
 		stashed_coordinates[stash_i][i] = [all_nodes[i].x, all_nodes[i].y];
 	}
-	if (selected.length==0) { return; }	
+	if (selected.length==0) { 
+		deselect_all();
+		selected = d3.range(0,all_nodes.length);
+	}	
 	var real_scale = 1;
 	
 	vis = d3.select('#vis')
