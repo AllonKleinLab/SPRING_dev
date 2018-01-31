@@ -201,12 +201,10 @@ function forceLayout(project_directory, sub_directory, callback) {
 		edge_container.position = sprites.position;
 		edge_container.scale = sprites.scale;
 		edge_container.alpha=0.5
-
+		all_edges = [];
+		all_edge_ends = [];
 		$.get(project_directory+'/'+sub_directory+'/edges.csv')
 			.done(function(text) { 
-
-				all_edges = [];
-				all_edge_ends = [];
 				text.split('\n').forEach(function(entry,index) {
 					if (entry.length > 0) {
 						items = entry.split(';')
@@ -328,6 +326,28 @@ function move_selection_aside(side) {
 	} else {
 		var offset = d3.max(non_x) - d3.min(sel_x) + 5;
 	}
+	function next_frame(steps,current_frame) {
+		current_frame += 1;
+		for (i=0; i<all_nodes.length; i++) {
+			if (all_outlines[i].selected) {
+				var y = all_nodes[i].y;
+				var x = all_nodes[i].x + offset/steps;
+				move_node(i,x,y);
+			}
+		}
+		if (current_frame < steps) {
+			setTimeout(function() { next_frame(steps,current_frame); }, 2);
+		} else {
+			deselect_all();
+			center_view();
+			adjust_edges();
+			if (edge_toggle_image.attr("xlink:href") == "stuff/check-mark.svg") {
+				blend_edges();
+			}
+		}
+	}
+	edge_container.visible = false;
+	next_frame(6,-1)
 	
 }
 
@@ -574,6 +594,9 @@ function initiateButtons() {
 	});
 
 	d3.select('#revert_positions').on('click',revert_positions);
+	
+	d3.select('#move_left').on('click',function() { move_selection_aside('left'); });
+	d3.select('#move_right').on('click',function() { move_selection_aside('right'); });
 	
 	d3.select('#save_coords').select('button').on("click",function() {
 		if (mutable.slice(0,5) != 'false') {
