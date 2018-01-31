@@ -14,7 +14,7 @@ https://conda.io/miniconda.html
 Several of the required libraries can be installed using conda. To do so, open Terminal (Mac) or Anaconda Prompt (Windows) and enter the following:  
 `conda install scikit-learn numpy scipy h5py`
 
-The remaining libraries can be installed using pip. Note that if you're a Windows user, you'll first need to install Microsoft Visual C++ 9.0 (available from http://aka.ms/vcpython27). Enter the following into Terminal or Anaconda Prompt:  
+The remaining libraries can be installed using pip. Note that if you're a Windows user, you'll first need to install Microsoft Visual C++ compiler for Python (available from http://aka.ms/vcpython27). Enter the following into Terminal or Anaconda Prompt:  
 `pip install networkx fa2`
 
 
