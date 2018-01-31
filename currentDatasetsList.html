@@ -23,7 +23,8 @@
 <script>
 
 var project_directory = window.location.search;
-if (project_directory == '?xenopus_embryo_timecourse') {
+var proj_dir_split = project_directory.split("/");
+if (proj_dir_split[proj_dir_split.length-1] == 'xenopus_embryo_timecourse') {
 	window.location.replace('https://kleintools.hms.harvard.edu/tools/currentDatasetsList_xenopus.html');
 }
 else {
