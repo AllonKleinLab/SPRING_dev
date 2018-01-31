@@ -37,13 +37,13 @@ Each subdirectory should contain:
 `graph_data.json`  
 `run_info.json`  
 
-Place the main directory (and all subdirectories) somewhere within the same folder as this README file. For example, if you have a main data set called "human_bone_marrow" and another called "frog_embryo", you could place them in `./datasets/human_bone_marrow/` and `./datasets/frog_embryo/`. 
+Place the main directory (and all subdirectories) somewhere within the same folder as this README file. For example, if you have a main data set called `human_bone_marrow` and another called `frog_embryo`, you could place them in `./datasets/human_bone_marrow/` and `./datasets/frog_embryo/`. 
 
 
 ### C. Running SPRING viewer
 
-1. Open Terminal (Mac) or Anaconda Prompt (Windows) and change directories (cd) to the directory containing this README file (SPRING_dev). 
+1. Open Terminal (Mac) or Anaconda Prompt (Windows) and change directories (`cd`) to the directory containing this README file (`SPRING_dev/`). 
 2. Start a local server by entering the following: `python -m CGIHTTPServer 8000`
 3. Open web browser (preferably Chrome, possibly in incognito mode to ensure no cached data is used).
-4. View data set by navigating to corresponding URL: http://localhost:8000/springViewer_1_6_dev.html?path_to/main/subplot. In the example above, if you wanted to view a subplot of human_bone_marrow called "HSC", then you would navigate to http://localhost:8000/springViewer_1_6_dev.html?datasets/human_bone_marrow/HSC
+4. View data set by navigating to corresponding URL: http://localhost:8000/springViewer_1_6_dev.html?path_to/main/subplot. In the example above, if you wanted to view a subplot of `human_bone_marrow` called `HSC`, then you would navigate to http://localhost:8000/springViewer_1_6_dev.html?datasets/human_bone_marrow/HSC
 
