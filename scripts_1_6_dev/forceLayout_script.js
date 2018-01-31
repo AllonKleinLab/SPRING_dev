@@ -175,6 +175,12 @@ function forceLayout(project_directory, sub_directory, callback) {
 			sprites.addChild(outline);
 			all_outlines.push(outline);
 		}
+		
+		stashed_coordinates = [{}];
+		for (i in all_nodes) {
+			stashed_coordinates[0][i] = [all_nodes[i].x, all_nodes[i].y];
+		}
+
 
 		svg_graph
 			.call(d3.behavior.drag()
@@ -247,6 +253,11 @@ function forceLayout(project_directory, sub_directory, callback) {
 				}
 			}
 			if (clicked_node != -1) {
+				var stash_i = stashed_coordinates.length;
+				stashed_coordinates.push({});
+				for (i in all_nodes) {
+					stashed_coordinates[stash_i][i] = [all_nodes[i].x, all_nodes[i].y];
+				}
 				if (all_outlines[clicked_node].selected) {
 					being_dragged = true;
 					for (i=0; i<all_nodes.length; i++) {
@@ -297,6 +308,53 @@ function forceLayout(project_directory, sub_directory, callback) {
 		for (i=0; i<all_nodes.length; i++) {
 			all_nodes[i].beingDragged = false;
 		}
+	}
+}
+
+function move_selection_aside(side) {
+	// find left and right most edge of selected and non selected cells
+	var sel_x = [];
+	var non_x = [];
+	for (i=0; i<all_nodes.length; i++) {
+		if (all_outlines[i].selected) {
+			sel_x.push(all_nodes[i].x);
+		} else {
+			non_x.push(all_nodes[i].x);
+		}
+	}
+	var new_coordinates = {}
+	if (side=='left') {
+		var offset = d3.min(non_x) - d3.max(sel_x) - 5;
+	} else {
+		var offset = d3.max(non_x) - d3.min(sel_x) + 5;
+	}
+	
+}
+
+
+function revert_positions() {
+	var stash_i = stashed_coordinates.length-1;
+	for (i in stashed_coordinates[stash_i]) {
+		move_node(i,stashed_coordinates[stash_i][i][0],stashed_coordinates[stash_i][i][1]);
+	}
+	adjust_edges();
+	stashed_coordinates = stashed_coordinates.slice(0,stashed_coordinates.length-1);
+}
+
+function move_node(i, x,y) {
+	all_nodes[i].x = x;
+	all_nodes[i].y = y;
+	all_outlines[i].x = x;
+	all_outlines[i].y = y;	
+}
+
+function adjust_edges() {
+	for (i in all_edges) {
+		all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
+		all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
+		all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
+		all_edges[i].y2 = all_nodes[all_edge_ends[i].target].y;
+		all_edges[i].updatePosition();
 	}
 }
 
@@ -354,7 +412,6 @@ function animation() {
 			}
 			
 			function next_frame_interp(current_frame,steps) {
-				console.log(current_frame);
 				current_frame += 1;
 				if (current_frame+1 > steps || (! any_diff)) {
 					blend_edges();
@@ -506,7 +563,7 @@ function downloadCoordinates() {
 
 
 function initiateButtons() {
-
+	
 	d3.select("#help").on("click", function() {
 		var win = window.open("helppage.html", '_blank');
 		win.focus();
@@ -516,7 +573,8 @@ function initiateButtons() {
 		center_view();
 	});
 
-
+	d3.select('#revert_positions').on('click',revert_positions);
+	
 	d3.select('#save_coords').select('button').on("click",function() {
 		if (mutable.slice(0,5) != 'false') {
 			var text = ""
@@ -574,15 +632,6 @@ function download_sprite_as_png(renderer, sprite, fileName) {
 	}, 'image/png');
 }
 
-function showGotoDropdown() {
-	if (d3.select("#goto_dropdown").style("height") == 'auto') {
-		closeDropdown();
-		collapse_settings();
-		setTimeout(function() {
-			document.getElementById("goto_dropdown").classList.toggle("show");
-		}, 10);
-	}
-}
 
 function showToolsDropdown() {
 	if (d3.select("#tools_dropdown").style("height") == 'auto') {
@@ -630,12 +679,6 @@ function closeDropdown() {
 function setup_download_dropdown() {
 	//d3.select("#download_dropdown_button").on("mouseenter",showDownloadDropdown);
 	d3.select("#download_dropdown_button").on("click",showDownloadDropdown);
-}
-
-
-
-function setup_goto_dropdown() {
-	d3.select("#goto_dropdown_button").on("click",showGotoDropdown);
 }
 
 function setup_tools_dropdown() {

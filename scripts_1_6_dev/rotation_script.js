@@ -3,15 +3,13 @@
 function rotation_update() {
 	
 	var selected = [];
+	var stash_i = stashed_coordinates.length;
+	stashed_coordinates.push({});
 	for (i in all_nodes) {
 		if (all_outlines[i].selected) { selected.push(i); }
+		stashed_coordinates[stash_i][i] = [all_nodes[i].x, all_nodes[i].y];
 	}
-	if (selected.length==0) { return; }
-	
-	var stashed_coordinates = {};
-	for (i in all_nodes) {
-		stashed_coordinates[i] = [all_nodes[i].x, all_nodes[i].y];
-	}
+	if (selected.length==0) { return; }	
 	var real_scale = 1;
 	
 	vis = d3.select('#vis')
@@ -71,9 +69,7 @@ function rotation_update() {
 			.on("drag", handle_dragged)
 			.on("dragend", handle_dragended));
 	
-	d3.select('#revert_rotate_scale').on('click',undo_positions);
-	
-	
+
 	function pivot_dragstarted() {
 		d3.event.sourceEvent.stopPropagation();
 	}
@@ -131,32 +127,7 @@ function rotation_update() {
 	function handle_dragended() {
 		d3.select("#rotation_outer_circ").style("opacity",0);
 	}
-
-	function move_node(i, x,y) {
-		all_nodes[i].x = x;
-		all_nodes[i].y = y;
-		all_outlines[i].x = x;
-		all_outlines[i].y = y;	
-	}
-	
-	function adjust_edges() {
-		for (i in all_edges) {
-			all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
-			all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
-			all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
-			all_edges[i].y2 = all_nodes[all_edge_ends[i].target].y;
-			all_edges[i].updatePosition();
-		}
-	}
-	
-	function undo_positions() {
-		for (i in stashed_coordinates) {
-			move_node(i,stashed_coordinates[i][0],stashed_coordinates[i][1]);
-		}
-		adjust_edges();
-	}
-	
-
+		
 }
 
 function rotation_show() {

@@ -27,7 +27,7 @@
 				<a href="javascript:save_coords()">Save coordinates</a>
 				<a id="center_view">Center view</a>
 				<a href="javascript:rotation_update()">Rotate / scale</a>
-				<a id="revert_rotate_scale">Revert</a>
+				<a id="revert_positions">Revert nodes</a>
 			</div>
 		</div>
 
@@ -49,19 +49,13 @@
 		  </div>
 		</div>
 
-
-		<div class="dropdown">
-		  <button id="goto_dropdown_button">Go to:</button>
-		  <div id="goto_dropdown" class="dropdown-content">
-		  	<a href="javascript:show_make_new_SPRINGplot_popup()">Make new subplot</a>
-			<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
-			<a target="_blank" id="changeViewer_link">Dynamic mode</a>
-		  </div>
-		</div>
 		<div class="dropdown">
 		 <button id="tools_dropdown_button">Tools:</button>
 		  <div id="tools_dropdown" class="dropdown-content">
-		  	<a href="javascript:start_clone_viewer()">Clone broswer</a>
+		  	<a href="javascript:show_make_new_SPRINGplot_popup()">Make new subplot</a>
+			<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
+			<a target="_blank" id="changeViewer_link">Dynamic mode</a>
+			<a href="javascript:start_clone_viewer()">Clone broswer</a>
 		  </div>
 		</div>
 		<div id="sound_toggle"> </div>
@@ -107,7 +101,6 @@
 var rotator_radius = null;
 
 setup_download_dropdown();
-setup_goto_dropdown();
 setup_tools_dropdown();
 
 d3.select("#sound_toggle").append('img')

@@ -8,9 +8,15 @@ import json
 import time
 from wolkit import *
 import networkx as nx
-from fa2_anim import ForceAtlas2
 import pickle
 import datetime
+
+try: 
+    from fa2_anim import ForceAtlas2
+    animation_mode = True
+except: 
+    from fa2 import ForceAtlas2
+    animation_mode = False
 
 cwd = os.getcwd()
 if cwd.endswith('cgi-bin'):
@@ -27,20 +33,20 @@ def sparse_var(E, axis=0):
     return tmp.mean(axis=axis).A.squeeze() - mean_gene ** 2
 
 def update_log_html(fname, logdat, overwrite=False):
-	if overwrite:
-		o = open(fname, 'w')
-	else:
-		o = open(fname, 'a')
-	o.write(logdat + '<br>\n')
-	o.close()
+    if overwrite:
+        o = open(fname, 'w')
+    else:
+        o = open(fname, 'a')
+    o.write(logdat + '<br>\n')
+    o.close()
 
 def update_log(fname, logdat, overwrite=False):
-	if overwrite:
-		o = open(fname, 'w')
-	else:
-		o = open(fname, 'a')
-	o.write(logdat + '\n')
-	o.close()
+    if overwrite:
+        o = open(fname, 'w')
+    else:
+        o = open(fname, 'a')
+    o.write(logdat + '\n')
+    o.close()
 
 def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 
@@ -257,13 +263,14 @@ forceatlas2 = ForceAtlas2(
                           # Log
                           verbose=False)
 
-if animate=='Yes': 
-	f = open(new_dir+'/animation.txt','w')
-	f = open(new_dir+'/animation.txt','a')
+if animation_mode and animate=='Yes': 
+    f = open(new_dir+'/animation.txt','w')
+    f = open(new_dir+'/animation.txt','a')
+    positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter, writefile=f)
 else: 
-	f = None
+    positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter)
 
-positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter, writefile=f)
+
 positions = np.array([positions[i] for i in sorted(positions.keys())])
 positions = positions / 5.0
 positions = positions - np.min(positions, axis = 0) - np.ptp(positions, axis = 0) / 2.0
@@ -283,19 +290,19 @@ np.savetxt(new_dir + '/' +  'coordinates.txt', np.hstack((np.arange(E.shape[0])[
 ################
 # Save new clone data if it exists in base dir
 if os.path.exists(current_dir + '/clone_map.json'):
-	clone_map = json.load(open(current_dir + '/clone_map.json'))
-	extra_filter_map = {i:j for j,i in enumerate(extra_filter)}
-	new_clone_map = {}
-	for i,clone in clone_map.items():
-		i = int(i)
-		new_clone = [extra_filter_map[j] for j in clone if j in extra_filter_map]
-		if i in extra_filter_map and len(new_clone) > 0:
-			new_clone_map[extra_filter_map[i]] = new_clone
-	json.dump(new_clone_map,open(new_dir+'/clone_map.json','w'))
-	
-	
-	
-	
+    clone_map = json.load(open(current_dir + '/clone_map.json'))
+    extra_filter_map = {i:j for j,i in enumerate(extra_filter)}
+    new_clone_map = {}
+    for i,clone in clone_map.items():
+        i = int(i)
+        new_clone = [extra_filter_map[j] for j in clone if j in extra_filter_map]
+        if i in extra_filter_map and len(new_clone) > 0:
+            new_clone_map[extra_filter_map[i]] = new_clone
+    json.dump(new_clone_map,open(new_dir+'/clone_map.json','w'))
+    
+    
+    
+    
 
 
 ################

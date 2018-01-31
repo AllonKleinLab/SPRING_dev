@@ -29,7 +29,8 @@ function clone_viewer_setup() {
 	app.stage.addChild(clone_sprites);
 
 	var popup = d3.select('#force_layout').append('div')
-		.attr('id','clone_viewer_popup');
+		.attr('id','clone_viewer_popup')
+		.on('click',update_colorstack);
 
 	popup.append('div')
 		.style('padding','5px')
@@ -162,8 +163,11 @@ function clone_mousemove() {
 		rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
 		if (rad < all_nodes[i].scale.x * get_clone_radius()) { 				
 			if (node_status[i].source) {
-				activate_edges(i,false);
-				activate_node(i,false); 
+				if (! (i in clone_nodes)) {
+					activate_edges(i,false);
+					activate_node(i,false); 
+					update_colorstack();
+				}
 			}	
 		}	
 	}
@@ -217,7 +221,8 @@ function activate_edges(i,stable) {
 		var edge_list = [];
 		for (var j=0; j<clone_map[i].length; j++)  {	
 			if (node_status[clone_map[i][j]].target) {
-				activate_node(clone_map[i][j],stable);		
+				activate_node(clone_map[i][j],stable);	
+				/*	
 				var source = i;
 				var target = clone_map[i][j];
 				var x1 = all_nodes[source].x;
@@ -232,6 +237,7 @@ function activate_edges(i,stable) {
 				line.lineTo(x2,y2);
 				clone_edge_container.addChild(line);
 				edge_list.push(line);
+				*/
 			}
 		}
 		clone_edges[i] = edge_list;	
@@ -270,8 +276,16 @@ function start_clone_viewer() {
 	d3.select('#clone_viewer_popup').style('visibility','visible')
 }
 
-	
-
+function update_colorstack() {
+	/*
+	if (Object.keys(clone_nodes).length>0 && d3.select('#clone_viewer_popup').style('width') == '140px') {
+		d3.select('#clone_viewer_popup').transition().style('width','280px');
+	}
+	if (Object.keys(clone_nodes).length==0 && d3.select('#clone_viewer_popup').style('width') == '280px') {
+		d3.select('#clone_viewer_popup').transition().style('width','140px');
+	}
+	*/
+}
 
 
 
