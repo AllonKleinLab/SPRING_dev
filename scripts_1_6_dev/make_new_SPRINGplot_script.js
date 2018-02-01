@@ -15,7 +15,7 @@ function make_new_SPRINGplot_setup() {
 		.text('Close')
 		.on('mousedown',hide_make_new_SPRINGplot_popup);
 
-	
+
 	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
 		.append('label').text('Name of plot')
 		.append('input').attr('type','text')
@@ -41,26 +41,26 @@ function make_new_SPRINGplot_setup() {
 				var o = d3.select('#input_description');
 				o.style('height','1px');
  				o.style('height',(o[0][0].scrollHeight).toString()+"px");
- 				if ( d3.select('#make_new_SPRINGplot_message_div').style('visibility')=='hidden') {	
- 					popup.style('height',(d3.min([$('#newSPRING_description_box').height() + 597.223,MAXHEIGHT])).toString()+'px');	
+ 				if ( d3.select('#make_new_SPRINGplot_message_div').style('visibility')=='hidden') {
+ 					popup.style('height',(d3.min([$('#newSPRING_description_box').height() + 597.223,MAXHEIGHT])).toString()+'px');
  				} else {
- 					popup.style('height',(d3.min([$('#newSPRING_description_box').height() + 745,MAXHEIGHT])).toString()+'px');	
- 				}			
+ 					popup.style('height',(d3.min([$('#newSPRING_description_box').height() + 745,MAXHEIGHT])).toString()+'px');
+ 				}
  			}, 0);
  		});
- 	
+
 
 	var batch_correction_blurb = popup.append('div')
 		.attr('class','make_new_SPRINGplot_input_div')
 		.attr('id','batch_correction_blurb')
 		.style('width','320px').style('margin-top','25px')
-		
+
 	batch_correction_blurb.append('text').text('Use cell projection to avoid batch effects. ').style('color','rgb(220,220,220)');
 	batch_correction_blurb.append('text').text('Negatively selected ').style('color','rgb(80,80,255)').style('font-weight','900');
 	batch_correction_blurb.append('text').text('cells will be projected onto ').style('color','rgb(220,220,220)');
 	batch_correction_blurb.append('text').text('positively selected ').style('color','yellow').style('font-weight','900');
 	batch_correction_blurb.append('text').text('cells.').style('color','white');
-	
+
 	var optional_params = popup.append('div')
 		.attr('class','make_new_SPRINGplot_input_div')
 		.attr('id','make_new_SPRINGplot_optional_params');
@@ -104,7 +104,7 @@ function make_new_SPRINGplot_setup() {
 		.append('input').attr('type','text')
 		.attr('id','input_nIter')
 		.attr('value','500')
-		
+
 	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
 		.append('label').text('Save force layout animation')
 		.append('button').text('No')
@@ -183,7 +183,7 @@ function show_make_new_SPRINGplot_popup() {
 // }
 
 function submit_new_SPRINGplot() {
-	
+
 	//
 	// Do cgi stuff to check for valid input
 	// When finished...
@@ -210,11 +210,12 @@ function submit_new_SPRINGplot() {
 	var nIter = $("#input_nIter").val();
 	var animate = d3.select('#input_animation').text();
 	var this_url = window.location.href;
-    
-	var output_message = "Checking input..."
 
+	var output_message = "Please wait...<br>";
+	output_message += "If everything goes smoothly, a link your new subplot will appear when processing is complete, and you will receive a link via email (if provided).<br>";
+	output_message += "This may take several minutes.<br>"
 	var MAXHEIGHT = 772;
-	
+
 	d3.select('#make_new_SPRINGplot_popup')
 		.transition().duration(200)
 		.style('height',(d3.min([$('#newSPRING_description_box').height() + 745,MAXHEIGHT])).toString()+'px');
@@ -222,57 +223,50 @@ function submit_new_SPRINGplot() {
 	d3.select('#make_new_SPRINGplot_message_div')
 		.transition().duration(200)
 		.style('height','120px')
-		.each('end',function() { 
+		.each('end',function() {
 			d3.select('#make_new_SPRINGplot_message_div')
 				.style('visibility','inherit');
 			d3.select('#make_new_SPRINGplot_message_div')
-				.select('text').text(output_message);
+				.select('text').html(output_message);
 		});
-
+	//var keep_checking_log = true;
   $.ajax({
 		url: "cgi-bin/spring_from_selection2.py",
     type: "POST",
     data: {
-			base_dir:graph_directory, 
-			current_dir:sub_directory, 
-			new_dir:new_dir, 
-			selected_cells:sel2text, 
-			compared_cells:com2text, 
-			minCells:minCells, 
-			minCounts:minCounts, 
-			varPctl:varPctl, 
-			kneigh:kneigh, 
-			numPC:numPC, 
-			nIter:nIter, 
-			this_url:this_url, 
-			description:description, 
+			base_dir:graph_directory,
+			current_dir:sub_directory,
+			new_dir:new_dir,
+			selected_cells:sel2text,
+			compared_cells:com2text,
+			minCells:minCells,
+			minCounts:minCounts,
+			varPctl:varPctl,
+			kneigh:kneigh,
+			numPC:numPC,
+			nIter:nIter,
+			this_url:this_url,
+			description:description,
 			email:email, animate:animate
 	   	},
 		success: function(output_message) {
-			var orig_message = output_message;
+			//keep_checking_log = false;
 			d3.select('#make_new_SPRINGplot_message_div')
-				.select('text').html(orig_message);
-
-			function checkLog(){
-				jQuery.get(graph_directory + "/" + new_dir + "/lognewspring2.txt", function(logdata) {
-					var logdata_split = logdata.split('\n');
-					var display_message = orig_message + "<br>" + logdata_split[logdata_split.length-2];
-					d3.select('#make_new_SPRINGplot_message_div')
-						.select('text').html(display_message);
-					if (!display_message.endsWith("</a><br>")) {
-						setTimeout(checkLog, 500);
-					}
-				});
-			}
-			console.log(orig_message);
-			if (orig_message.endsWith("minutes.<br>\n") || orig_message.endsWith("email.<br>\n")) {
-				setTimeout(checkLog, 500);
-    	}
+				.select('text').html(output_message);
 		}
-  });
-  
+	});
 
-	// Insert your own text here
-	// var output_message = 'Your SPRING plot is processing. A link will be emailed to you within a few minutes.';
+	// function checkLog(){
+	// 	if (keep_checking_log) {
+	// 		jQuery.get(graph_directory + "/" + new_dir + "/lognewspring2.txt", function(logdata) {
+	// 			var logdata_split = logdata.split('\n');
+	// 			var display_message = logdata_split[logdata_split.length-2];
+	// 			d3.select('#make_new_SPRINGplot_message_div')
+	// 				.select('text').html(display_message);
+	// 			setTimeout(checkLog, 500);
+	// 		});
+	// 	}
+	// }
 
+	//setTimeout(checkLog, 5000);
 }
