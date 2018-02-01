@@ -15,6 +15,7 @@ import numpy as np
 cwd = os.getcwd()
 if cwd.endswith('cgi-bin'):
     os.chdir('../')
+    
 #####################
 # CGI
 do_the_rest = True

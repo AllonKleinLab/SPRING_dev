@@ -24,6 +24,8 @@ function clone_viewer_setup() {
 	clone_sprites = new PIXI.Container(all_nodes.length, {scale: true, position: true, rotation: true, uvs: true, alpha: true});
 	clone_sprites.position = sprites.position;
 	clone_sprites.scale = sprites.scale;
+	
+	show_clone_edges = true;
 
 	app.stage.addChild(clone_edge_container);
 	app.stage.addChild(clone_sprites);
@@ -68,6 +70,21 @@ function clone_viewer_setup() {
 		.text('Darken cell colors')
 		.style('width','120px')
 		.on('click',darken_nodes);
+		
+	popup.append('div').append('button')
+		.style('width','121px')
+		.text('Hide clone edges')
+		.on('click',function() {
+			if (show_clone_edges) {
+				show_clone_edges = false;
+				d3.select(this).text('Show clone edges');
+			} else {
+				show_clone_edges = true;
+				d3.select(this).text('Hide clone edges');
+			}
+		});
+		
+		
 	var cc_div = popup.append('div')
 	cc_div.append('button')
 		.text('Clear')
@@ -166,7 +183,7 @@ function clone_mousemove() {
 				if (! (i in clone_nodes)) {
 					activate_edges(i,false);
 					activate_node(i,false); 
-					update_colorstack();
+					//update_colorstack();
 				}
 			}	
 		}	
@@ -222,22 +239,22 @@ function activate_edges(i,stable) {
 		for (var j=0; j<clone_map[i].length; j++)  {	
 			if (node_status[clone_map[i][j]].target) {
 				activate_node(clone_map[i][j],stable);	
-				/*	
-				var source = i;
-				var target = clone_map[i][j];
-				var x1 = all_nodes[source].x;
-				var y1 = all_nodes[source].y;
-				var x2 = all_nodes[target].x;
-				var y2 = all_nodes[target].y;
-				var rgb = base_colors[clone_map[i][j]];
-				var color = rgbToHex(rgb.r,rgb.g,rgb.b);
-				var line = new PIXI.Graphics();
-				line.lineStyle(5, color, 1);
-				line.moveTo(x1,y1);
-				line.lineTo(x2,y2);
-				clone_edge_container.addChild(line);
-				edge_list.push(line);
-				*/
+				if (show_clone_edges) {
+					var source = i;
+					var target = clone_map[i][j];
+					var x1 = all_nodes[source].x;
+					var y1 = all_nodes[source].y;
+					var x2 = all_nodes[target].x;
+					var y2 = all_nodes[target].y;
+					var rgb = base_colors[clone_map[i][j]];
+					var color = rgbToHex(rgb.r,rgb.g,rgb.b);
+					var line = new PIXI.Graphics();
+					line.lineStyle(5, color, 1);
+					line.moveTo(x1,y1);
+					line.lineTo(x2,y2);
+					clone_edge_container.addChild(line);
+					edge_list.push(line);
+				}
 			}
 		}
 		clone_edges[i] = edge_list;	

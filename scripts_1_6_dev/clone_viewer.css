@@ -2,12 +2,12 @@
 	position: absolute;
 	top: 70px;
 	left: 40px;
-	background-color: rgba(170,170,170,.7);
+	background-color: rgba(170,170,1705.3);
 	visibility: hidden;
-	border: solid 1px rgb(230,230,230);
+	border: solid 1px rgb(100,100,100);
 	overflow: hidden;
 	padding: 10px;
-	width: 280px;
+	width: 140px;
 }
 
 #clone_viewer_popup > div {
