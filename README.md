@@ -10,21 +10,25 @@ To run SPRING Viewer locally, make sure Python 2.7 is and the following Python l
 `fa2`  
 
 We recommend Anaconda to manage your Python libraries. You can download it here (be sure to get the Python 2.7 version):   https://conda.io/miniconda.html. Libraries can then be installed using the command `conda`. To do so, open Terminal (Mac) or Anaconda Prompt (Windows) and enter:  
+
 `conda install scikit-learn numpy scipy h5py`
 
 The remaining libraries can be installed using `pip`. Note that if you're a Windows user, you'll first need to install Microsoft Visual C++ compiler for Python (available from http://aka.ms/vcpython27). Enter the following into Terminal or Anaconda Prompt:  
+
 `pip install networkx fa2`
 
 
 ### Setting up a SPRING data directory
 
 A SPRING data set consist of a main directory and any number of subdirectories, with each subdirectory corresponding to one SPRING plot (i.e. subplot) that draws on a data matrix stored in the main directory. The main directory should have the following files, as well as one subdirectory for each SPRING plot. 
+
 `counts_norm.npz`  
 `counts_norm_sparse_cells.hdf5`  
 `counts_norm_sparse_genes.hdf5`  
 `genes.txt`  
 
 Each subdirectory should contain:  
+
 `categorical_coloring_data.json`  
 `cell_filter.npy`  
 `cell_filter.txt`  
