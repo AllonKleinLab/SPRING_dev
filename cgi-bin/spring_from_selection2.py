@@ -180,7 +180,7 @@ else:
 
 		#print 'Everything looks good. Now running...<br>'
 		#print 'This could take several minutes.<br>'
-		if user_email != '': print 'You will be notified of completion by email.<br>'
+		#if user_email != '': print 'You will be notified of completion by email.<br>'
 
 		o = open(new_dir + '/lognewspring2.txt', 'w')
 		o.write('Processing...<br>\n')
