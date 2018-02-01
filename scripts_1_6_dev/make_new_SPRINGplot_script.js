@@ -212,7 +212,7 @@ function submit_new_SPRINGplot() {
 	var this_url = window.location.href;
 
 	var output_message = "Please wait...<br>";
-	output_message += "If everything goes smoothly, a link to your new subplot will appear when processing is complete, and you will receive a link via email (if provided).<br>";
+	output_message += "If everything goes smoothly, a link to your new subplot will appear when ready, and you'll receive a link via email (if provided).<br>";
 	output_message += "<br>This may take several minutes.<br>";
 	var MAXHEIGHT = 772;
 
