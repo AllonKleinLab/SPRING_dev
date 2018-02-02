@@ -99,9 +99,12 @@ if not ssp.isspmatrix_csc(E):
     E = E.tocsc()
 t1 = time.time()
 # update_log(timef, 'Counts loaded from npz -- %.2f' %(t1-t0), True)
+print E.shape
+print gene_list.shape
 
 E = E.T
 
+print E.shape
 
 
 #################
@@ -129,7 +132,7 @@ np.savetxt(outdir + 'coordinates.csv', np.hstack((np.arange(coords.shape[0])[:,N
 
 # save original cell indices of selected cells
 print 'Saving cell indices'
-np.savetxt(outdir + 'original_cell_indices.csv', cell_filter, fmt='%i')
+np.savetxt(outdir + 'original_cell_indices.txt', cell_filter, fmt='%i')
 
 # save extra categorical variables
 print 'Saving categorical data'
