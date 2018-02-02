@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/groups/kleintools/py27/bin/python
+
 import cgi
 import cgitb
 cgitb.enable()  # for troubleshooting
@@ -15,7 +16,6 @@ import numpy as np
 cwd = os.getcwd()
 if cwd.endswith('cgi-bin'):
     os.chdir('../')
-    
 #####################
 # CGI
 do_the_rest = True
@@ -27,14 +27,18 @@ new_dir_short = data.getvalue('new_dir').strip('/')
 
 # ERROR HANDLING HERE
 selected_clusters = data.getvalue('selected_clusters')
+compared_clusters = data.getvalue('compared_clusters')
 current_dir = base_dir + current_dir_short
 new_dir = base_dir + new_dir_short
+this_url = 'https://kleintools.hms.harvard.edu/tools/springViewer_1_6_dev.html'
 
 all_errors = []
 
 if selected_clusters is None:
     all_errors.append('No clusters selected.<br>')
     do_the_rest = False
+if compared_clusters is None:
+    compared_clusters = ''
 
 if os.path.exists(new_dir + "/run_info.json"):
     all_errors.append('A plot called "%s" already exists. Please enter a different <font color="red">name of plot</font>.<br>' %new_dir_short)
@@ -110,6 +114,16 @@ except:
     all_errors.append('Enter an integer >0 for <font color="red">number of force layout iterations</font>.<br>')
     do_the_rest = False
 
+try:
+    description = data.getvalue('description')
+except:
+    description = ''
+
+try:
+    animate = data.getvalue('animate')
+except:
+    animate = 'No'
+
 
 if not do_the_rest:
     #os.rmdir(new_dir)
@@ -119,20 +133,24 @@ if not do_the_rest:
 
 else:
     try:
+        
         if os.path.exists(new_dir):
             import shutil
             shutil.rmtree(new_dir)
         os.makedirs(new_dir)
-
+        
         cat_dat = json.load(open(base_dir + '/base/categorical_coloring_data.json'))
         clust_labels = np.array(cat_dat['Cluster Label']['label_list'])
+        all_clusters =  np.array(selected_clusters.split(',')+compared_clusters.split(','))
         selected_clusters = np.array(selected_clusters.split(','))
-        extra_filter = np.nonzero(np.in1d(clust_labels, selected_clusters))[0]
-        extra_filter = np.sort(extra_filter)
-
+        
+        base_filter = np.nonzero(np.in1d(clust_labels, selected_clusters))[0]
+        extra_filter = np.nonzero(np.in1d(clust_labels, all_clusters))[0]
+        base_ix = np.nonzero([(i in base_filter) for i in extra_filter])[0]
+        
         params_dict = {}
         params_dict['extra_filter'] = extra_filter
-        params_dict['selected_clusters'] = selected_clusters
+        params_dict['base_ix'] = base_ix
         params_dict['base_dir'] = base_dir
         params_dict['current_dir'] = current_dir
         params_dict['new_dir'] = new_dir
@@ -144,8 +162,11 @@ else:
         params_dict['k_neigh'] = k_neigh
         params_dict['num_pc'] = num_pc
         params_dict['num_fa2_iter'] = num_fa2_iter
+        params_dict['this_url'] = this_url
+        params_dict['description'] = description
         params_dict['user_email'] = user_email
-
+        params_dict['animate'] = animate
+        
         params_filename = new_dir + "/params.pickle"
         params_file = open(params_filename, 'wb')
         pickle.dump(params_dict, params_file, -1)
@@ -160,5 +181,7 @@ else:
         o.close()
 
         subprocess.call(["cgi-bin/new_spring_submit.sh", new_dir])
+        
     except:
         print 'Error starting processing!<br>'
+
