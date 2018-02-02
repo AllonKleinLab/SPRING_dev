@@ -297,7 +297,7 @@ function colorBar(project_directory, color_menu_genes) {
 		.attr("x",240)
 		.attr("y",-10)
 		.style("visibility","hidden");
-		
+
 	var left_bracket_label = slider.append("text", "#track-overlay")
 		.attr("class","bracket_label")
 		.attr("id", "left_bracket_label")
@@ -447,7 +447,7 @@ function colorBar(project_directory, color_menu_genes) {
 		var upper_bound = slider_scale.invert(right_bracket.attr("x"));
 		left_bracket_label.text(lower_bound.toFixed(2));
 		right_bracket_label.text(upper_bound.toFixed(2));
-		
+
 		var color_array = null;
 		if (document.getElementById('gradient_button').checked) {
 			var current_selection = document.getElementById('gradient_menu').value
@@ -457,7 +457,7 @@ function colorBar(project_directory, color_menu_genes) {
 			var green_selection = document.getElementById('green_menu').value
 			color_array = green_array;
 		}
-		if (color_array != null) {			
+		if (color_array != null) {
 			for (i=0; i<all_nodes.length; i++) {
 				var x = color_array[i];
 				if (x >= lower_bound && x <= upper_bound) {
@@ -598,7 +598,7 @@ function colorBar(project_directory, color_menu_genes) {
 			categorical_coloring_data[k].label_list.forEach(function(n) { label_counts[n] += 1; });
 			categorical_coloring_data[k]['label_counts'] = label_counts;
 		});
-		
+
 		dispatch.load(categorical_coloring_data,"cell_labels");
 		update_slider();
 	});
@@ -849,7 +849,7 @@ function colorBar(project_directory, color_menu_genes) {
 				update_slider();
 			});
 	}
-    
+
     //preload_enrichments();
     function preload_enrichments() {
         var sel2text = "";
@@ -976,7 +976,7 @@ function colorBar(project_directory, color_menu_genes) {
 		hiddenElement.click();
 	}
 
-	downloadRankedTerms = function downloadRankedTerms() {	
+	downloadRankedTerms = function downloadRankedTerms() {
 		var num_selected = 0;
 		for (i=0; i<all_nodes.length; i++) {
 			if (all_outlines[i].selected) { num_selected += 1; }
@@ -988,45 +988,24 @@ function colorBar(project_directory, color_menu_genes) {
 				if (document.getElementById('gradient_button').checked) {
 					var tracks = gene_set_color_array;
 					var sparse_version = 0;
-				} else { var tracks = all_gene_color_array; var sparse_version = 1; }	
+				} else { var tracks = all_gene_color_array; var sparse_version = 1; }
 				rankedTerms = getRankedText(tracks, sparse_version).slice(0,1000)
 				termcol = rankedTerms[0];
-				scorecol = rankedTerms[1];	
+				scorecol = rankedTerms[1];
 			}
-			else { 
+			else {
 				termcol = []; scorecol = [];
 				d3.select("#termcolumn").selectAll("div").each(function(d) { termcol.push(d); });
-				d3.select("#scorecolumn").selectAll("div").each(function(d) { scorecol.push(d); });	
+				d3.select("#scorecolumn").selectAll("div").each(function(d) { scorecol.push(d); });
 			}
 			var text = '';
-			termcol.forEach(function(d,i) { 
+			termcol.forEach(function(d,i) {
 				text = text + "\n" + d + "\t" + scorecol[i];
 			})
 			text = text.slice(1,text.length);
 		}
 		downloadFile(text,"enriched_terms.txt")
 	}
-    downloadSelectedExpr = function downloadSelectedExpr() {
-        var sel2text = "";
-        for (i=0; i<all_outlines.length; i++) {
-        	if (all_outlines[i].selected) {
-                sel2text = sel2text + "," + i.toString();
-            }
-        }
-        if (sel2text.length>0) { sel2text = sel2text.slice(1, sel2text.length); }
-        var t0 = new Date();
-        console.log('Downloading expression');
-        $.ajax({
-            url: "cgi-bin/download_expression.submit.py",
-            type: "POST",
-            data: {base_dir:graph_directory, current_dir:graph_directory+'/'+sub_directory, selected_cells:sel2text},
-            success: function(data) {
-                var t1 = new Date();
-                console.log(t1.getTime() - t0.getTime());
-                console.log(data);
-            }
-        });
-    }
 }
 
 function make_legend(cat_color_map,cat_label_list) {
@@ -1043,13 +1022,13 @@ function make_legend(cat_color_map,cat_label_list) {
 	d3.select("#count_column")
 		.on('mouseenter',function() {
 			d3.selectAll('.text_count_div').each(function() {
-				var pct = 
+				var pct =
 				d3.select(this).select('p').text(d3.select(this).attr('pct')+'%');
 			});
 		}).on('mouseleave',function() {
 			d3.selectAll('.text_count_div').each(function() {
 				d3.select(this).select('p').text(d3.select(this).attr('count'));
-			});		
+			});
 		});
 
 	d3.select("#label_column").selectAll("div")
@@ -1084,7 +1063,7 @@ function make_legend(cat_color_map,cat_label_list) {
 					if (! (all_outlines[i].selected || all_outlines[i].compared))  { all_selected = false; }
 				}
 			}
-						
+
 			var base_radius = document.getElementById("settings_range_node_size").value / 100;
 			var large_radius = base_radius * 6;
 
@@ -1112,7 +1091,7 @@ function make_legend(cat_color_map,cat_label_list) {
 			}
 			var stepsize = (large_radius - base_radius) / 8;
 			shrinkNodes(base_radius,large_radius,stepsize);
-			
+
 			function shrinkNodes(base_radius,current_radius,stepsize) {
 				current_radius = current_radius - stepsize;
 				if (current_radius >= base_radius) {
