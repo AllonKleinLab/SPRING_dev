@@ -1,6 +1,6 @@
 ### Installing Python libraries
 
-To run SPRING Viewer locally, make sure Python 2.7 is and the following Python libraries are installed:  
+To run SPRING Viewer locally, make sure Python 2.7 is installed (and that it's your active version). You will also need the following Python libraries:  
 
 `scikit-learn`  
 `numpy`  
