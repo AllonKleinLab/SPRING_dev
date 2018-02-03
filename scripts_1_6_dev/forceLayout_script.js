@@ -338,10 +338,9 @@ function move_selection_aside(side) {
 		if (current_frame < steps) {
 			setTimeout(function() { next_frame(steps,current_frame); }, 2);
 		} else {
-			deselect_all();
-			center_view();
+			center_view(false);
 			adjust_edges();
-			if (edge_toggle_image.attr("xlink:href") == "stuff/check-mark.svg") {
+			if (d3.select('#edge_toggle_image').attr("xlink:href") == "stuff/check-mark.svg") {
 				blend_edges();
 			}
 		}
@@ -454,8 +453,6 @@ function animation() {
 		}).fail(function() { 
 			sprites.visible = true;
 			edge_container.visible = true;
-			//center_view();
-
 		})
 }
 
@@ -590,7 +587,7 @@ function initiateButtons() {
 	});
 
 	d3.select("#center_view").on("click", function() {
-		center_view();
+		center_view(true);
 	});
 
 	d3.select('#revert_positions').on('click',revert_positions);
@@ -767,7 +764,7 @@ function redraw() {
 
 
 
-function center_view() {
+function center_view(on_selected) {
 
 
 	var all_xs = [];
@@ -779,16 +776,16 @@ function center_view() {
 		}	
 	}
 	for (i=0; i<all_nodes.length; i++) {
-		if (all_outlines[i].selected || num_selected==0) {
+		if ((! on_selected) || all_outlines[i].selected || num_selected==0) {
 			all_xs.push(all_nodes[i].x);
 			all_ys.push(all_nodes[i].y);
 		}
 	}
 
-	var minx = Math.min(...all_xs);
-	var maxx = Math.max(...all_xs);
-	var miny = Math.min(...all_ys);
-	var maxy = Math.max(...all_ys);
+	var minx = d3.min(all_xs);
+	var maxx = d3.max(all_xs);
+	var miny = d3.min(all_ys);
+	var maxy = d3.max(all_ys);
 
 	var dx = maxx - minx + 50,
 		dy = maxy - miny + 50,

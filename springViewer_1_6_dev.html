@@ -10,6 +10,7 @@
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/diffex_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/make_new_SPRINGplot_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/clone_viewer.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stickyNote.css">
 
 <div id="options_bar">
 	<div id="button_panel">
@@ -58,6 +59,7 @@
 			<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
 			<a target="_blank" id="changeViewer_link">Dynamic mode</a>
 			<a href="javascript:start_clone_viewer()">Clone broswer</a>
+			<a href="javascript:show_stickyNote_popup()">Sticky notes</a>
 		  </div>
 		</div>
 		<div id="sound_toggle"> </div>
@@ -98,6 +100,7 @@
 <script src="scripts_1_6_dev/make_new_SPRINGplot_script.js"></script>
 <script src="scripts_1_6_dev/LineSprite.js"></script>
 <script src="scripts_1_6_dev/clone_viewer.js"></script>
+<script src="scripts_1_6_dev/stickyNote.js"></script>
 <script>
 
 var rotator_radius = null;
@@ -115,7 +118,7 @@ d3.select("#sound_toggle").append('img')
 
 
 function callback() {
-	center_view();
+	center_view(false);
 	sprites.visible = false;
 	edge_container.visible = false;
 	animation();
@@ -126,7 +129,8 @@ function callback() {
 	initiateButtons();
 	make_new_SPRINGplot_setup();
 	clone_viewer_setup();
-
+	stickyNote_setup();
+	show_stickyNote_popup();
 
 
 	window.onclick = function(event) {
@@ -158,7 +162,7 @@ var tmp = graph_directory.split('/');
 graph_directory = tmp.slice(0,tmp.length-1).join('/');
 sub_directory = tmp[tmp.length-1];
 
-document.title = 'SPRING: ' + tmp[tmp.length-2]+'/'+tmp[tmp.length-1];
+document.title = tmp[tmp.length-2]+'/'+tmp[tmp.length-1];
 
 clone_sprites = {};
 clone_edge_container = {};
