@@ -10,8 +10,6 @@ import pickle
 import numpy as np
 import subprocess
 
-import spring_from_selection_execute
-
 cwd = os.getcwd()
 if cwd.endswith('cgi-bin'):
 	os.chdir('../')
@@ -23,11 +21,12 @@ do_the_rest = True
 data = cgi.FieldStorage()
 base_dir = data.getvalue('base_dir')
 current_dir_short = data.getvalue('current_dir').strip('/')
-new_dir_short = data.getvalue('new_dir')
+new_dir_short = data.getvalue('new_dir').strip('/')
 
 # ERROR HANDLING HERE
 base_filter = data.getvalue('selected_cells')
 current_dir = base_dir + '/' + current_dir_short
+new_dir = base_dir + '/' + new_dir_short
 this_url = data.getvalue('this_url')
 
 all_errors = []
@@ -35,30 +34,24 @@ all_errors = []
 if new_dir_short is None:
 	all_errors.append('Enter a <font color="red">name of plot</font><br>')
 	do_the_rest = False
-else:
-	new_dir_short = new_dir_short.strip('/')
-	new_dir = base_dir + '/' + new_dir_short
-
 
 if base_filter is None:
 	all_errors.append('No cells selected.<br>')
 	do_the_rest = False
 
-if not new_dir_short is None:
-	if os.path.exists(new_dir + "/run_info.json"):
-		all_errors.append('A plot called "%s" already exists. Please enter a different <font color="red">name of plot</font>.<br>' %new_dir_short)
-		do_the_rest = False
+if os.path.exists(new_dir + "/run_info.json"):
+	all_errors.append('A plot called "%s" already exists. Please enter a different <font color="red">name of plot</font>.<br>' %new_dir_short)
+	do_the_rest = False
 
 bad_chars = [" ", "/", "\\", ",", ":", "#", "\"", "\'"]
 found_bad = []
-if not new_dir_short is None:
-	for b in bad_chars:
-		if b in new_dir_short:
-			do_the_rest = False
-			if b == " ":
-				found_bad.append('space')
-			else:
-				found_bad.append(b)
+for b in bad_chars:
+	if b in new_dir_short:
+		do_the_rest = False
+		if b == " ":
+			found_bad.append('space')
+		else:
+			found_bad.append(b)
 if len(found_bad) > 0:
 	all_errors.append('Enter a <font color="red">name of plot</font> without the following characters: <font face="courier">%s</font><br>' %('   '.join(found_bad)))
 
@@ -178,16 +171,15 @@ else:
 		pickle.dump(params_dict, params_file, -1)
 		params_file.close()
 
-		#print 'Everything looks good. Now running...<br>'
-		#print 'This could take several minutes.<br>'
-		#if user_email != '': print 'You will be notified of completion by email.<br>'
+		print 'Everything looks good. Now running...<br>'
+		print 'This could take several minutes.<br>'
+		if user_email != '': print 'You will be notified of completion by email.<br>'
 
 		o = open(new_dir + '/lognewspring2.txt', 'w')
-		o.write('Processing...<br>\n')
+		o.write('Started processing<br>\n')
 		o.close()
 
-		output_message = spring_from_selection_execute.execute_spring(params_filename)
-		print output_message
+		subprocess.call(["cgi-bin/new_spring_submit.sh", new_dir])
 
 	except:
 		print 'Error starting processing!<br>'

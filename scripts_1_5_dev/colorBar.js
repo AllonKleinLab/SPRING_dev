@@ -909,7 +909,7 @@ function colorBar(project_directory, color_menu_genes) {
 			});
 	}
 
-    preload_enrichments();
+    //preload_enrichments();
 	function preload_enrichments() {
         console.log('Preloading enrichments');
         var sel2text = "";

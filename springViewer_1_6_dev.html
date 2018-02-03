@@ -9,8 +9,10 @@
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/coexpression_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/diffex_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/make_new_SPRINGplot_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/downloadSelectedExpr_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/clone_viewer.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stickyNote.css">
+<link rel="stylesheet" type="text/css" href="scripts_dev_shared/autocomplete_style.css">
 
 <div id="options_bar">
 	<div id="button_panel">
@@ -44,9 +46,10 @@
 		  <div id="download_dropdown" class="dropdown-content">
 		  	<a href="javascript:downloadCoordinates()">Coordinates</a>
 			<a href="javascript:downloadSelection()">Selected cells</a>
+			<a href="javascript:show_downloadSelectedExpr_popup()">SPRING data <br> for selection</a>
             <!-- <a href="javascript:downloadEdges()">Edge list</a> --!>
 			<a href="javascript:downloadRankedTerms()">Enriched terms</a>
-            <!--<a href="javascript:downloadSelectedExpr()">Expression of selected cells</a>-->
+
 			<a id="download_png">Screenshot</a>
 			<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> --!>
 		  </div>
@@ -101,6 +104,8 @@
 <script src="scripts_1_6_dev/LineSprite.js"></script>
 <script src="scripts_1_6_dev/clone_viewer.js"></script>
 <script src="scripts_1_6_dev/stickyNote.js"></script>
+<script src="scripts_1_6_dev/downloadSelectedExpr_script.js"></script>
+<script src="scripts_dev_shared/jquery.autocomplete.min.js"></script>
 <script>
 
 var rotator_radius = null;
@@ -128,9 +133,10 @@ function callback() {
 	setup_layout_dropdown();
 	initiateButtons();
 	make_new_SPRINGplot_setup();
+	downloadSelectedExpr_setup();
 	clone_viewer_setup();
 	stickyNote_setup();
-	show_stickyNote_popup();
+	//show_stickyNote_popup();
 
 
 	window.onclick = function(event) {
