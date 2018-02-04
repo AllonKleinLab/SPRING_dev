@@ -21,7 +21,7 @@ do_the_rest = True
 data = cgi.FieldStorage()
 base_dir = data.getvalue('base_dir')
 current_dir_short = data.getvalue('current_dir').strip('/')
-new_dir_short = data.getvalue('new_dir').strip('/')
+new_dir_short = data.getvalue('new_dir')
 
 # ERROR HANDLING HERE
 base_filter = data.getvalue('selected_cells')
@@ -34,24 +34,29 @@ all_errors = []
 if new_dir_short is None:
 	all_errors.append('Enter a <font color="red">name of plot</font><br>')
 	do_the_rest = False
+else:
+	new_dir_short = new_dir_short.strip('/')
+	new_dir = base_dir + '/' + new_dir_short
 
 if base_filter is None:
 	all_errors.append('No cells selected.<br>')
 	do_the_rest = False
 
-if os.path.exists(new_dir + "/run_info.json"):
-	all_errors.append('A plot called "%s" already exists. Please enter a different <font color="red">name of plot</font>.<br>' %new_dir_short)
-	do_the_rest = False
+if not new_dir_short is None:
+	if os.path.exists(new_dir + "/run_info.json"):
+		all_errors.append('A plot called "%s" already exists. Please enter a different <font color="red">name of plot</font>.<br>' %new_dir_short)
+		do_the_rest = False
 
 bad_chars = [" ", "/", "\\", ",", ":", "#", "\"", "\'"]
 found_bad = []
-for b in bad_chars:
-	if b in new_dir_short:
-		do_the_rest = False
-		if b == " ":
-			found_bad.append('space')
-		else:
-			found_bad.append(b)
+if not new_dir_short is None:
+	for b in bad_chars:
+		if b in new_dir_short:
+			do_the_rest = False
+			if b == " ":
+				found_bad.append('space')
+			else:
+				found_bad.append(b)
 if len(found_bad) > 0:
 	all_errors.append('Enter a <font color="red">name of plot</font> without the following characters: <font face="courier">%s</font><br>' %('   '.join(found_bad)))
 
