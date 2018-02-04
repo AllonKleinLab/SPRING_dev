@@ -1108,12 +1108,11 @@ function make_legend(cat_color_map,cat_label_list) {
 					if (! (all_outlines[i].selected || all_outlines[i].compared))  { all_selected = false; }
 				}
 			}
-
-			var base_radius = document.getElementById("settings_range_node_size").value / 100;
-			var large_radius = base_radius * 6;
-
+			
+                        var my_nodes = [];
 			for (i=0; i<all_nodes.length; i++) {
 				if (cat_label_list[i]==d) {
+					my_nodes.push(i);
 					all_outlines[i].scale.set(large_radius);
 					all_nodes[i].scale.set(large_radius);
 					if (all_selected) {
@@ -1134,27 +1133,29 @@ function make_legend(cat_color_map,cat_label_list) {
 					}
 				}
 			}
+			
+			var base_radius = document.getElementById("settings_range_node_size").value / 100;
+			var large_radius = base_radius * 6;
 			var stepsize = (large_radius - base_radius) / 8;
-			shrinkNodes(base_radius,large_radius,stepsize);
-
-			function shrinkNodes(base_radius,current_radius,stepsize) {
-				current_radius = current_radius - stepsize;
-				if (current_radius >= base_radius) {
-					for (i=0; i<all_nodes.length; i++) {
-						if (cat_label_list[i]==d) {
-							all_outlines[i].scale.set(current_radius);
-							all_nodes[i].scale.set(current_radius);
-						}
-					}
-					setTimeout(function() { shrinkNodes(base_radius,current_radius,stepsize); }, 10);
-				}
-			}
-			console.log('heyhey');
+			shrinkNodes(base_radius,large_radius,stepsize,my_nodes);
 			update_selected_count();
 			count_clusters();
 		});
 	count_clusters();
 }
+
+function shrinkNodes(base_radius,current_radius,stepsize,nodes) {
+	current_radius = current_radius - stepsize;
+	if (current_radius >= base_radius) {
+		for (ii in nodes) {
+			var i = nodes[ii];
+			all_outlines[i].scale.set(current_radius);
+			all_nodes[i].scale.set(current_radius);
+		}
+		setTimeout(function() { shrinkNodes(base_radius,current_radius,stepsize, nodes); }, 10);
+	}
+}
+
 
 
 function count_clusters() {

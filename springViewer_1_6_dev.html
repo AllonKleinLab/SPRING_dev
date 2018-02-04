@@ -13,6 +13,8 @@
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/clone_viewer.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stickyNote.css">
 <link rel="stylesheet" type="text/css" href="scripts_dev_shared/autocomplete_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/sweetalert.css">
+
 
 <div id="options_bar">
 	<div id="button_panel">
@@ -106,6 +108,7 @@
 <script src="scripts_1_6_dev/stickyNote.js"></script>
 <script src="scripts_1_6_dev/downloadSelectedExpr_script.js"></script>
 <script src="scripts_dev_shared/jquery.autocomplete.min.js"></script>
+<script src="scripts_1_6_dev/sweetalert.min.js"></script>
 <script>
 
 var rotator_radius = null;
@@ -136,7 +139,7 @@ function callback() {
 	downloadSelectedExpr_setup();
 	clone_viewer_setup();
 	stickyNote_setup();
-	//show_stickyNote_popup();
+	show_stickyNote_popup();
 
 
 	window.onclick = function(event) {
