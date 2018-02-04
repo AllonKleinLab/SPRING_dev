@@ -319,6 +319,7 @@ def text_to_sparse(fname,delim='\t',start_row=0,start_column=0,update=0,data_typ
     return output
 
 def tot_counts_norm_sparse(E, exclude_dominant_frac = 1, included = [], target_mean = 0):
+    E = E.tocsc()
     ncell = E.shape[0]
     if len(included) == 0:
         if exclude_dominant_frac == 1:
@@ -340,7 +341,7 @@ def tot_counts_norm_sparse(E, exclude_dominant_frac = 1, included = [], target_m
     w.setdiag(float(target_mean) / tots_use)
     Enorm = w * E
 
-    return Enorm, target_mean, included
+    return Enorm.tocsc(), target_mean, included
 
 def sparse_var(E, axis=0):
     mean_gene = E.mean(axis=axis).A.squeeze()
@@ -504,6 +505,9 @@ def run_all_spring_sparse(E, gene_list, sample_name, save_dir = './', base_ix = 
                    precomputed_pca = [], gene_filter = [], custom_colors = {},
                    exclude_corr_genes = [], exclude_gene_corr = 0.2, dist_metric = 'euclidean', use_approxnn=False,
                    run_woublet = False, dd_k=50, dd_frac=5, dd_approx=True):
+
+    E = E.tocsc()
+
     if len(base_ix) == 0:
         base_ix = np.arange(E.shape[0])
 
@@ -642,6 +646,7 @@ def run_all_spring_sparse_hdf5(E, gene_list, sample_name, save_dir = './', base_
                    precomputed_pca = [], gene_filter = [], custom_colors = {},
                    exclude_corr_genes = [], exclude_gene_corr = 0.2, dist_metric = 'euclidean', use_approxnn=False,
                    run_woublet = False, dd_k=50, dd_frac=5, dd_approx=True, tot_counts_final = []):
+    E = E.tocsc()
     if len(base_ix) == 0:
         base_ix = np.arange(E.shape[0])
 
@@ -781,6 +786,7 @@ def run_all_spring_1_6(E, gene_list, sample_name, save_dir = './', base_ix = [],
                    precomputed_pca = [], gene_filter = [], custom_colors = {},
                    exclude_corr_genes_list = [], exclude_corr_genes_minCorr = 0.2, dist_metric = 'euclidean', use_approxnn=False,
                    run_doub_detector = False, dd_k=50, dd_frac=5, dd_approx=True, tot_counts_final = []):
+    E = E.tocsc()
     if len(base_ix) == 0:
         base_ix = np.arange(E.shape[0])
 
