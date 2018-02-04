@@ -26,7 +26,6 @@ new_dir_short = data.getvalue('new_dir')
 # ERROR HANDLING HERE
 base_filter = data.getvalue('selected_cells')
 current_dir = base_dir + '/' + current_dir_short
-new_dir = base_dir + '/' + new_dir_short
 this_url = data.getvalue('this_url')
 
 all_errors = []
