@@ -11,21 +11,6 @@ import networkx as nx
 import pickle
 import datetime
 
-try: 
-    from fa2_anim import ForceAtlas2
-    animation_mode = True
-except: 
-    from fa2 import ForceAtlas2
-    animation_mode = False
-
-cwd = os.getcwd()
-if cwd.endswith('cgi-bin'):
-    os.chdir('../')
-
-creation_time = datetime.datetime.now()
-
-t00 = time.time()
-
 def sparse_var(E, axis=0):
     mean_gene = E.mean(axis=axis).A.squeeze()
     tmp = E.copy()
@@ -80,20 +65,20 @@ def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
     server.sendmail(fromaddr, toaddr, text)
     server.quit()
 
+try:
+    from fa2_anim import ForceAtlas2
+    animation_mode = True
+except:
+    from fa2 import ForceAtlas2
+    animation_mode = False
 
-##########################
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
 
-#jitterTolerance=1.0,  # Tolerance
-#barnesHutOptimize=True,
-#barnesHutTheta=2,
-#multiThreaded=False,  # NOT IMPLEMENTED
-#
-## Tuning
-#scalingRatio=2.0,
-#strongGravityMode=False,
-#gravity=0.1,
+creation_time = datetime.datetime.now()
 
-#######################
+t00 = time.time()
 # Load parameters
 params_dict = pickle.load(open(sys.argv[1], 'rb'))
 
@@ -263,11 +248,11 @@ forceatlas2 = ForceAtlas2(
                           # Log
                           verbose=False)
 
-if animation_mode and animate=='Yes': 
+if animation_mode and animate=='Yes':
     f = open(new_dir+'/animation.txt','w')
     f = open(new_dir+'/animation.txt','a')
     positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter, writefile=f)
-else: 
+else:
     positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter)
 
 
@@ -299,12 +284,6 @@ if os.path.exists(current_dir + '/clone_map.json'):
         if i in extra_filter_map and len(new_clone) > 0:
             new_clone_map[extra_filter_map[i]] = new_clone
     json.dump(new_clone_map,open(new_dir+'/clone_map.json','w'))
-    
-    
-    
-    
-
-
 ################
 # Save run info
 import datetime
