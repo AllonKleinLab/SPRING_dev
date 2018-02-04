@@ -211,8 +211,8 @@ function submit_new_SPRINGplot() {
 	var animate = d3.select('#input_animation').text();
 	var this_url = window.location.href;
 
-	var output_message = "Please wait...<br>";
-	output_message += "If everything goes smoothly, a link to your new subplot will appear when ready, and you'll receive a link via email (if provided).<br>";
+	var output_message = "Please wait... ";
+	output_message += "If all goes smoothly a link to your new subplot will appear here and be sent by email.<br>";
 	output_message += "<br>This may take several minutes.<br>";
 	var MAXHEIGHT = 772;
 
@@ -250,23 +250,23 @@ function submit_new_SPRINGplot() {
 			email:email, animate:animate
 	   	},
 		success: function(output_message) {
-			//keep_checking_log = false;
 			d3.select('#make_new_SPRINGplot_message_div')
 				.select('text').html(output_message);
 		}
 	});
 
-	// function checkLog(){
-	// 	if (keep_checking_log) {
-	// 		jQuery.get(graph_directory + "/" + new_dir + "/lognewspring2.txt", function(logdata) {
-	// 			var logdata_split = logdata.split('\n');
-	// 			var display_message = logdata_split[logdata_split.length-2];
-	// 			d3.select('#make_new_SPRINGplot_message_div')
-	// 				.select('text').html(display_message);
-	// 			setTimeout(checkLog, 500);
-	// 		});
-	// 	}
-	// }
-
-	//setTimeout(checkLog, 5000);
+	function checkLog(){
+		console.log('check');
+		if (keep_checking_log) {
+			jQuery.get(graph_directory + "/" + new_dir + "/lognewspring2.txt", function(logdata) {
+				var logdata_split = logdata.split('\n');
+				var display_message = logdata_split[logdata_split.length-2];
+				d3.select('#make_new_SPRINGplot_message_div')
+					.select('text').html(display_message);
+				setTimeout(checkLog, 500);
+			});
+		}
+	}
+	var keep_checking_log = true;
+	setTimeout(checkLog, 5000);
 }

@@ -27,6 +27,9 @@ var proj_dir_split = project_directory.split("/");
 if (proj_dir_split[proj_dir_split.length-1] == 'xenopus_embryo_timecourse') {
 	window.location.replace('https://kleintools.hms.harvard.edu/tools/currentDatasetsList_xenopus.html');
 }
+if (proj_dir_split[proj_dir_split.length-1] == 'xenopus_embryo_timecourse_v2') {
+	window.location.replace('https://kleintools.hms.harvard.edu/tools/currentDatasetsList_xenopus_v2.html');
+}
 else {
 	populate_subdirs_list(project_directory.slice(1,project_directory.length));
 }
