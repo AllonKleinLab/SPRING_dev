@@ -449,7 +449,7 @@ function colorBar(project_directory, color_menu_genes) {
 			color_array = gene_set_color_array[current_selection];
 		}
 		if (document.getElementById('channels_button').checked) {
-			var green_selection = document.getElementById('green_menu').value
+			var green_selection = d3.select('#autocomplete')[0][0].value
 			color_array = green_array;
 		}
 		if (color_array != null) {

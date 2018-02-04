@@ -104,6 +104,11 @@ function stickyNote_setup() {
 		if (note.attr('active') != 'true') {
 			note.select('p').style('visibility','hidden');
 			$(note.select('textarea')[0][0]).focus();
+			
+// 			var emails = note.attr('emails');
+// 			if (emails.length > 0) {
+// 				$('#sticky_email_input').value = emails.split(',')[1];
+// 			}
 		}
 			
 		note.style('background-color','rgba(40,40,40,.5)')
