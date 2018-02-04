@@ -2,7 +2,7 @@
 function stickyNote_setup() {
 	var popup = d3.select('#force_layout').append('div')
 		.attr('id','stickyNote_popup')
-		//.on('mousedown',deactivate_all);
+		.on('mousedown',deactivate_all);
 		
 	var button_bar = popup.append('div')
 		.attr('id','stickyNote_button_bar')
@@ -10,7 +10,7 @@ function stickyNote_setup() {
 		
 	var selected_note = null
 
-	button_bar.append('text').text('Sticky notes');
+	button_bar.append('text').text('Notes');
 	button_bar.append('button').text('Close').style('margin-right','11px')
 		.on('click',function() { 
 			if (! is_synched()) {
@@ -27,6 +27,10 @@ function stickyNote_setup() {
 		
 	button_bar.append('button').text('New')
 		.on('click',new_note);
+
+	button_bar.append('button').text('Delete')
+		.on('click',delete_note);
+
 		
 	button_bar.append('button').text('Bind cells')
 		.on('click',bind_cells);
@@ -44,7 +48,7 @@ function stickyNote_setup() {
 		.append('input').attr('type','text')
 		.on('mousedown',function() { d3.event.stopPropagation(); })
 		.attr('id','sticky_email_input')
-		.style('width','272px');
+		.style('width','212px');
 	
 	
 	var sticky_path = window.location.search;
