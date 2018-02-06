@@ -33,9 +33,70 @@ function imputation_setup() {
 }
 
 function perform_smoothing() {
-	var beta = $('#imputation_beta_input').val();
-	var N = $('#imputation_N_input').val();
-	console.log([beta,N]);
+	if (document.getElementById('channels_button').checked) {
+		var t0 = new Date();
+
+		var beta = $('#imputation_beta_input').val();
+		var N = $('#imputation_N_input').val();
+
+		// var all_r = "";
+		// var all_g = "";
+		// var all_b = "";
+	 //    for (i=0; i<all_outlines.length; i++) {
+	 //    	var col = base_colors[i];
+	 //        all_r = all_r + "," + col["r"].toString();
+	 //        all_g = all_g + "," + col["g"].toString();
+	 //        all_b = all_b + "," + col["b"].toString();
+	 //    }
+	 //    all_r = all_r.slice(1, all_r.length);
+	 //    all_g = all_g.slice(1, all_g.length);
+	 //    all_b = all_b.slice(1, all_b.length);
+	 	var green_string = "";
+	 	for (i=0; i<all_outlines.length; i++) {
+	 		green_string = green_string + "," + green_array_raw[i].toString();
+	 	}
+	 	green_string = green_string.slice(1, green_string.length);
+
+
+	 	$.ajax({
+	        url: "cgi-bin/smooth_gene.py",
+	        type: "POST",
+	        //data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, raw_r:all_r, raw_g:all_g, raw_b:all_b, beta:beta, n_rounds:N},
+	        data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, beta:beta, n_rounds:N, raw_g:green_string},
+	        success: function(data) {
+	        	var t1 = new Date();
+	        	console.log('Smoothed the data: ', t1.getTime() - t0.getTime());
+	        	green_array = data.split(',');
+	            for (var i = 0; i < all_nodes.length; i++) {
+					var rawval = green_array[i];
+					var gg = normalize_one_val(rawval);
+					base_colors[i] = {r:0,g:Math.floor(gg*255),b:0};
+				}
+
+				app.stage.children[1].children.sort(function(a,b) {
+					return green_array[a.index] - green_array[b.index];
+				});
+
+				update_tints();
+	            if (d3.select("#left_bracket").style("visibility")=="visible"){
+	                slider_select_update();
+	                update_selected_count();
+	            }
+
+
+	   //      	var spl = data.split(";");
+	   //      	var reds = spl[0].split(",");
+	   //      	var greens = spl[1].split(",");
+	   //      	var blues = spl[2].split(",");
+	   //          for (var i = 0; i < all_nodes.length; i++) {
+				// 	base_colors[i] = {r:parseInt(reds[i]),g:parseInt(greens[i]),b:parseInt(blues[i])};
+				// }
+				// update_tints();
+			
+	        }
+	    });
+	 }
+	
 }
 
 
