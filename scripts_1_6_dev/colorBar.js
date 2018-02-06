@@ -5,7 +5,7 @@ function colorBar(project_directory, color_menu_genes) {
 	*/
 	var color_profiles = {};
 	var color_option = "gradient"
-	var color_max = 1;
+	color_max = 1;
 	color_stats = null;
 	var menuBar = d3.select("#color_chooser");
     var enrich_script = 'get_gene_zscores.from_npz.dev.py';
@@ -105,7 +105,8 @@ function colorBar(project_directory, color_menu_genes) {
 		.domain([0, .5, 1])
 		.range(["black", "red", "yellow"]);
 
-	var green_array = null;
+	green_array = null;
+	green_array_raw = null;
 
 	function normalize(x) {
 		min = 0; max = color_max;
@@ -118,7 +119,7 @@ function colorBar(project_directory, color_menu_genes) {
 		return out;
 	}
 
-	function normalize_one_val(x) {
+	normalize_one_val = function normalize_one_val(x) {
 		min = 0; max = color_max;
         var out
 		if (x > max) { out = 1; }
@@ -127,7 +128,7 @@ function colorBar(project_directory, color_menu_genes) {
 		return out;
 	}
 
-	function update_tints() {
+	update_tints = function update_tints() {
 		for (var i = 0; i < base_colors.length; i++) {
 			var rgb = (base_colors[i]);
 			all_nodes[i].tint = rgbToHex(rgb.r,rgb.g,rgb.b);
@@ -164,6 +165,7 @@ function colorBar(project_directory, color_menu_genes) {
                     var t1 = new Date();
                     console.log('Read gene data: ', t1.getTime() - t0.getTime());
                     green_array = data.split(',');
+                    green_array_raw = data.split(',');
                     for (var i = 0; i < all_nodes.length; i++) {
 						//tmp = tmp + 1;
 						var rawval = green_array[i];
