@@ -3,6 +3,8 @@ function imputation_setup() {
 		.attr('id','imputation_popup');
 	
 	var button_bar = popup.append('div').attr('id','imputation_button_bar')
+		.on('mousedown',function() { d3.event.stopPropagation(); });
+		
 	button_bar.append('label').text('N = ').append('input').attr('id','imputation_N_input').property('value',10);
 	button_bar.append('label').text('\u03B2 = ').append('input').attr('id','imputation_beta_input').property('value',0.1);
 	button_bar.append('button').text('Smooth').on('click',perform_smoothing);

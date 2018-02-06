@@ -15,6 +15,7 @@
 <link rel="stylesheet" type="text/css" href="scripts_dev_shared/autocomplete_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/sweetalert.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/smoothing_imputation.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_logic.css">
 
 
 <div id="options_bar">
@@ -67,6 +68,7 @@
 			<a href="javascript:start_clone_viewer()">Clone broswer</a>
 			<a href="javascript:show_stickyNote_popup()">Sticky notes</a>
 			<a href="javascript:show_imputation_popup()">Smooth / Impute</a>
+			<a href="javascript:show_selection_logic_popup()">Selection logic</a>
 		  </div>
 		</div>
 		<div id="sound_toggle"> </div>
@@ -112,6 +114,7 @@
 <script src="scripts_dev_shared/jquery.autocomplete.min.js"></script>
 <script src="scripts_1_6_dev/sweetalert.min.js"></script>
 <script src="scripts_1_6_dev/smoothing_imputation.js"></script>
+<script src="scripts_1_6_dev/selection_logic.js"></script>
 
 <script>
 
@@ -144,6 +147,7 @@ function callback() {
 	clone_viewer_setup();
 	stickyNote_setup();
 	imputation_setup();
+	selection_logic_setup();
 
 
 	window.onclick = function(event) {
