@@ -14,6 +14,7 @@
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stickyNote.css">
 <link rel="stylesheet" type="text/css" href="scripts_dev_shared/autocomplete_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/sweetalert.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/smoothing_imputation.css">
 
 
 <div id="options_bar">
@@ -65,6 +66,7 @@
 			<a target="_blank" id="changeViewer_link">Dynamic mode</a>
 			<a href="javascript:start_clone_viewer()">Clone broswer</a>
 			<a href="javascript:show_stickyNote_popup()">Sticky notes</a>
+			<a href="javascript:show_imputation_popup()">Smooth / Impute</a>
 		  </div>
 		</div>
 		<div id="sound_toggle"> </div>
@@ -109,6 +111,8 @@
 <script src="scripts_1_6_dev/downloadSelectedExpr_script.js"></script>
 <script src="scripts_dev_shared/jquery.autocomplete.min.js"></script>
 <script src="scripts_1_6_dev/sweetalert.min.js"></script>
+<script src="scripts_1_6_dev/smoothing_imputation.js"></script>
+
 <script>
 
 var rotator_radius = null;
@@ -139,6 +143,9 @@ function callback() {
 	downloadSelectedExpr_setup();
 	clone_viewer_setup();
 	stickyNote_setup();
+	
+	imputation_setup();
+	show_imputation_popup();
 
 
 	window.onclick = function(event) {

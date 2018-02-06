@@ -83,8 +83,7 @@ function stickyNote_setup() {
 		if ( !d ) { 
 			d = { text:'', emails:'', bound_cells:(get_selected_cells()).join(',')}; 
 		}
-		console.log(d);
-		
+
 		var note = sticky_div.insert("div", ":first-child").attr('class','sticky_note');
 		note.append('textarea').style('height','90px');
 		note.on('mousedown',function() {
