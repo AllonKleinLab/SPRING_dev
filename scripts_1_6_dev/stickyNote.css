@@ -2,7 +2,7 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 350px;
+	width: 390px;
 	background-color: rgba(50,50,50,.8);
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
@@ -65,11 +65,11 @@
 	font-family: Arial, Helvetica, sans-serif;
 	user-select: none;
 	font-size: 14px;
-	margin-left: 4px;
+	margin-left: 8px;
 }
 
 #sticky_email > label > input {
-	margin-left: 16px;
+	margin-left: 18px;
 	height: 13px;
 	font-size: 14px;
 	color: white;

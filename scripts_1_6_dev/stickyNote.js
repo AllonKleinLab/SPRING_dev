@@ -10,7 +10,6 @@ function stickyNote_setup() {
 		
 	var selected_note = null
 
-	button_bar.append('text').text('Notes');
 	button_bar.append('button').text('Close').style('margin-right','11px')
 		.on('click',function() { 
 			if (! is_synched()) {
@@ -34,6 +33,10 @@ function stickyNote_setup() {
 		
 	button_bar.append('button').text('Bind cells')
 		.on('click',bind_cells);
+	
+	button_bar.append('button').text('Show selected')
+		.on('click',show_selected);
+
 		
 	var sticky_div = popup.append('div')
 		.attr('id','sticky_div')
@@ -48,7 +51,7 @@ function stickyNote_setup() {
 		.append('input').attr('type','text')
 		.on('mousedown',function() { d3.event.stopPropagation(); })
 		.attr('id','sticky_email_input')
-		.style('width','212px');
+		.style('width','252px');
 	
 	
 	var sticky_path = window.location.search;
@@ -112,8 +115,7 @@ function stickyNote_setup() {
 // 			}
 		}
 			
-		note.style('background-color','rgba(40,40,40,.5)')
-			.style('border','solid 2px rgba(200,200,200,.8)')
+		note.style('border','solid 2px rgba(230,230,230,.8)')
 			.attr('active','true');
 			
 		var my_nodes = []
@@ -137,7 +139,6 @@ function stickyNote_setup() {
 	function deactivate_all() {
 		d3.selectAll('.sticky_note')
 			.attr('active','false')
-			.style('background-color','rgba(0,0,0,.5)')
 			.style('border','0px');
 
 		d3.selectAll('.sticky_note').selectAll('textarea')
@@ -209,7 +210,7 @@ function stickyNote_setup() {
 			type: "POST",
 			data: {path:path, content:JSON.stringify(all_data, null, ' ')},
 			success: function() { 
-				weetAlert({title:"All stickies have been saved"}); 
+				sweetAlert({title:"All stickies have been saved"}); 
 			}
 		});
 	}
@@ -241,8 +242,22 @@ function stickyNote_setup() {
 	}
 	function stickyNote_popup_dragended() { }
 	
-	function check_selection() {
-	
+	function show_selected() {
+		var selected_cells = [];
+		for (i=0; i<all_outlines.length; i++) {
+			if (all_outlines[i].selected) {
+				selected_cells.push(i.toString());
+			}
+		}
+		d3.selectAll('.sticky_note').style('background-color','rgba(0,0,0,.5)');
+		d3.selectAll('.sticky_note').each(function() {
+			var note = d3.select(this);
+			bound_cells = note.attr('bound_cells').split(',');
+			if ((bound_cells.filter((n) => selected_cells.includes(n))).length>0) {
+				note.style('background-color','rgba(255,255,0,.4)')
+				$(sticky_div[0][0]).prepend(note[0][0]);
+			}
+		});
 	}
 
 	d3.select("#stickyNote_popup")
@@ -268,5 +283,4 @@ function show_stickyNote_popup() {
 	d3.select("#stickyNote_popup")
 		.style("left",(svg_width/2-mywidth/2).toString()+"px")
 		.style("top","10px").style('visibility','visible');
-	check_selection();
 }
