@@ -103,6 +103,7 @@ function imputation_setup() {
 					var t1 = new Date();
 					console.log('Smoothed the data: ', t1.getTime() - t0.getTime());
 					green_array = data.split(',');
+					
 					for (var i = 0; i < all_nodes.length; i++) {
 						var rawval = green_array[i];
 						var gg = normalize_one_val(rawval);
