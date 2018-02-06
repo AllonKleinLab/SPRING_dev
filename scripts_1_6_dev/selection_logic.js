@@ -89,6 +89,7 @@ function selection_logic_setup() {
 		
 	function add_selection() {
 		var name = $('#selection_logic_input').val();
+		$('#selection_logic_input').val('');
 		left_dropdown.append('option').text(name).attr('selected','selected');
 		right_dropdown.append('option').text(name).attr('selected','selected');
 		selection_data[name] = get_selected_cells();

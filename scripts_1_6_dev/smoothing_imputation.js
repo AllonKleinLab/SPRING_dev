@@ -70,7 +70,7 @@ function imputation_setup() {
 	function perform_smoothing() {
 		if (document.getElementById('channels_button').checked) {
 			var t0 = new Date();
-
+			update_slider();
 			var beta = $('#imputation_beta_input').val();
 			var N = $('#imputation_N_input').val();
 
