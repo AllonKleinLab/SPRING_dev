@@ -52,6 +52,7 @@
 	padding-left: 8px;
 	padding-right: 8px;
 	border: none;
+	resize: none;
 }
 
 #sticky_email {
