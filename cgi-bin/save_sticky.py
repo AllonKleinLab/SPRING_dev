@@ -10,6 +10,12 @@ if cwd.endswith('cgi-bin'):
     os.chdir('../')
 
 
+def check_same(d1,d2):
+	out = True
+	for k,v in d1.items():
+		if not k in d2 or d2[k] != v: out = False
+	return out
+
 filepath = data.getvalue('path')
 content = data.getvalue('content')
 if os.path.exists(filepath):
