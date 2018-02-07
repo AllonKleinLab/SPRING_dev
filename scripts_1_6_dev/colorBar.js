@@ -223,7 +223,7 @@ function colorBar(project_directory, color_menu_genes) {
 
 
 
-	var slider_scale = d3.scale.linear()
+	slider_scale = d3.scale.linear()
 		.domain([0, 10])
 		.range([0, svg_width / 3])
 		.clamp(true);
@@ -479,10 +479,10 @@ function colorBar(project_directory, color_menu_genes) {
 			var name = document.getElementById('labels_menu').value;
 			var cat_color_map = categorical_coloring_data[name]['label_colors'];
 			var cat_label_list = categorical_coloring_data[name]['label_list'];
-			legendMask.transition().attr("x", svg_width-177)
+			d3.select('#legend_mask').transition().attr("x", svg_width-177)
 				.each("end", function() { make_legend(cat_color_map,cat_label_list); });
 		} else {
-			legendMask.transition().attr("x", svg_width)
+			d3.select('#legend_mask').transition().attr("x", svg_width)
 			if (color_stats == null) { return; }
 			if (document.getElementById('gradient_button').checked) {
 				var name = document.getElementById('gradient_menu').value;

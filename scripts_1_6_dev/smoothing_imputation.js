@@ -70,7 +70,7 @@ function imputation_setup() {
 	function perform_smoothing() {
 		if (document.getElementById('channels_button').checked) {
 			var t0 = new Date();
-			update_slider();
+			//update_slider();
 			var beta = $('#imputation_beta_input').val();
 			var N = $('#imputation_N_input').val();
 
@@ -115,11 +115,6 @@ function imputation_setup() {
 					});
 
 					update_tints();
-					if (d3.select("#left_bracket").style("visibility")=="visible"){
-						slider_select_update();
-						update_selected_count();
-					}
-				
 					hide_waiting_wheel();
 
 
