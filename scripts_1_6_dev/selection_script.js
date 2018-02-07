@@ -30,6 +30,19 @@ function selection_setup() {
 	var neg_select_count_rect = d3.select("svg").append("rect")
 		.attr("class","selection_option")
 		.attr("x", svg_width).attr("y", 127).attr("fill-opacity",.25).attr("width", 200).attr("height", 24)
+		
+	var switch_div = d3.select('#force_layout').append('div')
+		.attr('id','selection_switch_div')
+		.style('position','absolute')
+		.style('top','35px')
+		.style('right','0px')
+		.style('width','20px')
+		.style('height','30px')
+		.on('click', switch_pos_neg)
+		.append('img').attr('src','stuff/switch_arrow.png')
+			.style('height','100%')
+			.style('width','8px')
+			.style('margin-left','8px')
 
 		
 	d3.select("svg")
@@ -63,6 +76,30 @@ function selection_setup() {
 		.attr("x", svg_width).attr("y", 143).attr("font-family", "sans-serif")
 		.attr("font-size", "12px").attr("fill", "blue").text("0 cells selected")
 
+	function switch_pos_neg() {
+	
+		var pos_cells = [];
+		var neg_cells = [];
+		for (i=0; i<all_outlines.length; i++) {
+			if (all_outlines[i].selected) {
+				pos_cells.push(i);
+			}
+			if (all_outlines[i].compared) {
+				neg_cells.push(i);
+			}
+		}
+		for (i=0; i<neg_cells.length; i++) {
+			all_outlines[neg_cells[i]].tint = '0xffff00';
+			all_outlines[neg_cells[i]].selected = true;
+			all_outlines[neg_cells[i]].compared = false;
+		}
+		for (i=0; i<pos_cells.length; i++) {	
+			all_outlines[pos_cells[i]].tint = '0x0000ff';
+			all_outlines[pos_cells[i]].compared = true;
+			all_outlines[pos_cells[i]].selected = false;		
+		}
+	
+	}
 	
 	function switch_mode() {
 		drag_pan_zoom_rect.transition(5).attr("fill-opacity", selection_mode=='drag_pan_zoom' ? .5 : 0.15);
