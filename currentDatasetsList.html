@@ -7,7 +7,7 @@
 
 
 
-<div>
+<div id='container'>
   <h2 id="project_directory_title">  </h2>
   <ol id="dataset_list">
   </ol>
@@ -27,8 +27,14 @@ var proj_dir_split = project_directory.split("/");
 if (proj_dir_split[proj_dir_split.length-1] == 'xenopus_embryo_timecourse') {
 	window.location.replace('https://kleintools.hms.harvard.edu/tools/currentDatasetsList_xenopus.html');
 }
-if (proj_dir_split[proj_dir_split.length-1] == 'xenopus_embryo_timecourse_v2') {
+else if (proj_dir_split[proj_dir_split.length-1] == 'xenopus_embryo_timecourse_v2') {
 	window.location.replace('https://kleintools.hms.harvard.edu/tools/currentDatasetsList_xenopus_v2.html');
+}
+else if ( proj_dir_split[proj_dir_split.length-1] == 'all_plots_from_before_18_2_7' ) {
+	d3.select('#container').insert('div',':first-child').append('a')
+		.text('Xenopus Jamboree homepage').attr('href','https://kleintools.hms.harvard.edu/tools/currentDatasetsList_xenopus_v2.html')
+		.style('font-size','40px').style('color','red');
+	populate_subdirs_list(project_directory.slice(1,project_directory.length));
 }
 else {
 	populate_subdirs_list(project_directory.slice(1,project_directory.length));
