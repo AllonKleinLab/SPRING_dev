@@ -98,7 +98,8 @@ update_log(logf, 'smoothed data -- %.3f' %(t1-t0))
 
 t0 = time.time()
 # print ';'.join([','.join(map(str,E[:,0])), ','.join(map(str,E[:,1])), ','.join(map(str,E[:,2]))])
-print ','.join(map(strfloat,E))
+new_max = E.max()
+print ','.join(map(strfloat,E)) + ';' + str(new_max)
 t1 = time.time()
 update_log(logf, 'returned data -- %.3f' %(t1-t0))
 

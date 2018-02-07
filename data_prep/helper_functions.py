@@ -497,6 +497,58 @@ def get_vscores_sparse(E, min_mean=0, nBins=50, fit_percentile=0.1, error_wt=1):
 
     return v_scores, CV_eff, CV_input, gene_ix, mu_gene, FF_gene, a, b
 
+
+def save_hdf5_genes(E, gene_list, filename):
+    '''SPRING standard: filename = main_spring_dir + "counts_norm_sparse_genes.hdf5"'''
+    
+    import h5py
+    
+    E = E.tocsc()
+    
+    hf = h5py.File(filename, 'w')
+    counts_group = hf.create_group('counts')
+    cix_group = hf.create_group('cell_ix')
+
+    hf.attrs['ncells'] = E.shape[0]
+    hf.attrs['ngenes'] = E.shape[1]
+
+    for iG, g in enumerate(gene_list):
+        counts = E[:,iG].A.squeeze()
+        cell_ix = np.nonzero(counts)[0]
+        counts = counts[cell_ix]
+        counts_group.create_dataset(g, data = counts)
+        cix_group.create_dataset(g, data = cell_ix)
+
+    hf.close()
+    
+def save_hdf5_cells(E, filename):
+    '''SPRING standard: filename = main_spring_dir + "counts_norm_sparse_cells.hdf5" '''
+    import h5py
+    
+    E = E.tocsr()
+    
+    hf = h5py.File(filename, 'w')
+    counts_group = hf.create_group('counts')
+    gix_group = hf.create_group('gene_ix')
+
+    hf.attrs['ncells'] = E.shape[0]
+    hf.attrs['ngenes'] = E.shape[1]
+
+    for iC in range(E.shape[0]):
+        counts = E[iC,:].A.squeeze()
+        gene_ix = np.nonzero(counts)[0]
+        counts = counts[gene_ix]
+        counts_group.create_dataset(str(iC), data = counts)
+        gix_group.create_dataset(str(iC), data = gene_ix)
+
+    hf.close()
+    
+def save_sparse_npz(E, filename, compressed = False):
+    ''' SPRING standard: filename = main_spring_dir + "/counts_norm.npz"'''
+    E = E.tocsc()
+    scipy.sparse.save_npz(filename, E, compressed = compressed)
+
+
 def run_all_spring_sparse(E, gene_list, sample_name, save_dir = './', base_ix = [], normalize = True,
                    exclude_dominant_frac = 1.0, min_counts = 3, min_cells = 5, min_vscore_pctl = 75,
                    show_vscore_plot = False, exclude_gene_names = [],
