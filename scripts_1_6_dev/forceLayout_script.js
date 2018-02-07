@@ -242,34 +242,42 @@ function forceLayout(project_directory, sub_directory, callback) {
 			var y = d3.event.sourceEvent.clientY - dim.top;
 			x = (x - sprites.position.x) / sprites.scale.x;
 			y = (y - sprites.position.y) / sprites.scale.y;
-			var clicked_node = -1
+			var clicked_pos_sel = false;
+			var clicked_neg_sel = false;
 			for (i=0; i<all_nodes.length; i++) {
-				rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
-				if (rad < all_nodes[i].scale.x * 20 ) {
-					clicked_node = i;
-					i = all_nodes.length;
+				if (all_outlines[i].selected) {
+					rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
+					if (rad < all_nodes[i].scale.x * 20 ) { 
+						clicked_pos_sel = true;
+					}
+				}	
+				if (all_outlines[i].compared) {
+					rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
+					if (rad < all_nodes[i].scale.x * 20 ) { 
+						clicked_neg_sel = true;
+					}
 				}
 			}
-			if (clicked_node != -1) {
+			if (clicked_pos_sel || clicked_neg_sel) {
 				var stash_i = stashed_coordinates.length;
 				stashed_coordinates.push({});
 				for (i in all_nodes) {
 					stashed_coordinates[stash_i][i] = [all_nodes[i].x, all_nodes[i].y];
 				}
-				if (all_outlines[clicked_node].selected) {
-					being_dragged = true;
-					for (i=0; i<all_nodes.length; i++) {
-						if (all_outlines[i].selected) {
-							all_nodes[i].beingDragged = true;
-						}
+			}
+			if (clicked_pos_sel) {
+				being_dragged = true;
+				for (i=0; i<all_nodes.length; i++) {
+					if (all_outlines[i].selected) {
+						all_nodes[i].beingDragged = true;
 					}
 				}
-				if (all_outlines[clicked_node].compared) {
-					being_dragged = true;
-					for (i=0; i<all_nodes.length; i++) {
-						if (all_outlines[i].compared) {
-							all_nodes[i].beingDragged = true;
-						}
+			}
+			if (clicked_neg_sel) {
+				being_dragged = true;
+				for (i=0; i<all_nodes.length; i++) {
+					if (all_outlines[i].compared) {
+						all_nodes[i].beingDragged = true;
 					}
 				}
 			}
