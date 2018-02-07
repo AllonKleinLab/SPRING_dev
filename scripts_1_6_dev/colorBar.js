@@ -548,7 +548,7 @@ function colorBar(project_directory, color_menu_genes) {
         updateColorMax();
 	}
 
-	function set_slider_position_only(h) {
+	set_slider_position_only = function set_slider_position_only(h) {
   		handle.attr("cx",slider_scale(slider_scale.invert(h)));
   		slider_gradient.attr("width",Math.max(slider_scale(slider_scale.invert(h))-6,0));
   		color_max = slider_scale.invert(h);

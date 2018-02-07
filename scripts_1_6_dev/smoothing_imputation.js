@@ -102,7 +102,10 @@ function imputation_setup() {
 				success: function(data) {
 					var t1 = new Date();
 					console.log('Smoothed the data: ', t1.getTime() - t0.getTime());
-					green_array = data.split(',');
+                    datasplit = data.split(';');
+                    color_max = parseFloat(datasplit[1]);
+                    
+					green_array = datasplit[0].split(',');
 					
 					for (var i = 0; i < all_nodes.length; i++) {
 						var rawval = green_array[i];
@@ -115,6 +118,7 @@ function imputation_setup() {
 					});
 
 					update_tints();
+                    set_slider_position_only(slider_scale(color_max));
 					hide_waiting_wheel();
 
 
