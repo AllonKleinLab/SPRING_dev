@@ -126,11 +126,8 @@ function stickyNote_setup() {
 				all_outlines[d].alpha=1;
 			}
 		});
-		
-		var base_radius = document.getElementById("settings_range_node_size").value / 100;
-		var large_radius = base_radius * 10;
-		var stepsize = (large_radius - base_radius) / 8;
-		shrinkNodes(base_radius,large_radius,stepsize,my_nodes);
+		console.log('shink');
+		shrinkNodes(10,10,my_nodes);
 	}
 
 

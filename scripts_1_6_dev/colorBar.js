@@ -1111,12 +1111,10 @@ function make_legend(cat_color_map,cat_label_list) {
 				}
 			}
 			
-                        var my_nodes = [];
+            var my_nodes = [];
 			for (i=0; i<all_nodes.length; i++) {
 				if (cat_label_list[i]==d) {
 					my_nodes.push(i);
-					all_outlines[i].scale.set(large_radius);
-					all_nodes[i].scale.set(large_radius);
 					if (all_selected) {
 						all_outlines[i].selected = false;
 						all_outlines[i].compared = false;
@@ -1136,26 +1134,31 @@ function make_legend(cat_color_map,cat_label_list) {
 				}
 			}
 			
-			var base_radius = document.getElementById("settings_range_node_size").value / 100;
-			var large_radius = base_radius * 6;
-			var stepsize = (large_radius - base_radius) / 8;
-			shrinkNodes(base_radius,large_radius,stepsize,my_nodes);
+			shrinkNodes(6,10,my_nodes);
 			update_selected_count();
 			count_clusters();
 		});
 	count_clusters();
 }
 
-function shrinkNodes(base_radius,current_radius,stepsize,nodes) {
-	current_radius = current_radius - stepsize;
-	if (current_radius >= base_radius) {
-		for (ii in nodes) {
-			var i = nodes[ii];
-			all_outlines[i].scale.set(current_radius);
-			all_nodes[i].scale.set(current_radius);
-		}
-		setTimeout(function() { shrinkNodes(base_radius,current_radius,stepsize, nodes); }, 10);
+function shrinkNodes(scale,numsteps,nodes) {
+	current_radii = {}
+	for (ii in nodes) {
+		current_radii[ii] = all_nodes[nodes[ii]].scale.x;
 	}
+	var refreshIntervalId = setInterval(function() {
+		if (scale < 1) { 
+			clearInterval(refreshIntervalId); 
+		} 
+		else {
+			for (ii in nodes) {
+				var i = nodes[ii];
+				all_outlines[i].scale.set(scale * current_radii[ii]);
+				all_nodes[i].scale.set(scale * current_radii[ii]);
+			}
+			scale = scale - scale/numsteps;
+		}
+	},5);
 }
 
 

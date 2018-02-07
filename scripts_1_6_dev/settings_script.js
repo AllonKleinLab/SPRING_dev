@@ -78,16 +78,33 @@ function settings_setup() {
 	function link_strength_change(val) {  force.linkStrength(val/10); force.start(); }
 	function gravity_change(val) { force.gravity(val/100); force.start(); }
 
-	function node_size_change(val) { 
+	function check_any_selected() {
+		var any_selected = false;
+		for (i=0; i<all_outlines.length; i++) {
+			if (all_outlines[i].selected) { 
+				any_selected = true;
+			}
+		}
+		return any_selected
+	}
+
+	function node_size_change(val) {
+		val = (val / 50)**(2.5) * 50
+		var any_selected =  check_any_selected();
 		for (i=0; i<all_nodes.length; i++) {
-			all_nodes[i].scale.set(val/100);
-			all_outlines[i].scale.set(val/100);
+			if ((!any_selected) || (all_outlines[i].selected)) {
+				all_nodes[i].scale.set(val/100);
+				all_outlines[i].scale.set(val/100);
+			}
 		} 
 	}
 
 	function node_opacity_change(val) { 
+		var any_selected =  check_any_selected();
 		for (i=0; i<all_nodes.length; i++) {
-			all_nodes[i].alpha = val/100;
+			if ((!any_selected) || (all_outlines[i].selected)) {
+				all_nodes[i].alpha = val/100;
+			}
 		}
 	}
 	
