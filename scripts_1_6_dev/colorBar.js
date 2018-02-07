@@ -1193,3 +1193,106 @@ function count_clusters() {
 		});
 	}
 }
+
+function toggle_legend_hover_tooltip() {
+	var button = d3.select('#toggle_legend_hover_tooltip_button')
+	if (button.text()=='Hide label box') {
+		button.text('Show label box');
+		d3.select('#legend_hover_tooltip').remove();
+	}
+	else {
+		button.text('Hide label box');
+		
+		var tooltip = d3.select('#force_layout').append('div').attr('id','legend_hover_tooltip')
+			.style('background-color','rgba(100,100,100,.92)')
+			.style('position','absolute')
+			.style('top','100px')
+			.style('left','100px')
+			.style('padding','5px')
+			.style('width','200px')
+			.style('border-radius','5px')
+			.style('visibility','hidden');
+
+		d3.select('#force_layout').on('mousemove',function() {
+			var name = document.getElementById('labels_menu').value;
+			if (name.length > 0) {
+				var cat_color_map = categorical_coloring_data[name]['label_colors'];
+				var cat_label_list = categorical_coloring_data[name]['label_list'];
+
+				var hover_clusters = [];
+				var dim = document.getElementById('svg_graph').getBoundingClientRect();
+				var x = d3.event.clientX - dim.left;
+				var y = d3.event.clientY - dim.top;
+				x = (x - sprites.position.x) / sprites.scale.x;
+				y = (y - sprites.position.y) / sprites.scale.y;
+				for (i=0; i<all_nodes.length; i++) {
+					rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
+					if (rad < all_nodes[i].scale.x * 20 ) { 
+						hover_clusters.push(cat_label_list[i]);
+					}	
+				}
+
+				hover_clusters = hover_clusters.filter(function(item, pos) {
+					return hover_clusters.indexOf(item) == pos;
+				});
+				
+				if (hover_clusters.length > 0) {
+					tooltip.style('visibility','visible');
+				}
+				else {
+					tooltip.style('visibility','hidden');
+				}
+				
+				tooltip.selectAll("div").remove();
+				tooltip.selectAll("div")
+					.data(hover_clusters).enter().append("div")
+						.attr("class","legend_row")
+						.style("height","25px")
+						.style("margin-top","0px");
+
+				var widths = [];
+				tooltip.selectAll("div").each(function(d) {
+					d3.select(this).append("div")
+						.style("background-color",cat_color_map[d])
+					var tt = d3.select(this).append("div")
+						.attr("class","text_label_div")
+						.append("p").text(d)
+						.style("float","left")
+						.style("white-space","nowrap")
+						.style("margin-top","-6px")
+						.style("margin-left","3px");
+					widths.push(parseFloat(tt.style('width').split('px')[0]))
+				});
+			
+				var height = parseFloat(tooltip.style('height').split('px')[0])
+				tooltip
+					.style('width',(d3.max(widths)+45).toString()+'px')
+					.style('left',(d3.event.x).toString()+'px')
+					.style('top',(d3.event.y-height-40).toString()+'px');
+			}
+		});
+	}
+}
+
+function get_hover_cells(e) {
+	var dim = document.getElementById('svg_graph').getBoundingClientRect();
+	var x = e.clientX - dim.left;
+	var y = e.clientY - dim.top;
+	x = (x - sprites.position.x) / sprites.scale.x;
+	y = (y - sprites.position.y) / sprites.scale.y;
+	var hover_cells = [];
+	for (i=0; i<all_nodes.length; i++) {
+		if (all_outlines[i].selected) {
+			rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
+			if (rad < all_nodes[i].scale.x * 20 ) { 
+				hover_cells.push(i);
+			}
+		}	
+	}
+	console.log(hover_cells);
+	return hover_cells;
+
+}
+
+
+
