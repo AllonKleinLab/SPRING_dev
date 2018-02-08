@@ -14,12 +14,18 @@ ol {
   width: 600px;
   float: top;
   overflow: hidden;
+  margin-top: 10px;
+}
+
+#sticky_link {
+	font: bold 20px/1.5 Helvetica, Verdana, sans-serif;
+	margin-left: 15px;
 }
 
 h2 {
   font: bold 24px/1.5 Helvetica, Verdana, sans-serif;
   margin-top: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 6px;
   margin-left: 15px;
 }
 

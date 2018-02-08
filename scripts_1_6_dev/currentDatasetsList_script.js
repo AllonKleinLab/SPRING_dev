@@ -115,13 +115,17 @@ function populate_subdirs_list(project_directory) {
 	title = title[title.length-1];
 	d3.select('#project_directory_title').text('SPRING subplots of "'+title+'"')
 
+	var base_url = window.location.href.split('?')[0]
+	base_url = base_url.split('/');
+	base_url = (base_url.slice(0,base_url.length-1)).join('/') + '/stickyPage.html';
+	d3.select('#sticky_link').attr('href',base_url+'?'+project_directory);
+		
 	$.ajax({
-		url: "cgi-bin/list_directories_with_run_info.py",
+		url: "cgi-bin/list_directories_with_filename.py",
 		type: "POST",
-		data: {path: project_directory},
+		data: {path: project_directory, filename:'run_info.json'},
 		success: function(output_message) {
 			var subdirs = output_message.split(',');
-			console.log(subdirs);
 			for (i in subdirs) {
 				add_list_item(project_directory,subdirs[i],i+1);
 			}
