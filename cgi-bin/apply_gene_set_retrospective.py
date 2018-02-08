@@ -45,7 +45,6 @@ for dd in sub_dirs.split(','):
 	f = open(base_dir+'/'+dd+'/color_data_gene_sets.csv','a')
 	for k,ss in scores.items():
 		newline = ','.join([k]+[repr(x) for x in ss[cell_ix]])
-		print dd, newline
 		f.write(newline+'\n')
 	f.close()
 	

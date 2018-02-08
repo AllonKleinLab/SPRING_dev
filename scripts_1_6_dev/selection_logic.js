@@ -77,6 +77,8 @@ function selection_logic_setup() {
 			all_outlines[sel[i]].selected = true;
 			all_outlines[sel[i]].alpha=1;
 		}
+		update_selected_count();
+		count_clusters();
 	}
 	
 	function clear_options() {

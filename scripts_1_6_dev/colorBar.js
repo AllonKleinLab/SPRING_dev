@@ -458,7 +458,7 @@ function colorBar(project_directory, color_menu_genes) {
 		if (color_array != null) {
 			for (i=0; i<all_nodes.length; i++) {
 				var x = color_array[i];
-				if (x >= lower_bound && x <= upper_bound*1.01) {
+				if ((x >= lower_bound && x <= upper_bound) || upper_bound > slider_scale.domain()[1]*.98) {
 					all_outlines[i].selected = true;
 					all_outlines[i].compared = false;
 					all_outlines[i].alpha=1;

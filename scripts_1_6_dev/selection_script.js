@@ -228,7 +228,7 @@ function selection_setup() {
 	var pos_count_extended = false;
 	var neg_count_extended = false;
 
-	update_selected_count = function update_selected_count() {
+	update_selected_count = function() {
 		var num_selected = 0;
 		var num_compared = 0;
 		for (i=0; i<all_nodes.length; i++) {
