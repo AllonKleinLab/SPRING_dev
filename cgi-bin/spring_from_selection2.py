@@ -4,7 +4,7 @@ import cgitb
 cgitb.enable()  # for troubleshooting
 print "Content-Type: text/html"
 print
-
+print 'HEY'
 import os
 import pickle
 import numpy as np
@@ -135,10 +135,11 @@ try:
 except:
 	project_filter = np.array([])
 	
+
 try:
 	include_exclude = data.getvalue('include_exclude')
 	custom_genes = data.getvalue('custom_genes').split('\n')
-else:
+except:
 	include_exclude = 'Exclude'
 	custom_genes = []
 

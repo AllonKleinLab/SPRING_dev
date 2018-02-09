@@ -8,6 +8,7 @@ import pickle
 import numpy as np
 import subprocess
 
+
 cwd = os.getcwd()
 if cwd.endswith('cgi-bin'):
 	os.chdir('../')
@@ -130,13 +131,13 @@ try:
 except:
 	project_filter = np.array([])
 
+
 try:
 	include_exclude = data.getvalue('include_exclude')
 	custom_genes = data.getvalue('custom_genes').split('\n')
-else:
+except:
 	include_exclude = 'Exclude'
 	custom_genes = []
-
 
 if not do_the_rest:
 	#os.rmdir(new_dir)
@@ -194,3 +195,4 @@ else:
 
 	except:
 		print 'Error starting processing!<br>'
+
