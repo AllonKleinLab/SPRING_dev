@@ -126,7 +126,8 @@ function stickyNote_setup() {
 				all_outlines[d].alpha=1;
 			}
 		});
-		console.log('shink');
+		count_clusters();
+		update_selected_count();
 		shrinkNodes(10,10,my_nodes);
 	}
 

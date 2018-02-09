@@ -100,11 +100,11 @@ this_url = params_dict['this_url']
 description = params_dict['description']
 animate = params_dict['animate']
 if 'custom_genes' in params_dict and 'include_exclude' in params_dict:
-	custom_genes = params_dict['custom_genes']
-	include_exclude = params_dict['include_exclude']
+    custom_genes = params_dict['custom_genes']
+    include_exclude = params_dict['include_exclude']
 else:
-	custom_genes = set([])
-	include_exclude = 'Exclude'
+    custom_genes = set([])
+    include_exclude = 'Exclude'
 
 logf = new_dir + '/lognewspring2.txt'
 timef = new_dir + '/lognewspringtime.txt'
@@ -158,6 +158,7 @@ update_log_html(logf, 'Saving stats...')
 custom_colors = {}
 f = open(current_dir + '/color_data_gene_sets.csv', 'r')
 for l in f:
+    print l[:100]
     cols = l.strip('\n').split(',')
     custom_colors[cols[0]] = map(float, np.array(cols[1:])[extra_filter])
 for k,v in custom_colors.items():
@@ -196,15 +197,15 @@ t0 = time.time()
 update_log_html(logf, 'Filtering genes...')
 gene_filter = filter_genes(E[base_ix,:], min_counts, min_cells, min_vscore_pctl)
 if include_exclude == 'Exclude':
-	gene_filter = np.array([i for i in gene_filter if not gene_list[i] in custom_genes])
+    gene_filter = np.array([i for i in gene_filter if not gene_list[i] in custom_genes])
 else:
-	gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
+    gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
 
 if len(gene_filter)==0: 
-	update_log_html(logf, 'Error: No genes survived filtering')
-	print 'Error: No genes survived filtering'
-	sys.exit()
-	
+    update_log_html(logf, 'Error: No genes survived filtering')
+    print 'Error: No genes survived filtering'
+    sys.exit()
+    
 t1 = time.time()
 update_log(timef, 'Using %i genes -- %.2f' %(len(gene_filter), t1-t0))
 
