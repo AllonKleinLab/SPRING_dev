@@ -133,7 +133,8 @@ def execute_spring(param_filename):
     np.save(new_dir + '/cell_filter.npy', cell_filter)
     np.savetxt(new_dir + '/cell_filter.txt', cell_filter, fmt='%i')
     gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
-    custom_genes = set([g for g in custom_genes if g in gene_list])
+    custom_genes = set([prefix_map[g] for g in custom_genes if g in prefix_map]+[g for g in custom_genes if g in gene_list])
+
 
     t0 = time.time()
     update_log_html(logf, 'Loading counts data...')

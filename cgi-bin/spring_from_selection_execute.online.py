@@ -118,7 +118,8 @@ cell_filter = np.load(current_dir + '/cell_filter.npy')[extra_filter]
 np.save(new_dir + '/cell_filter.npy', cell_filter)
 np.savetxt(new_dir + '/cell_filter.txt', cell_filter, fmt='%i')
 gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
-custom_genes = set([g for g in custom_genes if g in gene_list])
+prefix_map = {g.split()[0]:g for g in gene_list}
+custom_genes = set([prefix_map[g] for g in custom_genes if g in prefix_map]+[g for g in custom_genes if g in gene_list])
 
 t0 = time.time()
 update_log_html(logf, 'Loading counts data...')
@@ -197,6 +198,10 @@ if include_exclude == 'Exclude':
 else:
 	gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
 
+if len(gene_filter)==0: 
+	print 'Error: No genes survived filtering'
+	sys.exit()
+	
 t1 = time.time()
 update_log(timef, 'Using %i genes -- %.2f' %(len(gene_filter), t1-t0))
 
