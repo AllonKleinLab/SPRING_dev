@@ -133,6 +133,9 @@ def execute_spring(param_filename):
     np.save(new_dir + '/cell_filter.npy', cell_filter)
     np.savetxt(new_dir + '/cell_filter.txt', cell_filter, fmt='%i')
     gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
+    prefix_map = {}
+    for g in gene_list: prefix_map[g.split()[0]] = g
+    for g in gene_list: prefix_map[g.split()[-1]] = g
     custom_genes = set([prefix_map[g] for g in custom_genes if g in prefix_map]+[g for g in custom_genes if g in gene_list])
 
 

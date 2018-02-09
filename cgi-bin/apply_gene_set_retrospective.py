@@ -8,8 +8,8 @@ gene_sets_path = sys.argv[3]
 
 hf = h5py.File(base_dir + '/counts_norm_sparse_genes.hdf5', 'r')
 ncells = hf.attrs['ncells']
-valid_genes_tmp = hf.get('counts').keys()
-gene_map = {g.split()[0]:g for g in valid_genes_tmp}
+valid_genes = hf.get('counts').keys()
+gene_map = {g.split()[0]:g for g in valid_genes}
 
 
 # Load gene sets
