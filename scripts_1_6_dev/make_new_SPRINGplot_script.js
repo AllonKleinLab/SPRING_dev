@@ -1,8 +1,8 @@
 function make_new_SPRINGplot_setup() {
 
-
-	console.log('here');
 	MAXHEIGHT = 772;
+	custom_genes = '';
+	include_exclude = 'exclude';
 	var popup = d3.select('#force_layout').append('div')
 		.attr('id','make_new_SPRINGplot_popup');
 
@@ -116,8 +116,8 @@ function make_new_SPRINGplot_setup() {
 			else { d3.select(this).text('Yes'); }
 		});
 		
-	var custom_genes = popup.append('div').attr('class','make_new_SPRINGplot_input_div')
-	custom_genes.append('label').append('button').text('Exclude')
+	var custom_genes_div = popup.append('div').attr('class','make_new_SPRINGplot_input_div')
+	custom_genes_div.append('label').append('button').text('Exclude')
 		.attr('id','include_exclude_toggle')
 		.on('click',function() {
 			if (d3.select(this).text()=='Exclude') {
@@ -127,7 +127,7 @@ function make_new_SPRINGplot_setup() {
 			}
 		});
 		
-	var wrapper = custom_genes.append('label').text(' custom gene list')
+	var wrapper = custom_genes_div.append('label').text(' custom gene list')
 		.append('span').attr('id','gene_list_upload_wrapper');
 	
 	wrapper.append('span').text('Choose file')	
@@ -138,17 +138,12 @@ function make_new_SPRINGplot_setup() {
 				var file = d3.select('#gene_list_upload_input')[0][0].files[0];
 				reader.readAsText(file, "UTF-8");
 				reader.onload = function (evt) {
-					var custom_genes = evt.target.result;
-					var include_exclude = d3.select('#include_exclude_toggle').text();
+					custom_genes = evt.target.result;
+					include_exclude = d3.select('#include_exclude_toggle').text();
 					wrapper.style('padding',"4px 11px 4px 11px");
 					wrapper.style('background-color','red');
-					wrapper.select('span').text('Uploaded');
-					
+					wrapper.select('span').text('Uploaded');					
 				}
-				reader.onerror = function (evt) {
-					var custom_genes = '';
-					var include_exclude = 'exclude';
-				}	
 			}	
 		});
 
@@ -217,7 +212,7 @@ function show_make_new_SPRINGplot_popup() {
 function submit_new_SPRINGplot() {	
 
 	
-	var running_online = false;
+	var running_online = true;
 	// Do cgi stuff to check for valid input
 	// When finished...
 	var sel2text = "";
@@ -271,6 +266,7 @@ function submit_new_SPRINGplot() {
 				.select('text').html(output_message);
 		});
 
+  console.log(subplot_script);
   $.ajax({
 		url: subplot_script,
     type: "POST",
@@ -289,10 +285,12 @@ function submit_new_SPRINGplot() {
 			this_url:this_url,
 			description:description,
 			email:email, animate:animate,
-			include_exclide:include_exclide,
+			include_exclude:include_exclude,
 			custom_genes:custom_genes
 	   	},
 		success: function(output_message) {
+			console.log(output_message);
+			
 			if (running_online) {
 				var orig_message = output_message;
 				d3.select('#make_new_SPRINGplot_message_div')
