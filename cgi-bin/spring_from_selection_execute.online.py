@@ -199,6 +199,7 @@ else:
 	gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
 
 if len(gene_filter)==0: 
+	update_log_html(logf, 'Error: No genes survived filtering')
 	print 'Error: No genes survived filtering'
 	sys.exit()
 	
