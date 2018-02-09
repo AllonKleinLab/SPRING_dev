@@ -112,15 +112,19 @@ def execute_spring(param_filename):
     description = params_dict['description']
     animate = params_dict['animate']
 
-	if 'custom_genes' in params_dict and 'include_exclude' in params_dict:
-		custom_genes = params_dict['custom_genes']
-		include_exclude = params_dict['include_exclude']
-	else:
-		custom_genes = set([])
-		include_exclude = 'Exclude'
+    if 'custom_genes' in params_dict and 'include_exclude' in params_dict:
+        custom_genes = params_dict['custom_genes']
+        include_exclude = params_dict['include_exclude']
+    else:
+        custom_genes = set([])
+        include_exclude = 'Exclude'
+        
+    
 
     logf = new_dir + '/lognewspring2.txt'
     timef = new_dir + '/lognewspringtime.txt'
+    
+    update_log(logf, include_exclude+repr(len(custom_genes)))
 
     #######################
     # Load data
@@ -204,9 +208,13 @@ def execute_spring(param_filename):
     update_log_html(logf, 'Filtering genes...')
     gene_filter = filter_genes(E[base_ix,:], min_counts, min_cells, min_vscore_pctl)
     if include_exclude == 'Exclude':
-    	gene_filter = np.array([i for i in gene_filter if not gene_list[i] in custom_genes])
+        gene_filter = np.array([i for i in gene_filter if not gene_list[i] in custom_genes])
     else:
-    	gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
+        gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
+    
+    if len(gene_filter)==0: 
+    	print 'Error: No genes survived filtering'
+    	sys.exit()
     
     t1 = time.time()
     update_log(timef, 'Using %i genes -- %.2f' %(len(gene_filter), t1-t0))

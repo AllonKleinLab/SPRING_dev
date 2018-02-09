@@ -7,7 +7,7 @@ import os
 import pickle
 import numpy as np
 import subprocess
-
+print ''
 
 cwd = os.getcwd()
 if cwd.endswith('cgi-bin'):

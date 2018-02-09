@@ -125,6 +125,8 @@ else:
 logf = new_dir + '/lognewspring2.txt'
 timef = new_dir + '/lognewspringtime.txt'
 
+update_log_html(logf, include_exclude+repr(len(custom_genes)))
+
 #######################
 # Load data
 

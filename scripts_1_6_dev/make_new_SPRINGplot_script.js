@@ -139,7 +139,6 @@ function make_new_SPRINGplot_setup() {
 				reader.readAsText(file, "UTF-8");
 				reader.onload = function (evt) {
 					custom_genes = evt.target.result;
-					include_exclude = d3.select('#include_exclude_toggle').text();
 					wrapper.style('padding',"4px 11px 4px 11px");
 					wrapper.style('background-color','red');
 					wrapper.select('span').text('Uploaded');					
@@ -213,6 +212,8 @@ function submit_new_SPRINGplot() {
 
 	
 	var running_online = true;
+	include_exclude = d3.select('#include_exclude_toggle').text();
+	
 	// Do cgi stuff to check for valid input
 	// When finished...
 	var sel2text = "";
