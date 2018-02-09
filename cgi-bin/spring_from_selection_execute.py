@@ -112,6 +112,13 @@ def execute_spring(param_filename):
     description = params_dict['description']
     animate = params_dict['animate']
 
+	if 'custom_genes' in params_dict and 'include_exclude' in params_dict:
+		custom_genes = params_dict['custom_genes']
+		include_exclude = params_dict['include_exclude']
+	else:
+		custom_genes = set([])
+		include_exclude = 'Exclude'
+
     logf = new_dir + '/lognewspring2.txt'
     timef = new_dir + '/lognewspringtime.txt'
 
@@ -122,6 +129,7 @@ def execute_spring(param_filename):
     np.save(new_dir + '/cell_filter.npy', cell_filter)
     np.savetxt(new_dir + '/cell_filter.txt', cell_filter, fmt='%i')
     gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
+    custom_genes = set([g for g in custom_genes if g in gene_list])
 
     t0 = time.time()
     update_log_html(logf, 'Loading counts data...')
@@ -195,6 +203,11 @@ def execute_spring(param_filename):
     t0 = time.time()
     update_log_html(logf, 'Filtering genes...')
     gene_filter = filter_genes(E[base_ix,:], min_counts, min_cells, min_vscore_pctl)
+    if include_exclude == 'Exclude':
+    	gene_filter = np.array([i for i in gene_filter if not gene_list[i] in custom_genes])
+    else:
+    	gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
+    
     t1 = time.time()
     update_log(timef, 'Using %i genes -- %.2f' %(len(gene_filter), t1-t0))
 

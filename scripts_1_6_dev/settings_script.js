@@ -89,7 +89,7 @@ function settings_setup() {
 	}
 
 	function node_size_change(val) {
-		val = (val / 50)**(2.5) * 50
+		val = (val / 50)**(2.5) * 50 * (32 / SPRITE_IMG_WIDTH);
 		var any_selected =  check_any_selected();
 		for (i=0; i<all_nodes.length; i++) {
 			if ((!any_selected) || (all_outlines[i].selected)) {

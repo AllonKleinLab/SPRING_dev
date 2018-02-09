@@ -115,19 +115,49 @@ function make_new_SPRINGplot_setup() {
 			if (d3.select(this).text()=='Yes') { d3.select(this).text('No'); }
 			else { d3.select(this).text('Yes'); }
 		});
+		
+	var custom_genes = popup.append('div').attr('class','make_new_SPRINGplot_input_div')
+	custom_genes.append('label').append('button').text('Exclude')
+		.attr('id','include_exclude_toggle')
+		.on('click',function() {
+			if (d3.select(this).text()=='Exclude') {
+				d3.select(this).text('Include');
+			} else {
+				d3.select(this).text('Exclude');
+			}
+		});
+		
+	var wrapper = custom_genes.append('label').text(' custom gene list')
+		.append('span').attr('id','gene_list_upload_wrapper');
+	
+	wrapper.append('span').text('Choose file')	
+	wrapper.append('input').attr('type','file').attr('id','gene_list_upload_input')
+		.on('change',function() {
+			if (d3.select('#gene_list_upload_input')[0][0].files.length > 0) {	
+				reader = new FileReader();
+				var file = d3.select('#gene_list_upload_input')[0][0].files[0];
+				reader.readAsText(file, "UTF-8");
+				reader.onload = function (evt) {
+					var custom_genes = evt.target.result;
+					var include_exclude = d3.select('#include_exclude_toggle').text();
+					wrapper.style('padding',"4px 11px 4px 11px");
+					wrapper.style('background-color','red');
+					wrapper.select('span').text('Uploaded');
+					
+				}
+				reader.onerror = function (evt) {
+					var custom_genes = '';
+					var include_exclude = 'exclude';
+				}	
+			}	
+		});
+
 
 	popup.append('div')
 		.attr('id','make_new_SPRINGplot_submission_div')
 		.attr('class','make_new_SPRINGplot_input_div')
 		.append('button').text('Submit')
 		.on('click',submit_new_SPRINGplot)
-
-	// popup.append('div')
-	// 	.attr('id','make_new_SPRINGplot_submission_div')
-	// 	.attr('class','make_new_SPRINGplot_input_div')
-	// 	.append('button').text('Reset')
-	// 	.on('click',restore_defaults)
-
 
 	popup.append('div')
 		.attr('id','make_new_SPRINGplot_message_div')
@@ -162,6 +192,9 @@ function make_new_SPRINGplot_setup() {
 
 function hide_make_new_SPRINGplot_popup() {
 	d3.select("#make_new_SPRINGplot_popup").style("visibility","hidden")
+	d3.select('#gene_list_upload_wrapper').style('padding',"4px 8px 4px 8px");
+	d3.select('#gene_list_upload_wrapper').style('background-color','rgba(0,0,0,.7)');
+	d3.select('#gene_list_upload_wrapper').select('span').text('Choose file');
 
 }
 
@@ -180,15 +213,11 @@ function show_make_new_SPRINGplot_popup() {
 
 }
 
-// function restore_defaults() {
-// 	$("#input_new_dir").attr('value', "")
-// }
 
-function submit_new_SPRINGplot() {
+function submit_new_SPRINGplot() {	
+
+	
 	var running_online = false;
-	console.log('running_online =', running_online);
-
-	//
 	// Do cgi stuff to check for valid input
 	// When finished...
 	var sel2text = "";
@@ -259,7 +288,9 @@ function submit_new_SPRINGplot() {
 			nIter:nIter,
 			this_url:this_url,
 			description:description,
-			email:email, animate:animate
+			email:email, animate:animate,
+			include_exclide:include_exclide,
+			custom_genes:custom_genes
 	   	},
 		success: function(output_message) {
 			if (running_online) {
@@ -290,5 +321,6 @@ function submit_new_SPRINGplot() {
 			}
 		}
 	});
+	
 
 }

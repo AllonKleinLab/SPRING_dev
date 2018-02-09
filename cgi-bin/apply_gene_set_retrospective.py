@@ -11,12 +11,13 @@ gene_sets = {}
 all_genes = set([])
 for l in open(gene_sets_path).read().split('\n'):
 	l = l.split('\t')
-	gene = l[0]
-	name = l[1]
-	if not name in gene_sets:
-		gene_sets[name] = []
-	gene_sets[name].append(gene)
-	all_genes.add(gene)
+	if len(l) > 1:
+		gene = l[0]
+		name = l[1]
+		if not name in gene_sets:
+			gene_sets[name] = []
+		gene_sets[name].append(gene)
+		all_genes.add(gene)
 
 
 # Load gene expression 

@@ -142,13 +142,28 @@ function forceLayout(project_directory, sub_directory, callback) {
 		all_outlines = [];
 		var totalSprites = app.renderer instanceof PIXI.WebGLRenderer ? coordinates.length : 100;
 		base_colors = [];
+		var sprite_chooser = Math.random();
 		for (var i = 0; i < totalSprites; i++) {
-			var dude = PIXI.Sprite.fromImage('stuff/disc.png');
-			//var dude = PIXI.Sprite.fromImage('stuff/frog_sprite.png')
-			//var dude = PIXI.Sprite.fromImage('stuff/tinyMaggot2.png')
-			//var dude = PIXI.Sprite.fromImage('stuff/mark.png')
+			//var dude = PIXI.Sprite.fromImage('stuff/disc.png');
+			
+			if (sprite_chooser < 1/10) {
+				var dude = PIXI.Sprite.fromImage('stuff/mark.png')
+				SPRITE_IMG_WIDTH = 144;
+			} else if (sprite_chooser < 2/10) {
+				var dude = PIXI.Sprite.fromImage('stuff/leon.png')
+				SPRITE_IMG_WIDTH = 144;
+			} else if (sprite_chooser < 3/10) {
+				var dude = PIXI.Sprite.fromImage('stuff/james.png')
+				SPRITE_IMG_WIDTH = 144;
+			} else {
+				var dude = PIXI.Sprite.fromImage('stuff/disc.png');
+				SPRITE_IMG_WIDTH = 32;
+			}
+			
+			
+			
 			dude.anchor.set(.5);
-			dude.scale.set(.5);
+			dude.scale.set(.5 * 32 / SPRITE_IMG_WIDTH);
 			dude.x = coordinates[i][0];
 			dude.y = coordinates[i][1];
 			dude.tint = rgbToHex(0, 0, 0);
@@ -163,7 +178,7 @@ function forceLayout(project_directory, sub_directory, callback) {
 
 			outline = PIXI.Sprite.fromImage('stuff/annulus.png');
 			outline.anchor.set(.5);
-			outline.scale.set(0.5);
+			outline.scale.set(.5);
 			outline.x = coordinates[i][0];
 			outline.y = coordinates[i][1];
 			outline.tint = '0xffff00';

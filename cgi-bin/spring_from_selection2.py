@@ -134,6 +134,13 @@ try:
 	project_filter = np.sort(np.array(map(int,project_filter.split(','))))
 except:
 	project_filter = np.array([])
+	
+try:
+	include_exclude = data.getvalue('include_exclude')
+	custom_genes = data.getvalue('custom_genes').split('\n')
+else:
+	include_exclude = 'Exclude'
+	custom_genes = []
 
 
 if not do_the_rest:
@@ -172,6 +179,8 @@ else:
 		params_dict['description'] = description
 		params_dict['user_email'] = user_email
 		params_dict['animate'] = animate
+		params_dict['include_exclude'] = include_exclude
+		params_dict['custom_genes'] = custom_genes
 
 		params_filename = new_dir + "/params.pickle"
 		params_file = open(params_filename, 'wb')
