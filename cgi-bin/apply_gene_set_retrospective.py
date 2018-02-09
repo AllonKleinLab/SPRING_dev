@@ -6,6 +6,10 @@ base_dir = sys.argv[1]
 sub_dirs = sys.argv[2]
 gene_sets_path = sys.argv[3]
 
+hf = h5py.File(base_dir + '/counts_norm_sparse_genes.hdf5', 'r')
+ncells = hf.attrs['ncells']
+valid_genes = set(hf.get('counts').keys())
+
 # Load gene sets
 gene_sets = {}
 all_genes = set([])
@@ -14,16 +18,16 @@ for l in open(gene_sets_path).read().split('\n'):
 	if len(l) > 1:
 		gene = l[0]
 		name = l[1]
-		if not name in gene_sets:
-			gene_sets[name] = []
-		gene_sets[name].append(gene)
-		all_genes.add(gene)
+		if not g in valid_genes: print 'Invalid',g
+		else:	
+			if not name in gene_sets:
+				gene_sets[name] = []
+			gene_sets[name].append(gene)
+			all_genes.add(gene)
 
 
 # Load gene expression 
 gene_exp = {}
-hf = h5py.File(base_dir + '/counts_norm_sparse_genes.hdf5', 'r')
-ncells = hf.attrs['ncells']
 for g in all_genes:
 	ee = np.zeros(ncells)
 	counts = np.array(hf.get('counts').get(g))
