@@ -138,7 +138,7 @@ except:
 
 try:
 	include_exclude = data.getvalue('include_exclude')
-	custom_genes = data.getvalue('custom_genes').split('\n')
+	custom_genes = data.getvalue('custom_genes').replace('\r','\n').split('\n')
 except:
 	include_exclude = 'Exclude'
 	custom_genes = []

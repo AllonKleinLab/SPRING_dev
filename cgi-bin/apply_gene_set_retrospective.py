@@ -8,7 +8,9 @@ gene_sets_path = sys.argv[3]
 
 hf = h5py.File(base_dir + '/counts_norm_sparse_genes.hdf5', 'r')
 ncells = hf.attrs['ncells']
-valid_genes = set(hf.get('counts').keys())
+valid_genes_tmp = hf.get('counts').keys()
+gene_map = {g.split()[0]:g for g in valid_genes_tmp}
+
 
 # Load gene sets
 gene_sets = {}
@@ -18,7 +20,8 @@ for l in open(gene_sets_path).read().split('\n'):
 	if len(l) > 1:
 		gene = l[0]
 		name = l[1]
-		if not g in valid_genes: print 'Invalid',g
+		if gene in gene_map: gene = gene_map[gene]
+		if not gene in valid_genes: print 'Invalid',gene
 		else:	
 			if not name in gene_sets:
 				gene_sets[name] = []
