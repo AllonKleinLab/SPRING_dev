@@ -15,7 +15,7 @@ gene_map = {g.split()[0]:g for g in valid_genes}
 # Load gene sets
 gene_sets = {}
 all_genes = set([])
-for l in open(gene_sets_path).read().split('\n'):
+for l in open(gene_sets_path).read().replace('\r','\n').split('\n'):
 	l = l.split('\t')
 	if len(l) > 1:
 		gene = l[0]
@@ -42,7 +42,7 @@ for g in all_genes:
 scores = {}
 for k,gs in gene_sets.items():
 	Z = np.array([gene_exp[g] for g in gs])
-	Z = (Z - np.mean(Z,axis=1)[:,None]) / np.std(Z,axis=1)[:,None]
+	Z = (Z - np.mean(Z,axis=1)[:,None]) / (np.std(Z,axis=1)[:,None] + .0001)
 	ss = np.sum(Z,axis=0)
 	ss = ss - np.min(ss)
 	scores[k] = ss
