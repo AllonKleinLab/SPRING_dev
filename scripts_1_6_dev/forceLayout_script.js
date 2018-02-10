@@ -144,8 +144,9 @@ function forceLayout(project_directory, sub_directory, callback) {
 		base_colors = [];
 		var sprite_chooser = Math.random();
 		for (var i = 0; i < totalSprites; i++) {
-			//var dude = PIXI.Sprite.fromImage('stuff/disc.png');
-			
+			var dude = PIXI.Sprite.fromImage('stuff/disc.png');
+			SPRITE_IMG_WIDTH = 32;
+			/*
 			if (sprite_chooser < 1/10) {
 				var dude = PIXI.Sprite.fromImage('stuff/mark.png')
 				SPRITE_IMG_WIDTH = 144;
@@ -159,6 +160,7 @@ function forceLayout(project_directory, sub_directory, callback) {
 				var dude = PIXI.Sprite.fromImage('stuff/disc.png');
 				SPRITE_IMG_WIDTH = 32;
 			}
+			*/
 			
 			
 			
