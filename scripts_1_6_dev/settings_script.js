@@ -111,6 +111,11 @@ function settings_setup() {
 	function background_color_change(val) {
 		var val = parseInt(val)
 		app.renderer.backgroundColor =  rgbToHex(val,val,val);
+		if (val < 125) {
+			text_anos.ba.style.fill = '#B8B8B8';
+		} else {
+			text_anos.ba.style.fill = '#303030';
+		}
 	}
 	
 	function edge_color_change(val) {  }

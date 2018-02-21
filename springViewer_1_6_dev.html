@@ -116,6 +116,7 @@
 <script src="scripts_1_6_dev/sweetalert.min.js"></script>
 <script src="scripts_1_6_dev/smoothing_imputation.js"></script>
 <script src="scripts_1_6_dev/selection_logic.js"></script>
+<script src="scripts_1_6_dev/text_annotations.js"></script>
 
 <script>
 
@@ -149,6 +150,8 @@ function callback() {
 	stickyNote_setup();
 	imputation_setup();
 	selection_logic_setup();
+	
+	//load_text_annotation();
 
 	window.onclick = function(event) {
 		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }

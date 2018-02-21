@@ -782,6 +782,8 @@ function redraw() {
 		clone_edge_container.scale = sprites.scale;
 		clone_sprites.position = sprites.position;
 		clone_sprites.scale = sprites.scale;
+		text_container.position = sprites.position;
+		text_container.scale = sprites.scale;
 		
 		
 	}
