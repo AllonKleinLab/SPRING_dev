@@ -198,7 +198,6 @@ function clone_click() {
 	var y = d3.event.clientY - dim.top;
 	x = (x - sprites.position.x) / sprites.scale.x;
 	y = (y - sprites.position.y) / sprites.scale.y;
-	console.log([x,y]);
 	for (var i=0; i<all_nodes.length; i++) {
 		if (! all_outlines[i].selected) {
 			rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);

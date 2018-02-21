@@ -620,7 +620,6 @@ function colorBar(project_directory, color_menu_genes) {
 	var gene_entered = false;
 
 	function geneAutocomplete(gene_list){
-	  console.log(gene_list);
 	  var gene_lookup = [];
 	  gene_list.split('\n').forEach(function(g) {
 	    if (g.length > 0) {

@@ -152,6 +152,9 @@ function callback() {
 	selection_logic_setup();
 	
 	//load_text_annotation();
+	
+	move_grid_setup();
+	show_move_grid_popup();
 
 	window.onclick = function(event) {
 		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }

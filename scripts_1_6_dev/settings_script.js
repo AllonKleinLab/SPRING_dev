@@ -104,6 +104,7 @@ function settings_setup() {
 		for (i=0; i<all_nodes.length; i++) {
 			if ((!any_selected) || (all_outlines[i].selected)) {
 				all_nodes[i].alpha = val/100;
+				all_outlines[i].alpha = val/100;
 			}
 		}
 	}
@@ -111,11 +112,13 @@ function settings_setup() {
 	function background_color_change(val) {
 		var val = parseInt(val)
 		app.renderer.backgroundColor =  rgbToHex(val,val,val);
+		/*
 		if (val < 125) {
 			text_anos.ba.style.fill = '#B8B8B8';
 		} else {
 			text_anos.ba.style.fill = '#303030';
 		}
+		*/
 	}
 	
 	function edge_color_change(val) {  }
