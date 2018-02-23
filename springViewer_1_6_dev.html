@@ -16,8 +16,8 @@
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/sweetalert.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/smoothing_imputation.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_logic.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stratify.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/gridstack.css">
+<!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stratify.css"> -->
+<!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/gridstack.css"> -->
 
 
 <div id="options_bar">
@@ -119,9 +119,9 @@
 <script src="scripts_1_6_dev/smoothing_imputation.js"></script>
 <script src="scripts_1_6_dev/selection_logic.js"></script>
 <script src="scripts_1_6_dev/text_annotations.js"></script>
-<script src="scripts_1_6_dev/stratify.js"></script>
-<script src="scripts_1_6_dev/gridstack.js"></script>
-<script src="scripts_1_6_dev/gridstack.jQueryUI.js"></script>
+<!-- <script src="scripts_1_6_dev/stratify.js"></script> -->
+<!-- <script src="scripts_1_6_dev/gridstack.js"></script> -->
+<!-- <script src="scripts_1_6_dev/gridstack.jQueryUI.js"></script> -->
 
 <script>
 
@@ -157,9 +157,8 @@ function callback() {
 	selection_logic_setup();
 	
 	//load_text_annotation();
-	
-	stratify_setup();
-	show_stratify_popup();
+	//stratify_setup();
+	//show_stratify_popup();
 
 	window.onclick = function(event) {
 		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }
