@@ -461,7 +461,7 @@ function colorBar(project_directory, color_menu_genes) {
 				if (x >= lower_bound && (x <= upper_bound || upper_bound > slider_scale.domain()[1]*.98)) {
 					all_outlines[i].selected = true;
 					all_outlines[i].compared = false;
-					all_outlines[i].alpha=1;
+					all_outlines[i].alpha=all_nodes[i].alpha;
 					all_outlines[i].tint='0xffff00';
 				} else {
 					all_outlines[i].selected = false;
@@ -1124,11 +1124,11 @@ function make_legend(cat_color_map,cat_label_list) {
 						if (selection_mode=='negative_select') {
 							all_outlines[i].compared = true;
 							all_outlines[i].tint = '0x0000ff';
-							all_outlines[i].alpha=1;
+							all_outlines[i].alpha=all_nodes[i].alpha;
 						} else {
 							all_outlines[i].selected = true;
 							all_outlines[i].tint = '0xffff00';
-							all_outlines[i].alpha=1;
+							all_outlines[i].alpha=all_nodes[i].alpha;
 						}
 
 					}

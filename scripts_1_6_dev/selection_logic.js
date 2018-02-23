@@ -75,7 +75,7 @@ function selection_logic_setup() {
 		for (i=0; i<sel.length; i++) {
 			all_outlines[sel[i]].tint = '0xffff00';
 			all_outlines[sel[i]].selected = true;
-			all_outlines[sel[i]].alpha=1;
+			all_outlines[sel[i]].alpha=all_nodes[sel[i]].alpha;
 		}
 		update_selected_count();
 		count_clusters();

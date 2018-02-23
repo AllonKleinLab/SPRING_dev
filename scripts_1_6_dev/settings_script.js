@@ -104,7 +104,9 @@ function settings_setup() {
 		for (i=0; i<all_nodes.length; i++) {
 			if ((!any_selected) || (all_outlines[i].selected)) {
 				all_nodes[i].alpha = val/100;
-				all_outlines[i].alpha = val/100;
+				if (all_outlines[i].selected || all_outlines[i].compared) {
+					all_outlines[i].alpha = val/100;
+				}
 			}
 		}
 	}

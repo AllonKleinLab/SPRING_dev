@@ -178,11 +178,11 @@ function selection_setup() {
 				o.compared = o.compared && (! inrect);
 			}
 			if (o.selected) { 
-				o.alpha = 1;
+				o.alpha = all_nodes[i].alpha;
 				o.tint = '0xffff00';
 			} 
 			if (o.compared) {
-				o.alpha = 1;
+				o.alpha = all_nodes[i].alpha;
 				o.tint = '0x0000ff';
 			}
 			if (o.selected || o.compared) {
@@ -321,7 +321,7 @@ function deselect_all() {
 	}
 	if (! any_selected) {
 		for (i=0; i<all_nodes.length; i++) { 
-			all_outlines[i].alpha = 1
+			all_outlines[i].alpha = all_nodes[i].alpha
 			all_outlines[i].tint = '0xffff00';
 			all_outlines[i].selected = true;
 // 				all_outlines[i].scale.set(large_radius);
