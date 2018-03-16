@@ -52,17 +52,25 @@ t0 = time.time()
 data = cgi.FieldStorage()
 base_dir = data.getvalue('base_dir')
 sub_dir = data.getvalue('sub_dir')
-# reds = np.array(map(float, data.getvalue('raw_r').split(',')))[:,None]
-# greens = np.array(map(float, data.getvalue('raw_g').split(',')))[:,None]
-# blues = np.array(map(float, data.getvalue('raw_b').split(',')))[:,None]
-# E = np.hstack((reds, greens, blues))
-E = np.array(map(float, data.getvalue('raw_g').split(',')))[:,None]
+reds = np.array(map(float, data.getvalue('raw_r').split(',')))[:,None]
+greens = np.array(map(float, data.getvalue('raw_g').split(',')))[:,None]
+blues = np.array(map(float, data.getvalue('raw_b').split(',')))[:,None]
+E = np.hstack((reds, greens, blues))
+#E = np.array(map(float, data.getvalue('raw_g').split(',')))[:,None]
+
+sel = data.getvalue('selected')[1:]
+print sel
+if len(sel)==0: 
+	sel = np.arange(E.shape[0])
+else: 
+	sel = np.array(map(int, sel.split(',')),dtype=int)
+	E = E[sel,:]
+
 
 beta = float(data.getvalue('beta'))
 n_rounds = int(data.getvalue('n_rounds'))
 t1 = time.time()
 update_log(logf, 'got cgi data -- %.3f' %(t1-t0))
-
 
 ##### SMOOTH
 
@@ -80,15 +88,18 @@ except:
 	    A[jj,ii] = 1
 	A = A.tocsc()
 	ssp.save_npz(sub_dir + '/A.npz', A)
+	
 t1 = time.time()
 update_log(logf, 'loaded adjacency matrix -- %.3f' %(t1-t0))
 
 ###########
 t0 = time.time()
+A = A[:,sel].tocsr()[sel,:].tocsc()
 A = sparse_multiply(A, 1 / A.sum(1).A.squeeze())
-
 for iRound in xrange(n_rounds):
 	E = (beta * E + ((1 - beta) * A) * E)
+
+
 t1 = time.time()
 update_log(logf, 'smoothed data -- %.3f' %(t1-t0))
 
@@ -97,9 +108,8 @@ update_log(logf, 'smoothed data -- %.3f' %(t1-t0))
 # E = np.array(E, dtype=int)
 
 t0 = time.time()
-# print ';'.join([','.join(map(str,E[:,0])), ','.join(map(str,E[:,1])), ','.join(map(str,E[:,2]))])
-new_max = E.max()
-print ','.join(map(strfloat,E)) + ';' + str(new_max)
+
+print repr(np.min(E))+'|'+repr(np.max(E))+'|' +';'.join([','.join(map(str,E[:,0])), ','.join(map(str,E[:,1])), ','.join(map(str,E[:,2]))])
 t1 = time.time()
 update_log(logf, 'returned data -- %.3f' %(t1-t0))
 

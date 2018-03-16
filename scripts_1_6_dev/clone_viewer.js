@@ -25,14 +25,18 @@ function clone_viewer_setup() {
 	clone_sprites.position = sprites.position;
 	clone_sprites.scale = sprites.scale;
 	
-	show_clone_edges = true;
+	targetCircle = new PIXI.Graphics();
+	targetCircle.alpha = 0
+	clone_sprites.addChild(targetCircle);
+	
+	show_clone_edges = false;
+	show_source_nodes = false;
 
 	app.stage.addChild(clone_edge_container);
 	app.stage.addChild(clone_sprites);
 
 	var popup = d3.select('#force_layout').append('div')
-		.attr('id','clone_viewer_popup')
-		.on('click',update_colorstack);
+		.attr('id','clone_viewer_popup');
 
 	popup.append('div')
 		.style('padding','5px')
@@ -44,58 +48,111 @@ function clone_viewer_setup() {
 		.on('mousedown',function() {
 			d3.event.stopPropagation();	
 		})
+		.append('label').text('Selector radius')
 		.append("input")
 		.attr("type","range")
-		.attr('id','clone_radius_slider')
+		.attr('id','clone_selector_size_slider')
+		.style('margin-left','21px')
 		.attr('value','25')
-		.style('width','110px')
-		.style('margin-top','-2px')
-		.style('margin-bottom','10px')
-		.style('margin-left','5px')
+		.on('input',draw_target_circle);
+		
+	popup.append("div")
+		.on('mousedown',function() {
+			d3.event.stopPropagation();	
+		})
+		.append('label').text('Highlight size')
+		.append("input")
+		.attr("type","range")
+		.attr('value','25')
+		.attr('id','clone_node_size_slider')
+		.style('margin-left','31px')
+		.on('input',update_highlight_size);
 
-	popup.append('div').append('button')
-		.text('Set source nodes')
-		.style('width','120px')
+	popup.append("div")
+		.on('mousedown',function() {
+			d3.event.stopPropagation();	
+		})
+		.append('label').text('Darkness level')
+		.append("input")
+		.attr("type","range")
+		.attr('value','25')
+		.attr('id','clone_darkness_slider')
+		.style('margin-left','23px')
+		.on('input',darken_nodes);
+
+	
+	var source_target_options = popup.append('div');
+	source_target_options.append('button')
+		.text('Source')
+		.style('width','60px')
 		.on('click',set_source_from_selection);
-	popup.append('div').append('button')
-		.text('Set target nodes')
-		.style('width','120px')
+	source_target_options.append('button')
+		.text('Target')
+		.style('width','60px')
 		.on('click',set_target_from_selection);
-	popup.append('div').append('button')
-		.text('Reset all nodes')
-		.style('width','120px')
+	source_target_options.append('button')
+		.text('Reset all')
+		.style('width','87px')
 		.on('click',reset_all_nodes);
 
-	popup.append('div').append('button')
-		.text('Darken cell colors')
-		.style('width','120px')
+	var node_color_options = popup.append('div');
+	node_color_options.append('button')
+		.text('Darken')
 		.on('click',darken_nodes);
 		
-	popup.append('div').append('button')
-		.style('width','121px')
-		.text('Hide clone edges')
+	node_color_options.append('button')
+		.text('Burn')
+		.on('click',burn);
+		
+	node_color_options.append('button')
+		.text('Restore')
+		.on('click',restore_colors);
+			
+	node_color_options.append('button')
+		.text('Clear')
+		.on('click',clear_clone_overlays)
+	
+	var show_things_options = popup.append('div');
+	show_things_options.append('button')
+		.style('width','106px')
+		.text('Show edges')
 		.on('click',function() {
 			if (show_clone_edges) {
 				show_clone_edges = false;
-				d3.select(this).text('Show clone edges');
+				d3.select(this).text('Show edges');
 			} else {
 				show_clone_edges = true;
-				d3.select(this).text('Hide clone edges');
+				d3.select(this).text('Hide edges');
+			}
+		});
+		
+	show_things_options.append('button')
+		.style('width','106px')
+		.text('Show source')
+		.on('click',function() {
+			if (show_source_nodes) {
+				show_source_nodes = false;
+				d3.select(this).text('Show source');
+			} else {
+				show_source_nodes = true;
+				d3.select(this).text('Hide source');
 			}
 		});
 		
 		
-	var cc_div = popup.append('div')
-	cc_div.append('button')
-		.text('Clear')
-		.style('width','54px')
-		.style('margin-right','12px')
-		.on('click',clear_clone_overlays);
-	cc_div.append('button')
+	var other_options = popup.append('div')
+	
+	other_options.append('button')
+		.text('Extend from selection')
+		.style('width','156px')
+		.on('click',extend_from_selection);
+		
+	other_options.append('button')
 		.text('Close')
-		.style('width','54px')
+		.style('width','56px')
 		.on('click',close_clone_viewer);
 		
+
 	function clone_viewer_popup_dragstarted() {
 		d3.event.sourceEvent.stopPropagation();
 	}
@@ -113,39 +170,20 @@ function clone_viewer_setup() {
 			.on("drag", clone_viewer_popup_dragged)
 			.on("dragend", clone_viewer_popup_dragended));
 			
-			
-	function set_source_from_selection() {
-		for (i=0; i<all_outlines.length; i++) {
-			if (all_outlines[i].selected) {
-				node_status[i].source = true;
-			}
-		}
-	}
-	
-	function set_target_from_selection() {
-		for (i=0; i<all_outlines.length; i++) {
-			if (all_outlines[i].selected) {
-				node_status[i].target = true;
-			}
-		}	
-	}
-	
+				
 	function reset_all_nodes() {
 		for (i=0; i<all_outlines.length; i++) {
 			node_status[i].source = false;
 			node_status[i].target = false;
 		}
 	}
-	
-	function darken_nodes() {
-		for (i=0; i<all_nodes.length; i++) {
-			all_nodes[i].tint = '0x000000';
-		}
-	}
-	
+		
 	function clear_clone_overlays() {
 		for (i in clone_nodes) {
 			deactivate_nodes(i);
+		}
+		for (i in clone_edges) {
+			deactivate_edges(i);
 		}
 	}
 	
@@ -154,41 +192,107 @@ function clone_viewer_setup() {
 		svg_graph.on('click',null);
 		popup.style('visibility','hidden');
 		reset_all_nodes();		
+		clear_clone_overlays();
+		targetCircle.clear()
 	}
 	
+	function update_highlight_size() {
+		var my_scale = parseFloat(d3.select('#clone_node_size_slider')[0][0].value) / 10;
+		for (i in clone_nodes) {
+			clone_nodes[i].scale.x = all_nodes[i].scale.x * my_scale;
+			clone_nodes[i].scale.y = all_nodes[i].scale.x * my_scale;
+		}
+	}
+	
+	function burn() {
+		for (i=0; i<all_nodes.length; i++) {
+			if (clone_nodes[i] == undefined && all_nodes[i].tint == '0x000000') {
+				base_colors[i] = {r:0,g:0,b:0};
+			}
+		}
+		update_tints()	
+		app.stage.children[1].children.sort(function(a,b) {
+			return average_color(base_colors[a.index]) - average_color(base_colors[b.index]);
+		});
+
+		clear_clone_overlays();
+	}
+	
+	function restore_colors() {
+		setNodeColors();
+	
+	}
+		
+	function extend_from_selection() {
+		for (i in clone_nodes) {
+			if (! clone_nodes[i].active_stable) {
+				deactivate_nodes(i);
+			}
+		}
+		for (i in clone_edges) {
+			deactivate_edges(i);
+		}
+		for (var i=0; i<all_nodes.length; i++) {
+			if (all_outlines[i].selected) { 				
+				if (node_status[i].source) {
+					if (! (i in clone_nodes)) {
+						activate_edges(i,false);				
+						if (show_source_nodes) {
+							activate_node(i,false);
+						} 
+					}
+				}	
+			}	
+		}
+	}
 }
 
 function get_clone_radius() {
-	var r = parseInt(d3.select('#clone_radius_slider')[0][0].value);
+	var r = parseInt(d3.select('#clone_selector_size_slider')[0][0].value);
 	return r**(1.5) / 8;
 }
 
 function clone_mousemove() {
-	
 	var dim = document.getElementById('svg_graph').getBoundingClientRect();
 	var x = d3.event.clientX - dim.left;
 	var y = d3.event.clientY - dim.top;
 	x = (x - sprites.position.x) / sprites.scale.x;
 	y = (y - sprites.position.y) / sprites.scale.y;
 	
+	targetCircle.x = x;
+	targetCircle.y = y;	
+	
 	for (i in clone_nodes) {
 		if (! clone_nodes[i].active_stable) {
 			deactivate_nodes(i);
 		}
 	}	
+	for (i in clone_edges) {
+		deactivate_edges(i);
+	}
 	for (var i=0; i<all_nodes.length; i++) {
 		rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
-		if (rad < all_nodes[i].scale.x * get_clone_radius()) { 				
+		if (rad <= get_clone_radius()) { 				
 			if (node_status[i].source) {
 				if (! (i in clone_nodes)) {
-					activate_edges(i,false);
-					activate_node(i,false); 
-					//update_colorstack();
+					activate_edges(i,false);				
+					if (show_source_nodes) {
+						activate_node(i,false);
+					} 
 				}
 			}	
 		}	
 	}
 	
+	targetCircle.alpha=0.75
+	setTimeout(function() { dim_target_circle(0.75); },150);
+	
+	function dim_target_circle(x) {
+		if (x > 0 && targetCircle.alpha==x) {
+			targetCircle.alpha=x-.08;
+			dimmer = setTimeout(function() { dim_target_circle(x-.08); },20);
+		}
+	}
 }
 
 	
@@ -201,9 +305,11 @@ function clone_click() {
 	for (var i=0; i<all_nodes.length; i++) {
 		if (! all_outlines[i].selected) {
 			rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
-			if (rad < all_nodes[i].scale.x * get_clone_radius() ) { 
+			if (rad < get_clone_radius()) { 
 				if (node_status[i].source) {
-					activate_node(i,true); 
+					if (show_source_nodes) {
+						activate_node(i,true); 
+					}
 					activate_edges(i,true);
 				}
 			}
@@ -216,7 +322,8 @@ function activate_node(i,stable) {
 	if (! (i in clone_nodes)) {		
 		var circ = PIXI.Sprite.fromImage('stuff/disc.png');
 		circ.anchor.set(.5);
-		circ.scale.set(all_nodes[i].scale.x*1.5);
+		var my_scale = parseFloat(d3.select('#clone_node_size_slider')[0][0].value) / 10;
+		circ.scale.set(all_nodes[i].scale.x * my_scale);
 		circ.x = all_nodes[i].x;
 		circ.y = all_nodes[i].y;
 		var rgb = base_colors[i];
@@ -274,14 +381,18 @@ function deactivate_nodes(i) {
 		delete clone_nodes[i];
 		node_status[i].active = false;
 		node_status[i].active_stable = false;
-	}
+	}	
+}
+	
+function deactivate_edges(i) {
 	if (i in clone_edges) {
 		for (var j=0; j<clone_edges[i].length; j++) {
 			clone_edge_container.removeChild(clone_edges[i][j]);
 		}
 		delete clone_edges[i];	
-	}	
-}
+	}
+}	
+
 	
 function start_clone_viewer() {
 	for (var i=0; i<all_nodes.length; i++) {
@@ -289,23 +400,68 @@ function start_clone_viewer() {
 	}	
 	svg_graph.on('mousemove',clone_mousemove);
 	svg_graph.on('click',clone_click);
-	d3.select('#clone_viewer_popup').style('visibility','visible')
+	d3.select('#clone_viewer_popup').style('visibility','visible');
+	
+	d3.select("#settings_range_background_color")[0][0].value = 65;
+	app.renderer.backgroundColor =  rgbToHex(65,65,65);
+	draw_target_circle();
+	set_source_from_selection(); 
+	set_target_from_selection(); 
+	darken_nodes()
 }
 
-function update_colorstack() {
-	/*
-	if (Object.keys(clone_nodes).length>0 && d3.select('#clone_viewer_popup').style('width') == '140px') {
-		d3.select('#clone_viewer_popup').transition().style('width','280px');
-	}
-	if (Object.keys(clone_nodes).length==0 && d3.select('#clone_viewer_popup').style('width') == '280px') {
-		d3.select('#clone_viewer_popup').transition().style('width','140px');
-	}
-	*/
+function draw_target_circle() {
+	targetCircle.clear()
+	targetCircle.lineStyle(7, 0xFFFFFF);  //(thickness, color)
+	targetCircle.drawCircle(0, 0, get_clone_radius() + all_nodes[0].scale.x*SPRITE_IMG_WIDTH );   //(x,y,radius)
+	targetCircle.endFill(); 
+	targetCircle.alpha=0;
 }
 
 
 
+function set_source_from_selection() {
+	var none_selected = true
+	for (i=0; i<all_outlines.length; i++) {
+		if (all_outlines[i].selected) {
+			none_selected = false;
+			i = all_outlines.length;
+		}
+	}
+	for (i=0; i<all_outlines.length; i++) {
+		if (all_outlines[i].selected || none_selected)  {
+			node_status[i].source = true;
+		}
+	}
+}
 
+function set_target_from_selection() {
+	var none_selected = true
+	for (i=0; i<all_outlines.length; i++) {
+		if (all_outlines[i].selected) {
+			none_selected = false;
+			i = all_outlines.length;
+		}
+	}
+
+	for (i=0; i<all_outlines.length; i++) {
+		if (all_outlines[i].selected || none_selected) {
+			node_status[i].target = true;
+		}
+	}	
+}
+
+
+function darken_nodes() {
+	var darkness = parseFloat(d3.select('#clone_darkness_slider')[0][0].value)/100;
+	for (i=0; i<all_nodes.length; i++) {
+		var cc = base_colors[i]
+		var r = Math.floor(cc.r * darkness);
+		var b = Math.floor(cc.b * darkness);
+		var g = Math.floor(cc.g * darkness);
+		all_nodes[i].tint = rgbToHex(r,g,b);
+	}
+}
 
 
 

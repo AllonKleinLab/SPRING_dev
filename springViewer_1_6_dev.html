@@ -1,24 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+
 <body>
-
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/forceLayout_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/colorbar_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/settings_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/coexpression_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/diffex_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/make_new_SPRINGplot_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/downloadSelectedExpr_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/clone_viewer.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stickyNote.css">
-<link rel="stylesheet" type="text/css" href="scripts_dev_shared/autocomplete_style.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/sweetalert.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/smoothing_imputation.css">
-<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_logic.css">
-<!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stratify.css"> -->
-<!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/gridstack.css"> -->
-
 
 <div id="options_bar">
 	<div id="button_panel">
@@ -39,6 +22,7 @@
 				<a id="revert_positions">Undo</a>
 				<a id="move_left">Move left</a>
 				<a id="move_right">Move right</a>
+				<a id="toggle_edges_layout">Hide edges</a>
 			</div>
 		</div>
 
@@ -89,12 +73,34 @@
 		<div class="column" id="count_column"> </div>
 		<div class="column" id="label_column"> </div>
 	</div>
-
+	
 </div>
 
+<div id="colorpicker_popup">
+	<div id="colorpicker_button_bar"> </div>
+	<div id="colorpickerHolder"> </div>
+</div>
+
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/forceLayout_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/colorbar_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/settings_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/coexpression_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/diffex_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/make_new_SPRINGplot_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/downloadSelectedExpr_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/clone_viewer.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stickyNote.css">
+<link rel="stylesheet" type="text/css" href="scripts_dev_shared/autocomplete_style.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/sweetalert.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/smoothing_imputation.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_logic.css">
+<!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stratify.css"> -->
+<!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/gridstack.css"> -->
+
+<script src="scripts_1_6_dev/jquery-3.1.0.min.js"></script>
 <script src="scripts_1_6_dev/d3.min.js"></script>
 <script src="scripts_1_6_dev/d3-queue.v3.min.js"></script> <!-- SPARSE UPDATE -->
-<script src="scripts_1_6_dev/jquery-3.1.0.min.js"></script>
 <script src="scripts_1_6_dev/colorBar.js"></script>
 <script src="scripts_1_6_dev/forceLayout_script.js"></script>
 <script src="scripts_1_6_dev/newSpringPlot.js"></script>
@@ -119,9 +125,13 @@
 <script src="scripts_1_6_dev/smoothing_imputation.js"></script>
 <script src="scripts_1_6_dev/selection_logic.js"></script>
 <script src="scripts_1_6_dev/text_annotations.js"></script>
-<!-- <script src="scripts_1_6_dev/stratify.js"></script> -->
-<!-- <script src="scripts_1_6_dev/gridstack.js"></script> -->
-<!-- <script src="scripts_1_6_dev/gridstack.jQueryUI.js"></script> -->
+
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/colorpicker.css">
+<script src="scripts_1_6_dev/colorpicker.js"></script>
+<script src="scripts_1_6_dev/colorpicker_eye.js"></script>
+<script src="scripts_1_6_dev/colorpicker_utils.js"></script>
+<script src="scripts_1_6_dev/colorpicker_layout.js"></script>
+
 
 <script>
 
@@ -155,11 +165,15 @@ function callback() {
 	stickyNote_setup();
 	imputation_setup();
 	selection_logic_setup();
+	colorpicker_setup();
 	
 	//load_text_annotation();
 	//stratify_setup();
 	//show_stratify_popup();
-
+	//start_clone_viewer();
+	//show_imputation_popup();
+	//show_colorpicker_popup('HSC_HSC_fate1');
+	
 	window.onclick = function(event) {
 		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }
 		if (!event.target.matches('#download_dropdown_button')) { closeDropdown(); }
@@ -200,6 +214,7 @@ d3.select("#color_chooser").selectAll("div").remove()
 d3.select("#color_chooser").selectAll("input").remove()
 d3.select("#color_chooser").selectAll("select").remove()
 forceLayout(graph_directory, sub_directory, callback);
+
 
 
 

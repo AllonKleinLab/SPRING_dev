@@ -86,30 +86,10 @@ function forceLayout(project_directory, sub_directory, callback) {
 		.attr("y", 115)
 		.attr("width", 25)
 		.attr("height", 25)
-		.attr("class","other_frills");
+		.attr("class","other_frills")
+		.on("click", toggle_edges);
 
-	
-	edge_toggle_image.on("click",function() {
-		if (edge_toggle_image.attr("xlink:href") == "stuff/check-mark.svg") {
-			edge_toggle_image.attr("xlink:href","stuff/ex-mark.svg");
-			edge_container.visible = false;
-			d3.select('#edge_text').selectAll('tspan').remove()
-			d3.select('#edge_text')
-				.append("tspan").attr('id','hide_edges_tspan').attr("x",svg_width-167).attr("dy",0).text("Show edges")
-				.append("tspan").attr('id','hide_edges_sub_tspan').attr("x",svg_width-167).attr("dy",17).text("(runs slower)");
-
-		} 
-		else {
-			edge_toggle_image.attr("xlink:href","stuff/check-mark.svg");
-			edge_container.visible = true;
-			d3.select('#edge_text').selectAll('tspan').remove()
-			d3.select('#edge_text')
-				.append("tspan").attr('id','hide_edges_tspan').attr("x",svg_width-167).attr("dy",0).text("Hide edges")
-				.append("tspan").attr('id','hide_edges_sub_tspan').attr("x",svg_width-167).attr("dy",17).text("(runs faster)");
-
-		}
-	});
-
+	d3.select('#toggle_edges_layout').on('click',toggle_edges);
 
 	// Read coordinates file if it exists
 	coordinates = []
@@ -331,6 +311,29 @@ function forceLayout(project_directory, sub_directory, callback) {
 		for (i=0; i<all_nodes.length; i++) {
 			all_nodes[i].beingDragged = false;
 		}
+	}
+	
+	function toggle_edges() {
+		if (edge_container.visible == true) {
+			edge_toggle_image.attr("xlink:href","stuff/ex-mark.svg");
+			edge_container.visible = false;
+			d3.select('#edge_text').selectAll('tspan').remove()
+			d3.select('#edge_text')
+				.append("tspan").attr('id','hide_edges_tspan').attr("x",svg_width-167).attr("dy",0).text("Show edges")
+				.append("tspan").attr('id','hide_edges_sub_tspan').attr("x",svg_width-167).attr("dy",17).text("(runs slower)");
+			d3.select('#toggle_edges_layout').text('Show edges')
+		} 
+		else {
+			edge_toggle_image.attr("xlink:href","stuff/check-mark.svg");
+			edge_container.visible = true;
+			d3.select('#edge_text').selectAll('tspan').remove()
+			d3.select('#edge_text')
+				.append("tspan").attr('id','hide_edges_tspan').attr("x",svg_width-167).attr("dy",0).text("Hide edges")
+				.append("tspan").attr('id','hide_edges_sub_tspan').attr("x",svg_width-167).attr("dy",17).text("(runs faster)");
+			d3.select('#toggle_edges_layout').text('Hide edges')
+		}
+
+	
 	}
 }
 
@@ -782,8 +785,12 @@ function redraw() {
 		clone_edge_container.scale = sprites.scale;
 		clone_sprites.position = sprites.position;
 		clone_sprites.scale = sprites.scale;
+		
 		//text_container.position = sprites.position;
 		//text_container.scale = sprites.scale;
+		
+		d3.select('#vis').attr("transform","translate(" + [sprites.x,sprites.y] + ")" + " scale(" + sprites.scale.x + ")");
+
 		
 		
 	}

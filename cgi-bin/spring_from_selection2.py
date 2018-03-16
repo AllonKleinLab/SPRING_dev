@@ -4,7 +4,6 @@ import cgitb
 cgitb.enable()  # for troubleshooting
 print "Content-Type: text/html"
 print
-print 'HEY'
 import os
 import pickle
 import numpy as np

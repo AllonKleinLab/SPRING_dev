@@ -7,6 +7,7 @@ function imputation_setup() {
 		
 	button_bar.append('label').text('N = ').append('input').attr('id','imputation_N_input').property('value',10);
 	button_bar.append('label').text('\u03B2 = ').append('input').attr('id','imputation_beta_input').property('value',0.1);
+	button_bar.append('button').text('Restore').on('click',restore_colors);
 	button_bar.append('button').text('Smooth').on('click',perform_smoothing);
 	button_bar.append('button').text('Close').on('click',hide_imputation_popup);
 
@@ -60,6 +61,9 @@ function imputation_setup() {
 		$(target).data('spinner', spinner);
 	}
 
+	function restore_colors() {
+		setNodeColors();
+	}
 
 
 	function hide_waiting_wheel() {
@@ -68,68 +72,91 @@ function imputation_setup() {
 	}
 
 	function perform_smoothing() {
-		if (document.getElementById('channels_button').checked) {
+		if ( true ) {
 			var t0 = new Date();
 			//update_slider();
 			var beta = $('#imputation_beta_input').val();
 			var N = $('#imputation_N_input').val();
 
-			// var all_r = "";
-			// var all_g = "";
-			// var all_b = "";
-		 //    for (i=0; i<all_outlines.length; i++) {
-		 //    	var col = base_colors[i];
-		 //        all_r = all_r + "," + col["r"].toString();
-		 //        all_g = all_g + "," + col["g"].toString();
-		 //        all_b = all_b + "," + col["b"].toString();
-		 //    }
-		 //    all_r = all_r.slice(1, all_r.length);
-		 //    all_g = all_g.slice(1, all_g.length);
-		 //    all_b = all_b.slice(1, all_b.length);
-			var green_string = "";
+			var all_r = "";
+			var all_g = "";
+			var all_b = "";
+			var sel = "";
+			var sel_nodes = [];
 			for (i=0; i<all_outlines.length; i++) {
-				green_string = green_string + "," + green_array_raw[i].toString();
+				if (all_nodes[i].tint=='0x000000' && clone_nodes[i]==undefined) { 
+					var col = {r:0,b:0,g:0}; 
+				}
+				else { 
+					var col = base_colors[i]; 
+				}
+				if (all_outlines[i].selected) { 
+					sel = sel + "," + (i).toString(); 
+					sel_nodes.push(i);
+				}
+				all_r = all_r + "," + col["r"].toString();
+				all_g = all_g + "," + col["g"].toString();
+				all_b = all_b + "," + col["b"].toString();
 			}
-			green_string = green_string.slice(1, green_string.length);
-
+			all_r = all_r.slice(1, all_r.length);
+			all_g = all_g.slice(1, all_g.length);
+			all_b = all_b.slice(1, all_b.length);
+			sel = '#'+sel.slice(1, sel.length)
+			
 			show_waiting_wheel();
-		
+			console.log(sel);
 			$.ajax({
 				url: "cgi-bin/smooth_gene.py",
 				type: "POST",
-				//data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, raw_r:all_r, raw_g:all_g, raw_b:all_b, beta:beta, n_rounds:N},
-				data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, beta:beta, n_rounds:N, raw_g:green_string},
+				data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, raw_r:all_r, raw_g:all_g, raw_b:all_b, beta:beta, n_rounds:N, selected:sel},
+				//data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, beta:beta, n_rounds:N, raw_g:green_string},
 				success: function(data) {
 					var t1 = new Date();
 					console.log('Smoothed the data: ', t1.getTime() - t0.getTime());
-                    datasplit = data.split(';');
-                    color_max = parseFloat(datasplit[1]);
-                    
-					green_array = datasplit[0].split(',');
+ 					datasplit = data.split("|");
+					var new_min = parseFloat(datasplit[0])-.02;
+					var new_max = parseFloat(datasplit[1]);
 					
-					for (var i = 0; i < all_nodes.length; i++) {
-						var rawval = green_array[i];
-						var gg = normalize_one_val(rawval);
-						base_colors[i] = {r:0,g:Math.floor(gg*255),b:0};
+					if (document.getElementById('channels_button').checked) {
+						current_min = 0;
+						current_max = d3.max(green_array);
 					}
+					else {
+						var current_max = d3.max(base_colors.map(max_color));
+						var current_min = d3.min(base_colors.map(min_color));
+					}
+					
+					function nrm(x) {
+						return (parseFloat(x) - new_min + current_min) / (new_max - new_min + .01) * (current_max - current_min);
+					}
+					
+					var spl = datasplit[2].split(';');
+					var reds = spl[0].split(",").map(nrm);
+					var greens = spl[1].split(",").map(nrm);
+					var blues = spl[2].split(",").map(nrm);
 
+					if (document.getElementById('channels_button').checked) {
+						green_array = greens;
+						greens = greens.map(x => normalize_one_val(x));
+					}
+					
+					if (sel_nodes.length==0) {
+						for (var i = 0; i < all_nodes.length; i++) {
+							base_colors[i] = {r:Math.floor(reds[i]),g:Math.floor(greens[i]),b:Math.floor(blues[i])};
+						}
+					} else {
+						for (var i = 0; i < sel_nodes.length; i++) {
+							base_colors[sel_nodes[i]] = {r:Math.floor(reds[i]),g:Math.floor(greens[i]),b:Math.floor(blues[i])};
+						}
+					}
+					
+					updateColorMax();
+					hide_waiting_wheel();
+					
 					app.stage.children[1].children.sort(function(a,b) {
-						return green_array[a.index] - green_array[b.index];
+						return average_color(base_colors[a.index]) - average_color(base_colors[b.index]);
 					});
 
-					update_tints();
-                    set_slider_position_only(slider_scale(color_max));
-					hide_waiting_wheel();
-
-
-		   //      	var spl = data.split(";");
-		   //      	var reds = spl[0].split(",");
-		   //      	var greens = spl[1].split(",");
-		   //      	var blues = spl[2].split(",");
-		   //          for (var i = 0; i < all_nodes.length; i++) {
-					// 	base_colors[i] = {r:parseInt(reds[i]),g:parseInt(greens[i]),b:parseInt(blues[i])};
-					// }
-					// update_tints();
 			
 				}
 			});

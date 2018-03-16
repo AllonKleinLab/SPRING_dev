@@ -136,7 +136,7 @@ function colorBar(project_directory, color_menu_genes) {
 		}
 	}
 
-	function setNodeColors() {
+	setNodeColors = function setNodeColors() {
 		if (document.getElementById('gradient_button').checked) {
 			var current_selection = document.getElementById('gradient_menu').value
 			var color_array = normalize(gene_set_color_array[current_selection]);
@@ -189,7 +189,8 @@ function colorBar(project_directory, color_menu_genes) {
 		}
 	}
 
-	function updateColorMax() {
+	updateColorMax = function updateColorMax() {
+
 		if (document.getElementById('gradient_button').checked) {
 			var current_selection = document.getElementById('gradient_menu').value
 			var color_array = normalize(gene_set_color_array[current_selection]);
@@ -205,6 +206,15 @@ function colorBar(project_directory, color_menu_genes) {
 			}
 			update_tints();
 		}
+		if (document.getElementById('labels_button').checked) {
+			for (var i = 0; i < base_colors.length; i++) {
+		    	var rr = Math.floor(normalize_one_val(base_colors[i].r)*255);
+		    	var gg = Math.floor(normalize_one_val(base_colors[i].g)*255);
+		    	var bb = Math.floor(normalize_one_val(base_colors[i].b)*255);
+				all_nodes[i].tint = rgbToHex(rr,gg,bb);
+			}
+			//update_tints();
+		}		
 	}
 
 	/* -----------------------------------------------------------------------------------
@@ -455,6 +465,9 @@ function colorBar(project_directory, color_menu_genes) {
 			var green_selection = d3.select('#autocomplete')[0][0].value
 			color_array = green_array;
 		}
+		if (document.getElementById('labels_button').checked) {
+			color_array = base_colors.map(average_color);
+		}
 		if (color_array != null) {
 			for (i=0; i<all_nodes.length; i++) {
 				var x = color_array[i];
@@ -482,6 +495,12 @@ function colorBar(project_directory, color_menu_genes) {
 			var cat_label_list = categorical_coloring_data[name]['label_list'];
 			d3.select('#legend_mask').transition().attr("x", svg_width-177)
 				.each("end", function() { make_legend(cat_color_map,cat_label_list); });
+			var max = d3.max(base_colors.map(max_color));
+			if (max==0) { max = 255; }
+			color_max = max;
+			slider_scale.domain([0, max*1.05]);
+			set_slider_position_only(max);
+			
 		} else {
 			d3.select('#legend_mask').transition().attr("x", svg_width)
 			if (color_stats == null) { return; }
@@ -498,41 +517,39 @@ function colorBar(project_directory, color_menu_genes) {
 			}
 			var max = color_stats[name][3];
 			slider_scale.domain([0, max*1.05]);
-			//set_slider_position(slider_scale(color_stats[name][4]));
 			set_slider_position_only(slider_scale(color_stats[name][4]));
+		}
+		
+		slider_ticks.remove();
+		d3.select(".ticks").remove();
 
+		if (max < 1) { ticknum = max * 10; }
+		else if (max < 2) { ticknum = max * 5; }
+		else if (max < 10) { ticknum = max; }
+		else if (max < 50) { ticknum = max / 5; }
+		else if (max < 100){ ticknum = max / 10; }
+		else if (max < 200){ ticknum = max / 20; }
+		else if (max < 1000){ ticknum = max / 100; }
+		else if (max < 20000) { ticknum = max / 1000; }
+		else if (max < 200000) { ticknum = max / 10000; }
+		else if (max < 2000000) { ticknum = max / 100000; }
+		else if (max < 20000000) { ticknum = max / 1000000; }
 
-			slider_ticks.remove();
-			d3.select(".ticks").remove();
+		slider_ticks = slider.insert("g", ".track-overlay")
+			.attr("class","colorbar_item")
+			.attr("id", "ticks")
+			.attr("transform", "translate(0," + 18 + ")")
+			.selectAll("text")
+			.data(slider_scale.ticks(ticknum))
+			.enter().append("text")
+			.attr("x", slider_scale)
+			.attr("text-anchor", "middle")
+			.text(function(d) { return d});
 
-			if (max < 1) { ticknum = max * 10; }
-			else if (max < 2) { ticknum = max * 5; }
-			else if (max < 10) { ticknum = max; }
-			else if (max < 50) { ticknum = max / 5; }
-			else if (max < 100){ ticknum = max / 10; }
-			else if (max < 200){ ticknum = max / 20; }
-			else if (max < 1000){ ticknum = max / 100; }
-			else if (max < 20000) { ticknum = max / 1000; }
-			else if (max < 200000) { ticknum = max / 10000; }
-			else if (max < 2000000) { ticknum = max / 100000; }
-			else if (max < 20000000) { ticknum = max / 1000000; }
-
-			slider_ticks = slider.insert("g", ".track-overlay")
-				.attr("class","colorbar_item")
-				.attr("id", "ticks")
-				.attr("transform", "translate(0," + 18 + ")")
-				.selectAll("text")
-				.data(slider_scale.ticks(ticknum))
-				.enter().append("text")
-				.attr("x", slider_scale)
-				.attr("text-anchor", "middle")
-				.text(function(d) { return d});
-
-			if (document.getElementById('gradient_button').checked) {
-				d3.select(".ticks").append("text").attr("x",svg_width/3+10).text("Z-score");
-			} else {
-				d3.select(".ticks").append("text").attr("x",svg_width/3+10).text("UMIs");
-			}
+		if (document.getElementById('gradient_button').checked) {
+			d3.select(".ticks").append("text").attr("x",svg_width/3+10).text("Z-score");
+		} else {
+			d3.select(".ticks").append("text").attr("x",svg_width/3+10).text("UMIs");
 		}
 		setNodeColors();
 		if (left_bracket.style("visibility") == "visible") {
@@ -988,6 +1005,7 @@ function colorBar(project_directory, color_menu_genes) {
             //else {var script="get_gene_zscores.from_hdf5.dev.py"; console.log("hdf5 enrichment");}
             //if (n_highlight > 500) {var script="get_gene_zscores.from_npz.py"; console.log("npz enrichment");}
             //else {var script="get_gene_zscores.py"; console.log("hdf5 enrichment");}
+            var enrich_script = "get_gene_zscores.from_hdf5.dev.py"
             var t0 = new Date();
             console.log(enrich_script);
             $.ajax({
@@ -1091,56 +1109,64 @@ function make_legend(cat_color_map,cat_label_list) {
 	d3.select("#label_column").selectAll("div").each(function(d) {
 		d3.select(this).append("div")
 			.style("background-color",cat_color_map[d])
+			.on('click',function() { show_colorpicker_popup(d); });
 		d3.select(this).append("div")
 			.attr("class","text_label_div")
 			.append("p").text(d)
 			.style("float","left")
 			.style("white-space","nowrap")
 			.style("margin-top","-6px")
-			.style("margin-left","3px");
+			.style("margin-left","3px")
+			.on('click',function() { categorical_click(d,cat_label_list); });
 	});
 	d3.selectAll(".legend_row")
 		.style("width","152px")
 		.style("background-color","rgba(0, 0, 0, 0)")
 		.on("mouseover", function(d) { d3.select(this).style("background-color","rgba(0, 0, 0, 0.3)"); })
-		.on("mouseout", function(d) { d3.select(this).style("background-color","rgba(0, 0, 0, 0)");})
-		.on("click", function(d) {
-			all_selected = true;
-			for (i=0; i<all_nodes.length; i++) {
-				if (cat_label_list[i]==d) {
-					if (! (all_outlines[i].selected || all_outlines[i].compared))  { all_selected = false; }
-				}
-			}
-			
-            var my_nodes = [];
-			for (i=0; i<all_nodes.length; i++) {
-				if (cat_label_list[i]==d) {
-					my_nodes.push(i);
-					if (all_selected) {
-						all_outlines[i].selected = false;
-						all_outlines[i].compared = false;
-						all_outlines[i].alpha=0;
-					} else {
-						if (selection_mode=='negative_select') {
-							all_outlines[i].compared = true;
-							all_outlines[i].tint = '0x0000ff';
-							all_outlines[i].alpha=all_nodes[i].alpha;
-						} else {
-							all_outlines[i].selected = true;
-							all_outlines[i].tint = '0xffff00';
-							all_outlines[i].alpha=all_nodes[i].alpha;
-						}
-
-					}
-				}
-			}
-			
-			shrinkNodes(6,10,my_nodes);
-			update_selected_count();
-			count_clusters();
-		});
+		.on("mouseout", function(d) { d3.select(this).style("background-color","rgba(0, 0, 0, 0)");});
+	
 	count_clusters();
 }
+
+	function categorical_click(d,cat_label_list) {
+
+		all_selected = true;
+		for (i=0; i<all_nodes.length; i++) {
+			if (cat_label_list[i]==d) {
+				if (! (all_outlines[i].selected || all_outlines[i].compared))  { all_selected = false; }
+			}
+		}
+	
+		var my_nodes = [];
+		for (i=0; i<all_nodes.length; i++) {
+			if (cat_label_list[i]==d) {
+				my_nodes.push(i);
+				if (all_selected) {
+					all_outlines[i].selected = false;
+					all_outlines[i].compared = false;
+					all_outlines[i].alpha=0;
+				} else {
+					if (selection_mode=='negative_select') {
+						all_outlines[i].compared = true;
+						all_outlines[i].tint = '0x0000ff';
+						all_outlines[i].alpha=all_nodes[i].alpha;
+					} else {
+						all_outlines[i].selected = true;
+						all_outlines[i].tint = '0xffff00';
+						all_outlines[i].alpha=all_nodes[i].alpha;
+					}
+
+				}
+			}
+		}
+	
+		if (all_nodes.length < 25000) { 
+			shrinkNodes(6,10,my_nodes); 
+		}
+		update_selected_count();
+		count_clusters();
+
+	}
 
 function shrinkNodes(scale,numsteps,nodes) {
 	current_radii = {}
@@ -1292,6 +1318,18 @@ function get_hover_cells(e) {
 	console.log(hover_cells);
 	return hover_cells;
 
+}
+
+function max_color(c) {
+	return d3.max([c.r,c.b,c.g]);
+}
+
+function min_color(c) {
+	return d3.min([c.r,c.b,c.g]);
+}
+
+function average_color(c) {
+	return d3.mean([c.r,c.b,c.g]);
 }
 
 
