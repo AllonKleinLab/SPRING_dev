@@ -211,7 +211,7 @@ function show_make_new_SPRINGplot_popup() {
 function submit_new_SPRINGplot() {	
 
 	
-	var running_online = true;
+	var running_online = false;
 	include_exclude = d3.select('#include_exclude_toggle').text();
 	
 	// Do cgi stuff to check for valid input
