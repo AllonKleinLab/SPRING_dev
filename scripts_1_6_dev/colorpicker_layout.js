@@ -70,7 +70,7 @@ function restore_colorpicker() {
 	if (current_label != '') {
 		var current_track = d3.select('#colorpicker_popup').attr('current_track');
 		tmp_cat_coloring = Object.assign({},categorical_coloring_data[current_track]['label_colors']);
-		var current_color = categorical_coloring_data['Sample']["label_colors"][current_label].replace('#','0x');
+		var current_color = categorical_coloring_data[current_track]["label_colors"][current_label].replace('#','0x');
 		$('#colorpickerHolder').ColorPickerSetColor(current_color);
 	
 		d3.selectAll('.legend_row').each(function(d) {
@@ -83,11 +83,11 @@ function restore_colorpicker() {
 
 
 function show_colorpicker_popup(label) {
-	
-	var current_color = categorical_coloring_data['Sample']["label_colors"][label].replace('#','0x');
+
 	var current_track = document.getElementById('labels_menu').value;
+	var current_color = categorical_coloring_data[current_track]["label_colors"][label].replace('#','0x');	
 	var nodes = [];
-	categorical_coloring_data['Sample']['label_list'].forEach(function(l,i) {
+	categorical_coloring_data[current_track]['label_list'].forEach(function(l,i) {
 		if (label == l) { nodes.push(i); }
 	});
 	

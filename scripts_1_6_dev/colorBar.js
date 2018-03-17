@@ -1123,7 +1123,9 @@ function make_legend(cat_color_map,cat_label_list) {
 		.style("width","152px")
 		.style("background-color","rgba(0, 0, 0, 0)")
 		.on("mouseover", function(d) { d3.select(this).style("background-color","rgba(0, 0, 0, 0.3)"); })
-		.on("mouseout", function(d) { d3.select(this).style("background-color","rgba(0, 0, 0, 0)");});
+		.on("mouseout", function(d) { d3.select(this).style("background-color","rgba(0, 0, 0, 0)");})
+	
+	d3.selectAll('.legend_row').selectAll('p').style('width','150px');
 	
 	count_clusters();
 }
@@ -1168,13 +1170,26 @@ function make_legend(cat_color_map,cat_label_list) {
 
 	}
 
-function shrinkNodes(scale,numsteps,nodes) {
-	current_radii = {}
+function shrinkNodes(scale,numsteps,my_nodes) {
+	var current_radii = {}
+	var nodes = [];
+	for (ii in my_nodes) {
+		//console.log(['A',my_nodes[ii], all_nodes[my_nodes[ii]].active_scaling]);
+		if (all_nodes[my_nodes[ii]].active_scaling != true) {
+			nodes.push(my_nodes[ii])
+		}
+	}
 	for (ii in nodes) {
 		current_radii[ii] = all_nodes[nodes[ii]].scale.x;
+		all_nodes[nodes[ii]].active_scaling = true;
 	}
 	var refreshIntervalId = setInterval(function() {
 		if (scale < 1) { 
+			for (ii in nodes) {
+				current_radii[ii] = all_nodes[nodes[ii]].scale.x;
+				all_nodes[nodes[ii]].active_scaling = false;
+				//console.log(['B',nodes[ii], all_nodes[nodes[ii]].active_scaling]);
+			}
 			clearInterval(refreshIntervalId); 
 		} 
 		else {
