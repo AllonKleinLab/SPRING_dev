@@ -8,8 +8,8 @@ function colorBar(project_directory, color_menu_genes) {
 	color_max = 1;
 	color_stats = null;
 	var menuBar = d3.select("#color_chooser");
-    //var enrich_script = 'get_gene_zscores.from_npz.dev.py';
-    var enrich_script = "get_gene_zscores.from_hdf5.dev.py";
+    var enrich_script = 'get_gene_zscores.from_npz.dev.py';
+    //var enrich_script = "get_gene_zscores.from_hdf5.dev.py";
 
 	svg_width = parseInt(d3.select("svg").attr("width"));
 	svg_height = parseInt(d3.select("svg").attr("height"));
