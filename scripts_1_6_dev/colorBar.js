@@ -8,8 +8,8 @@ function colorBar(project_directory, color_menu_genes) {
 	color_max = 1;
 	color_stats = null;
 	var menuBar = d3.select("#color_chooser");
-    //var enrich_script = 'get_gene_zscores.from_npz.dev.py';
-    var enrich_script = "get_gene_zscores.from_hdf5.dev.py";
+    var enrich_script = 'get_gene_zscores.from_npz.dev.py';
+    //var enrich_script = "get_gene_zscores.from_hdf5.dev.py";
 
 	svg_width = parseInt(d3.select("svg").attr("width"));
 	svg_height = parseInt(d3.select("svg").attr("height"));
@@ -1005,7 +1005,7 @@ function colorBar(project_directory, color_menu_genes) {
             //else {var script="get_gene_zscores.from_hdf5.dev.py"; console.log("hdf5 enrichment");}
             //if (n_highlight > 500) {var script="get_gene_zscores.from_npz.py"; console.log("npz enrichment");}
             //else {var script="get_gene_zscores.py"; console.log("hdf5 enrichment");}
-            var enrich_script = "get_gene_zscores.from_hdf5.dev.py"
+            //var enrich_script = "get_gene_zscores.from_hdf5.dev.py"
             var t0 = new Date();
             console.log(enrich_script);
             $.ajax({
