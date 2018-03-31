@@ -28,7 +28,6 @@ function clone_viewer_setup() {
 			clone_map[i] = data[i];
 		}
 		d3.select('#clone_loading_screen').style('visibility','hidden');
-		darken_nodes();
 	});
 	
 	
