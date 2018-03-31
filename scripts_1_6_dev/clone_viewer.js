@@ -28,6 +28,7 @@ function clone_viewer_setup() {
 			clone_map[i] = data[i];
 		}
 		d3.select('#clone_loading_screen').style('visibility','hidden');
+		darken_nodes();
 	});
 	
 	
@@ -522,7 +523,6 @@ function set_target_from_selection() {
 
 
 function darken_nodes() {
-	console.log('darken');
 	var darkness = parseFloat(d3.select('#clone_darkness_slider')[0][0].value)/100;
 	for (i=0; i<all_nodes.length; i++) {
 		var cc = base_colors[i]
