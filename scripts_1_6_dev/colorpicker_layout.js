@@ -19,7 +19,7 @@ function colorpicker_submit(hex) {
 
 function colorpicker_setup() {
 
-	popup = d3.select('#colorpicker_popup');
+	var popup = d3.select('#colorpicker_popup');
 	popup.attr('current_color','');
 	popup.attr('current_nodes','');
 	popup.attr('current_label','');

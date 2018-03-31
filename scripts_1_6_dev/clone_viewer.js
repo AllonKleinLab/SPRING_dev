@@ -10,12 +10,26 @@ function clone_viewer_setup() {
 		clone_map[i] = [];
 	}
 
+	/*
+	d3.text(window.location.search.slice(1,name.length) + "/clone_map.txt", function(text) {	
+		text.split('\n').forEach(function(line,i) {
+			if (line.length > 0) {
+				line.split(',').forEach(function(val) {
+					clone_map[i].push(parseInt(val));
+				});
+			}
+		});
+	});
+	*/
+	
+	
 	d3.json(window.location.search.slice(1,name.length) + "/clone_map.json", function(data) {	
 		for (i in data) {
 			clone_map[i] = data[i];
 		}
-		console.log('DONE');
+		d3.select('#clone_loading_screen').style('visibility','hidden');
 	});
+	
 	
 	clone_edge_container = new PIXI.Container();
 	clone_edge_container.position = sprites.position;
@@ -80,7 +94,19 @@ function clone_viewer_setup() {
 		.style('margin-left','23px')
 		.on('input',darken_nodes);
 
-	
+	console.log('BBOYYYY');
+	popup.append("div")
+		.on('mousedown',function() {
+			d3.event.stopPropagation();	
+		})
+		.append('label').text('Max clone size')
+		.append("input")
+		.attr("type","text")
+		.attr('value','100')
+		.attr('id','clone_size_input')
+		.style('margin-left','23px')
+		.on('input',darken_nodes);
+		
 	var source_target_options = popup.append('div');
 	source_target_options.append('button')
 		.text('Source')
@@ -152,6 +178,41 @@ function clone_viewer_setup() {
 		.style('width','56px')
 		.on('click',close_clone_viewer);
 		
+	var loading_screen = popup.append('div')
+		.attr('id','clone_loading_screen')
+
+	
+	show_waiting_wheel();
+	loading_screen.append('p').text('Loading clones')
+	
+	function show_waiting_wheel() {
+		loading_screen.append('div').attr('id','clone_wheel_mask');
+		var opts = {
+			  lines: 17 // The number of lines to draw
+			, length: 35 // The length of each line
+			, width: 15 // The line thickness
+			, radius: 50 // The radius of the inner circle
+			, scale: 0.22 // Scales overall size of the spinner
+			, corners: 1 // Corner roundness (0..1)
+			, color: '#000' // #rgb or #rrggbb or array of colors
+			, opacity: 0.2 // Opacity of the lines
+			, rotate: 8 // The rotation offset
+			, direction: 1 // 1: clockwise, -1: counterclockwise
+			, speed: 0.9 // Rounds per second
+			, trail: 60 // Afterglow percentage
+			, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+			, zIndex: 2e9 // The z-index (defaults to 2000000000)
+			, className: 'spinner' // The CSS class to assign to the spinner
+			, top: '50%' // Top position relative to parent
+			, left: '50%' // Left position relative to parent
+			, shadow: false // Whether to render a shadow
+			, hwaccel: true // Whether to use hardware acceleration
+			, position: 'relative' // Element positioning
+			}
+		var target = document.getElementById('clone_wheel_mask');
+		var spinner = new Spinner(opts).spin(target);
+		$(target).data('spinner', spinner);
+	}
 
 	function clone_viewer_popup_dragstarted() {
 		d3.event.sourceEvent.stopPropagation();
@@ -232,15 +293,17 @@ function clone_viewer_setup() {
 		for (i in clone_edges) {
 			deactivate_edges(i);
 		}
+
+		var maxsize = parseFloat(d3.select('#clone_size_input')[0][0].value);
+		if  ((maxsize > 0)==false) { maxsize = 100000000; }
+
 		for (var i=0; i<all_nodes.length; i++) {
-			if (all_outlines[i].selected) { 				
-				if (node_status[i].source) {
-					if (! (i in clone_nodes)) {
-						activate_edges(i,false);				
-						if (show_source_nodes) {
-							activate_node(i,false);
-						} 
-					}
+			if (all_outlines[i].selected && clone_map[i].length < maxsize && node_status[i].source) { 				
+				if (! (i in clone_nodes)) {
+					activate_edges(i,false);				
+					if (show_source_nodes) {
+						activate_node(i,false);
+					} 
 				}	
 			}	
 		}
@@ -270,10 +333,13 @@ function clone_mousemove() {
 	for (i in clone_edges) {
 		deactivate_edges(i);
 	}
+	var maxsize = parseFloat(d3.select('#clone_size_input')[0][0].value);
+	if  ((maxsize > 0)==false) { maxsize = 100000000; }
+	
 	for (var i=0; i<all_nodes.length; i++) {
 		rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
 		if (rad <= get_clone_radius()) { 				
-			if (node_status[i].source) {
+			if (node_status[i].source && clone_map[i].length < maxsize) {
 				if (! (i in clone_nodes)) {
 					activate_edges(i,false);				
 					if (show_source_nodes) {
@@ -297,6 +363,7 @@ function clone_mousemove() {
 
 	
 function clone_click() {
+	/*
 	var dim = document.getElementById('svg_graph').getBoundingClientRect();
 	var x = d3.event.clientX - dim.left;
 	var y = d3.event.clientY - dim.top;
@@ -315,6 +382,7 @@ function clone_click() {
 			}
 		}
 	}
+	*/
 }
 
 
@@ -343,6 +411,7 @@ function activate_edges(i,stable) {
 	if (! (i in clone_edges)) {		
 		var edge_list = [];
 		for (var j=0; j<clone_map[i].length; j++)  {	
+			//console.log([i,clone_map[i][j]]);
 			if (node_status[clone_map[i][j]].target) {
 				activate_node(clone_map[i][j],stable);	
 				if (show_clone_edges) {
@@ -453,6 +522,7 @@ function set_target_from_selection() {
 
 
 function darken_nodes() {
+	console.log('darken');
 	var darkness = parseFloat(d3.select('#clone_darkness_slider')[0][0].value)/100;
 	for (i=0; i<all_nodes.length; i++) {
 		var cc = base_colors[i]
