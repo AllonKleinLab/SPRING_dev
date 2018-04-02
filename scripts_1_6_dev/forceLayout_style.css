@@ -12,6 +12,7 @@ body {
 #sound_toggle {
 	padding-left: 10px;
 	padding-right: 14px;
+	visibility: hidden;
 }
 
 #sound_toggle > img {
@@ -54,11 +55,32 @@ body {
 
 #button_panel > div { display: inline-block; }
 
+#fast_buttons_box {
+	margin-left: 45px;
+}
+
+#fast_buttons_box > div {
+	display: inline-block
+}
+
+#fast_buttons_box > div > button {
+	color: white;
+	background-color: rgb(150,150,150);
+	border: 1px solid rgb(230,230,230);
+	/* padding: 1.7px 5.px 2.3px 5.px; */
+}
+
+#fast_buttons_box > div > button:active {
+	background-color: #3f3f3f;
+}
+
+
 button { 
 	border: none; 
-	font: 13px sans-serif;
+	font: 12px sans-serif;
 	color: white;
 	background-color: gray;
+	padding: 1.9px 5.4px 2.5px 5.4px;
 }
 
 button:active {

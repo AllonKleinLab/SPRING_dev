@@ -1,6 +1,6 @@
 function forceLayout(project_directory, sub_directory, callback) {
 	d3.select('#toggleforce').select('button').on("click",toggleForce);
-
+	d3.select('#sound_toggle').style('visibility','hidden')
 	if (d3.select("#sound_toggle").select("img").attr("src") == "scripts_1_6_dev/sound_effects/icon_speaker.svg") {
 		var snd = new Audio("scripts_1_6_dev/sound_effects/opennew_sound.wav"); snd.play(); }
 

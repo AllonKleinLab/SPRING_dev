@@ -8,77 +8,89 @@ function colorBar(project_directory, color_menu_genes) {
 	color_max = 1;
 	color_stats = null;
 	var menuBar = d3.select("#color_chooser");
-    var enrich_script = 'get_gene_zscores.from_npz.dev.py';
-    //var enrich_script = "get_gene_zscores.from_hdf5.dev.py";
+    //var enrich_script = 'get_gene_zscores.from_npz.dev.py';
+    var enrich_script = "get_gene_zscores.from_hdf5.dev.py";
 
 	svg_width = parseInt(d3.select("svg").attr("width"));
 	svg_height = parseInt(d3.select("svg").attr("height"));
 
 	/* -------------------------------    Gene menu    ---------------------------- */
-	menuBar.append("div")
-		.append("p").text("Genes")
-
+	
 	var channelsButton = menuBar.append("input")
 		.attr("id","channels_button")
-		.style("margin-left", "2px")
-		.attr("type","radio")
+		.style("margin-left", "-25px")
+		.style('visibility','hidden')
+		.attr("type","radio");
+
+	greenMenu = menuBar.append("input")
+		.attr("type", "text")
+		.attr("class", "biginput")
+		.attr("id", "autocomplete")
+		.attr("value", "Enter gene name")
+		.style('margin-bottom','7px')
 		.on("click", function() {
 			document.getElementById("gradient_button").checked = false;
 			document.getElementById("labels_button").checked = false;
-			update_slider();
-		})
-
-	greenMenu = menuBar.append("input")
-			.attr("type", "text")
-			.attr("class", "biginput")
-			.attr("id", "autocomplete")
-			.attr("value", "Enter gene name");
+			document.getElementById("channels_button").checked = true;
+			update_color_menu_tints();
+			update_slider();		
+		});
 
 	/* -------------------------------    Label menu    ---------------------------- */
-	menuBar.append("div")
-		.append("p").text("Cell labels");
 
 	var labelsButton = menuBar.append("input")
-		.style("margin-left", "2px")
 		.attr("id","labels_button")
 		.attr("type","radio")
-		.attr("checked",true)
-		.on("click", function() {
-			document.getElementById("channels_button").checked = false;
-			document.getElementById("gradient_button").checked = false;
-			update_slider();
-		})
+		.style("margin-left", "12px")
+		.on("click", labels_click)
+		.attr("checked",true);
 
 	var labelsMenu = menuBar.append("select")
-		.style("margin-left", "3px")
+		.style("margin-left", "-2px")
 		.style("font-size","13px")
-		.style("background", "linear-gradient(to right, #FFBABA, #FFFCBA, #C4FFBA, #BAFFFE, #BAC0FF, #FCBAFF)")
+		.style("background", "linear-gradient(to right, rgb(255, 186, 186), rgb(255, 252, 186), rgb(196, 255, 186), rgb(186, 255, 254), rgb(186, 192, 255), rgb(252, 186, 255))")
+		//.style("background", "linear-gradient(to right, rgb(185, 116, 116), rgb(185, 182, 116), rgb(126, 185, 126), rgb(116, 185, 184), rgb(116, 122, 185), rgb(182, 116, 185))")
+		.style("background-color","rgba(0,0,0,0.5)")
+		.style("background-blend-mode","screen")
 		.attr("id","labels_menu")
-		.on("change", function() { update_slider(); });
+		.on("change", function() { update_slider(); })
+		.on("click", labels_click);
+		
+	function labels_click() {
+		document.getElementById("gradient_button").checked = false;
+		document.getElementById("labels_button").checked = true;
+		document.getElementById("channels_button").checked = false;
+		update_color_menu_tints();
+		update_slider();	
+	}
 
 	menuBar.selectAll("options")
 		.style("font-size","6px");
 
 	/* -------------------------------    Gradient menu    ---------------------------- */
-	menuBar.append("div")
-		.append("p").text("Gene sets / custom colors");
 
 	var gradientButton = menuBar.append("input")
-		.style("margin-left", "2px")
+		.style("margin-left", "7px")
 		.attr("id","gradient_button")
 		.attr("type","radio")
-		.on("click", function() {
-			document.getElementById("channels_button").checked = false;
-			document.getElementById("labels_button").checked = false;
-			update_slider();
-		})
+		.on("click", gradient_click);
 
 	var gradientMenu = menuBar.append("select")
-		.style("margin-left", "3px")
+		.style("margin-left", "-1px")
 		.style("font-size","13px")
-		.style("background", "linear-gradient(to right, #ff9966 , #ffff99)")
+		//.style("background", "linear-gradient(to right, rgb(255, 153, 102), rgb(255, 255, 153))")
+		.style("background", "linear-gradient(to right, rgb(185, 83, 32), rgb(185, 185, 83))")
 		.attr("id","gradient_menu")
-		.on("change", function() { update_slider(); });
+		.on("change", function() { update_slider(); })
+		.on("click", gradient_click);
+		
+	function gradient_click() {
+		document.getElementById("gradient_button").checked = true;
+		document.getElementById("channels_button").checked = false;
+		document.getElementById("labels_button").checked = false;
+		update_color_menu_tints();
+		update_slider();
+	}
 
 	/* -----------------------------    Populate menus    ---------------------------- */
 	var dispatch = d3.dispatch("load", "statechange");
@@ -242,20 +254,7 @@ function colorBar(project_directory, color_menu_genes) {
 	var slider = d3.select("svg").append("g")
 		.attr("class","colorbar_item")
 		.attr("id", "slider")
-		.attr("transform", "translate(" + svg_width/3 + "," + 42 + ")");
-	var slider_select_button = d3.select("svg").append("rect")
-		.attr("class","colorbar_item")
-		.attr("id", "slider_select_button")
-		.attr("transform", "translate(" + parseInt(svg_width/2-54.5) + "," + 9.5 + ")")
-		.style("width","114px").style("height","17px")
-		.style("fill-color","black")
-		.style("fill-opacity",0.25)
-		.on("click", toggle_slider_select)
-	d3.select("svg")
-		.append("text").attr("pointer-events","none")
-		.attr("class","colorbar_item")
-		.attr("x", svg_width/2-50).attr("y", 22).attr("font-family", "sans-serif")
-		.attr("font-size", "12px").attr("fill", "yellow").text("Expression selector")
+		.attr("transform", "translate(" + (svg_width/3) + "," + 26 + ")");
 
 
 
@@ -369,6 +368,8 @@ function colorBar(project_directory, color_menu_genes) {
 		.attr("width", 405)
 		.attr("height",d3.select("svg").attr("height"));
 
+	d3.select('#slider_select_button').select('button').on('click', toggle_slider_select);
+
 	var drag_mode = null;
 	slider.call(d3.behavior.drag()
 		.on("dragstart", function() {
@@ -391,6 +392,24 @@ function colorBar(project_directory, color_menu_genes) {
 			else if (drag_mode == 'handle') { set_slider_position(cx); }
 		})
 		.on("dragend", function() { slider.interrupt(); }));
+
+
+	function update_color_menu_tints() {
+		d3.select('#autocomplete').style('background-color','rgb(130,200,130)');
+		d3.select('#labels_menu').style("background", "linear-gradient(to right, rgb(185, 116, 116), rgb(185, 182, 116), rgb(126, 185, 126), rgb(116, 185, 184), rgb(116, 122, 185), rgb(182, 116, 185))");
+		d3.select('#gradient_menu').style("background", "linear-gradient(to right, rgb(185, 83, 32), rgb(185, 185, 83))");
+		
+		if ( document.getElementById("gradient_button").checked ) {
+			d3.select('#gradient_menu').style("background", "linear-gradient(to right, rgb(255, 153, 102), rgb(255, 255, 153))");	
+		}
+		if ( document.getElementById("labels_button").checked ) {
+			d3.select('#labels_menu').style("background", "linear-gradient(to right, rgb(255, 186, 186), rgb(255, 252, 186), rgb(196, 255, 186), rgb(186, 255, 254), rgb(186, 192, 255), rgb(252, 186, 255))");
+		}
+		if ( document.getElementById("channels_button").checked ) {
+			d3.select('#autocomplete').style('background-color','#b3ffb3');
+		}
+	}
+
 
 	function toggle_slider_select() {
 		if (d3.select("#slider_select_button").style("stroke")=="none") {
@@ -1005,7 +1024,7 @@ function colorBar(project_directory, color_menu_genes) {
             //else {var script="get_gene_zscores.from_hdf5.dev.py"; console.log("hdf5 enrichment");}
             //if (n_highlight > 500) {var script="get_gene_zscores.from_npz.py"; console.log("npz enrichment");}
             //else {var script="get_gene_zscores.py"; console.log("hdf5 enrichment");}
-            //var enrich_script = "get_gene_zscores.from_hdf5.dev.py"
+            var enrich_script = "get_gene_zscores.from_hdf5.dev.py"
             var t0 = new Date();
             console.log(enrich_script);
             $.ajax({

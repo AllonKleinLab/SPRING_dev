@@ -10,11 +10,8 @@
 			<button>HELP!</button>
 		</div>
 		-->
-		<div id="deselect">
-			<button>(De)select All</button>
-		</div>
 		<div id="layout_tools">
-			<button id="layout_dropdown_button">Layout tools:</button>
+			<button id="layout_dropdown_button">Layout</button>
 			<div id="layout_dropdown" class="dropdown-content">
 				<a href="javascript:save_coords()">Save coordinates</a>
 				<a id="center_view">Center view</a>
@@ -26,13 +23,8 @@
 			</div>
 		</div>
 
-
-		<div id="settings">
-			<button>Settings:</button>
-		</div>
-
 		<div class="dropdown">
-		  <button id="download_dropdown_button">Download:</button>
+		  <button id="download_dropdown_button">Download</button>
 		  <div id="download_dropdown" class="dropdown-content">
 		  	<a href="javascript:downloadCoordinates()">Coordinates</a>
 			<a href="javascript:downloadSelection()">Selected cells</a>
@@ -46,7 +38,7 @@
 		</div>
 
 		<div class="dropdown">
-		 <button id="tools_dropdown_button">Tools:</button>
+		 <button id="tools_dropdown_button">Tools</button>
 		  <div id="tools_dropdown" class="dropdown-content">
 		  	<a href="javascript:show_make_new_SPRINGplot_popup()">Make new subplot</a>
 			<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
@@ -58,9 +50,30 @@
 			<a href="javascript:toggle_legend_hover_tooltip()" id="toggle_legend_hover_tooltip_button">Show clusters</a>
 		  </div>
 		</div>
+		<div id="settings">
+			<button>Settings</button>
+		</div>
+
+
 		<div id="sound_toggle"> </div>
 	</div>
 	<div id="color_chooser"> </div>
+	<div id="fast_buttons_box"> 
+		<div id="deselect">
+			<button>(De)select All</button>
+		</div>
+		<div id="quick_dark">
+			<button>Dark</button>
+		</div>
+		<div id="quick_light">
+			<button>Light</button>
+		</div>
+		<div id="slider_select_button">
+			<button> Slider select</button>
+		</div>
+	</div>
+
+
 </div>
 <div id="container">
 	<div id="pixi_canvas_holder"> </div>

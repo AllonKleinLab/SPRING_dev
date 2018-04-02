@@ -73,6 +73,16 @@ function settings_setup() {
 		.attr("min",0).attr("max",100).attr("value",50)
 		.on("input", function() { edge_opacity_change(this.value); });
 	
+	d3.select('#quick_dark').select('button').on('click', function() {
+		d3.select("#settings_range_background_color")[0][0].value = '20';
+		background_color_change('20');
+	});
+	
+	d3.select('#quick_light').select('button').on('click', function() {
+		d3.select("#settings_range_background_color")[0][0].value = '220';
+		background_color_change('220');
+	});
+	
 	function node_repulsion_change(val) { force.charge(-val/10); force.start(); }
 	function link_distance_change(val) { force.linkDistance(val/10); force.start(); }
 	function link_strength_change(val) {  force.linkStrength(val/10); force.start(); }
