@@ -222,6 +222,12 @@ def execute_spring(param_filename):
     
     t1 = time.time()
     update_log(timef, 'Using %i genes -- %.2f' %(len(gene_filter), t1-t0))
+    
+    # save filtered gene list
+    with open(new_dir+'/filtered_genes.tsv','w') as o:
+        o.write('gene_index\tgene_name\n')
+        for iG in gene_filter:
+            o.write('%i\t%s\n' %(iG, gene_list[iG]))
 
     ################
     # PCA
@@ -230,6 +236,8 @@ def execute_spring(param_filename):
     Epca = get_PCA_sparseInput(E[:,gene_filter], numpc=num_pc, method='', base_ix=base_ix)
     t1 = time.time()
     update_log(timef, 'PCA done -- %.2f' %(t1-t0))
+
+    np.savetxt(new_dir+'/pca.csv', Epca, delimiter=',')
 
     ################
     # Get KNN graph
