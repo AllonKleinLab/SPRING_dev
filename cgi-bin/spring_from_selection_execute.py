@@ -210,7 +210,12 @@ def execute_spring(param_filename):
     # Gene filtering
     t0 = time.time()
     update_log_html(logf, 'Filtering genes...')
-    gene_filter = filter_genes(E[base_ix,:], min_counts, min_cells, min_vscore_pctl)
+    if (min_counts > 0) or (min_cells > 0) or (min_vscore_pctl > 0):
+        update_log_html(logf, 'Filtering genes...')
+        gene_filter = filter_genes(E[base_ix,:], min_counts, min_cells, min_vscore_pctl)
+    else:
+        gene_filter = np.arange(E.shape[1])
+
     if include_exclude == 'Exclude':
         gene_filter = np.array([i for i in gene_filter if not gene_list[i] in custom_genes])
     else:
