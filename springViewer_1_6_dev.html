@@ -29,11 +29,11 @@
 		  	<a href="javascript:downloadCoordinates()">Coordinates</a>
 			<a href="javascript:downloadSelection()">Selected cells</a>
 			<a href="javascript:show_downloadSelectedExpr_popup()">SPRING data <br> for selection</a>
-            <!-- <a href="javascript:downloadEdges()">Edge list</a> --!>
+            <!-- <a href="javascript:downloadEdges()">Edge list</a> -->
 			<a href="javascript:downloadRankedTerms()">Enriched terms</a>
 
 			<a id="download_png">Screenshot</a>
-			<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> --!>
+			<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> -->
 		  </div>
 		</div>
 
@@ -47,6 +47,7 @@
 			<a href="javascript:show_stickyNote_popup()">Sticky notes</a>
 			<a href="javascript:show_imputation_popup()">Smooth / Impute</a>
 			<a href="javascript:show_selection_logic_popup()">Selection logic</a>
+			<a href="javascript:show_doublet_popup()">Doublet detector</a>
 			<a href="javascript:toggle_legend_hover_tooltip()" id="toggle_legend_hover_tooltip_button">Show clusters</a>
 		  </div>
 		</div>
@@ -108,6 +109,7 @@
 <link rel="stylesheet" type="text/css" href="scripts_dev_shared/autocomplete_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/sweetalert.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/smoothing_imputation.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/doublet_detector.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_logic.css">
 <!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stratify.css"> -->
 <!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/gridstack.css"> -->
@@ -137,6 +139,7 @@
 <script src="scripts_dev_shared/jquery.autocomplete.min.js"></script>
 <script src="scripts_1_6_dev/sweetalert.min.js"></script>
 <script src="scripts_1_6_dev/smoothing_imputation.js"></script>
+<script src="scripts_1_6_dev/doublet_detector.js"></script>
 <script src="scripts_1_6_dev/selection_logic.js"></script>
 <script src="scripts_1_6_dev/text_annotations.js"></script>
 
@@ -178,6 +181,8 @@ function callback() {
 	clone_viewer_setup();
 	stickyNote_setup();
 	imputation_setup();
+	doublet_setup();
+
 	selection_logic_setup();
 	colorpicker_setup();
 	

@@ -93,7 +93,7 @@ function colorBar(project_directory, color_menu_genes) {
 	}
 
 	/* -----------------------------    Populate menus    ---------------------------- */
-	var dispatch = d3.dispatch("load", "statechange");
+	dispatch = d3.dispatch("load", "statechange");
 	dispatch.on("load", function(data, tag) {
 		if (tag=="gene_sets") { var select = gradientMenu; }
 		else if (tag =="all_genes") { var select = greenMenu; }
@@ -709,6 +709,7 @@ function colorBar(project_directory, color_menu_genes) {
 
 	var rankedGenesButtonRect = d3.select("svg").append("rect")
 		.attr("class","colorbar_item")
+		.attr("id", "rankedGenesButton")
 		.attr("x", -70)
 		.attr("y", 24)
 		.attr("fill-opacity",.35)

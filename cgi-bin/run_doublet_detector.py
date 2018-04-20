@@ -1,6 +1,21 @@
-from spring_helper import *
+#!/usr/bin/env python
+from doublet_helper import *
+import cgi
+import cgitb
+import os
+import json
+cgitb.enable()  # for troubleshooting
+print "Content-Type: text/plain\n"
 
 #========================================================================================#
+
+def update_log(fname, logdat, overwrite=False):
+    if overwrite:
+        o = open(fname, 'w')
+    else:
+        o = open(fname, 'a')
+    o.write(logdat + '\n')
+    o.close()
 
 def simulate_doublets_from_counts(E, sim_doublet_ratio=1):
     '''
@@ -69,7 +84,7 @@ def simulate_doublets_from_pca(PCdat, total_counts=[], sim_doublet_ratio=1):
 
 #========================================================================================#
 
-def calculate_doublet_scores(embedding, doub_labels, k=50, use_approx_nn=True, exp_doub_rate = 1.0):
+def calculate_doublet_scores(embedding, doub_labels, k=50, use_approx_nn=True, exp_doub_rate = 1.0, get_doub_parents = False, parent_ix = None):
     t00 = time.time()
     n_obs = sum(doub_labels == 0)
     n_sim = sum(doub_labels == 1)
@@ -81,11 +96,25 @@ def calculate_doublet_scores(embedding, doub_labels, k=50, use_approx_nn=True, e
     neighbors = get_knn_graph(embedding, k=k_adj, dist_metric='euclidean', approx=use_approx_nn)[1]
     
     # Calculate doublet score based on ratio of simulated cell neighbors vs. observed cell neighbors
-    n_sim_neigh = np.sum(doub_labels[neighbors] == 1, axis = 1)
-    n_obs_neigh = np.sum(doub_labels[neighbors] == 0, axis = 1)
+    doub_neigh_mask = doub_labels[neighbors] == 1
+    n_sim_neigh = np.sum(doub_neigh_mask, axis = 1)
+    n_obs_neigh = doub_neigh_mask.shape[1] - n_sim_neigh
     
     doub_score = n_sim_neigh / (n_sim_neigh + n_obs_neigh * n_sim / float(n_obs) / exp_doub_rate)
     doub_score_obs = doub_score[doub_labels == 0]
+
+    # get parents of doublet neighbors, if requested
+    neighbors = neighbors - n_obs
+    if get_doub_parents and parent_ix is not None:
+        neighbor_parents = []
+        for iCell in xrange(n_obs):
+            this_doub_neigh = neighbors[iCell,:][neighbors[iCell,:] > -1]
+            if len(this_doub_neigh) > 0:
+                this_doub_neigh_parents = np.unique(parent_ix[this_doub_neigh,:].flatten())
+                neighbor_parents.append(list(this_doub_neigh_parents))
+            else:
+                neighbor_parents.append([])
+        return doub_score[doub_labels == 0], doub_score[doub_labels == 1], neighbor_parents
 
     # return doublet scores for observed cells and simulated cells
     return doub_score[doub_labels == 0], doub_score[doub_labels == 1]
@@ -93,7 +122,7 @@ def calculate_doublet_scores(embedding, doub_labels, k=50, use_approx_nn=True, e
 
 #========================================================================================#
 
-def woublet(E=None, exp_doub_rate = 0.1, sim_doublet_ratio=3, k=50, use_approx_nn=False, precomputed_pca=None, total_counts=None, total_counts_normalize=True, norm_exclude_abundant_gene_frac=1, min_counts=3, min_cells=5, vscore_percentile=85, gene_filter=None, num_pc=50, sparse_pca=False):
+def woublet(E=None, exp_doub_rate = 0.1, sim_doublet_ratio=3, k=50, use_approx_nn=False, get_doub_parents = False, precomputed_pca=None, total_counts=None, total_counts_normalize=True, norm_exclude_abundant_gene_frac=1, min_counts=3, min_cells=5, vscore_percentile=85, gene_filter=None, num_pc=50, sparse_pca=False):
     
     # Check that input is valid
     if E is None and precomputed_pca is None:
@@ -121,11 +150,86 @@ def woublet(E=None, exp_doub_rate = 0.1, sim_doublet_ratio=3, k=50, use_approx_n
         PCdat = precomputed_pca
 
     # Simulate doublets
-    print 'Simulating doublets'
+    #print 'Simulating doublets'
     PCdat, doub_labels, parent_ix = simulate_doublets_from_pca(PCdat, total_counts=total_counts, sim_doublet_ratio=sim_doublet_ratio)
 
     # Calculate doublet scores using k-nearest-neighbor classifier
-    print 'Running KNN classifier'
-    doub_score_obs, doub_score_sim = calculate_doublet_scores(PCdat, doub_labels, k=k, use_approx_nn=use_approx_nn, exp_doub_rate = exp_doub_rate)
-    return doub_score_obs, doub_score_sim
+    #print 'Running KNN classifier'
+    return calculate_doublet_scores(PCdat, doub_labels, k=k, use_approx_nn=use_approx_nn, exp_doub_rate = exp_doub_rate, get_doub_parents = get_doub_parents, parent_ix = parent_ix)
+
+#========================================================================================#
+
+
+
+cwd = os.getcwd()
+if cwd.endswith('cgi-bin'):
+    os.chdir('../')
+t00 = time.time()
+
+
+
+
+data = cgi.FieldStorage()
+base_dir = data.getvalue('base_dir')
+sub_dir = data.getvalue('sub_dir')
+k = int(data.getvalue('k'))
+r = float(data.getvalue('r'))
+
+
+Epca = np.loadtxt(sub_dir + '/pca.csv', delimiter=',')
+if os.path.exists(sub_dir + '/total_counts.npy'):
+    total_counts = np.load(sub_dir + '/total_counts.npy')
+else:
+    total_counts = np.ones(Epca.shape[0])
+
+doublet_scores, doublet_scores_sim, doub_neigh_parents = woublet(precomputed_pca = Epca, total_counts = total_counts, exp_doub_rate = 0.1, sim_doublet_ratio = r, k = k, use_approx_nn = True, get_doub_parents = True)
+np.save(sub_dir + '/doublet_scores.npy', doublet_scores)
+
+d = {}
+for i, neigh in enumerate(doub_neigh_parents):
+    d[str(i)] = neigh
+open(sub_dir+'/clone_map.json','w').write(json.dumps(doub_neigh_parents,indent=4, separators=(',', ': ')))
+
+
+# with open(sub_dir + '/clone_map.txt', 'w') as o:
+#     for cell in doub_neigh_parents:
+#         o.write(','.join(map(str, cell)) + '\n')
+
+color_stats = json.load(open(sub_dir + '/color_stats.json'))
+overwrite = False
+if 'Doublet score' in color_stats:
+    overwrite = True
+color_stats['Doublet score'] = (np.mean(doublet_scores),np.std(doublet_scores),np.min(doublet_scores),np.max(doublet_scores),np.percentile(doublet_scores,99))
+save_color_stats(sub_dir + '/color_stats.json', color_stats)
+
+if not overwrite:
+    o = open(sub_dir + '/color_data_gene_sets.csv', 'a')
+    o.write('\nDoublet score,' + ','.join(['%.3f' %x for x in doublet_scores]))
+    o.close()
+else:
+    f = open(sub_dir + '/color_data_gene_sets.csv', 'r')
+    outLines = []
+    for l in f:
+        if l.startswith('Doublet score'):
+            if l.endswith('\n'):
+                ending = '\n'
+            else:
+                ending = ''
+            outLines.append('Doublet score,' + ','.join(['%.3f' %x for x in doublet_scores]) + ending)
+        else:
+            outLines.append(l)
+    f.close()
+    o = open(sub_dir + '/color_data_gene_sets.csv', 'w')
+    for l in outLines:
+        o.write(l)
+    o.close()
+
+    
+
+print ','.join(map(str,doublet_scores))
+
+
+
+
+
 
