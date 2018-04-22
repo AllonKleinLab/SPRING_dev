@@ -19,7 +19,11 @@ The remaining libraries can be installed using `pip`. Note that if you're a Wind
 
 
 ### Setting up a SPRING data directory
-See the example [notebook](./data_prep/spring_example_notebook.ipynb). 
+See the example notebooks: 
+
+[Hematopoietic progenitor FACS subpopulations](./data_prep/spring_example_HPCs.ipynb)
+
+[Mature blood cells (10X Genomics 4k PBMCs)](./data_prep/spring_example_pbmc4k.ipynb)
 
 A SPRING data set consist of a main directory and any number of subdirectories, with each subdirectory corresponding to one SPRING plot (i.e. subplot) that draws on a data matrix stored in the main directory. The main directory should have the following files, as well as one subdirectory for each SPRING plot. 
 
