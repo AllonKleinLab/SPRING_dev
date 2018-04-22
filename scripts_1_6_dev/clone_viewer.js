@@ -5,32 +5,6 @@ node_status = {};
 
 function clone_viewer_setup() {
 
-	clone_map = {};
-	for (i in all_nodes) {
-		clone_map[i] = [];
-	}
-
-	/*
-	d3.text(window.location.search.slice(1,name.length) + "/clone_map.txt", function(text) {	
-		text.split('\n').forEach(function(line,i) {
-			if (line.length > 0) {
-				line.split(',').forEach(function(val) {
-					clone_map[i].push(parseInt(val));
-				});
-			}
-		});
-	});
-	*/
-	
-	
-	d3.json(window.location.search.slice(1,name.length) + "/clone_map.json", function(data) {	
-		for (i in data) {
-			clone_map[i] = data[i];
-		}
-		d3.select('#clone_loading_screen').style('visibility','hidden');
-	});
-	
-	
 	clone_edge_container = new PIXI.Container();
 	clone_edge_container.position = sprites.position;
 	clone_edge_container.scale = sprites.scale;
@@ -55,8 +29,49 @@ function clone_viewer_setup() {
 	popup.append('div')
 		.style('padding','5px')
 		.style('height','22px')
-		.append('text').text('Clone browser')
+		.append('text').text('Linkage browser')
 		.attr('id','clone_title');
+
+	var cloneKeyMenu = popup.append("div")
+		.append("select")
+			.style("font-size","13px")
+			// .style('margin-left','50px')
+			//.style("text-align", "center")
+			.attr("id","clone_key_menu")
+			.on("change", function() { 
+				clone_key = document.getElementById('clone_key_menu').value;
+			});
+
+	cloneDispatch = d3.dispatch("load", "statechange");
+	cloneDispatch.on("load", function(data) {
+        cloneKeyMenu.selectAll("option").remove();
+		cloneKeyMenu.selectAll("option")
+			.data(Object.keys(data))
+			.enter().append("option")
+			.attr("value", function(d) { return d; })
+			.text(function(d) { return d; });
+		cloneDispatch.on("statechange", function(state) {
+			select.property("value", state.id);
+		});
+	});
+
+	clone_map = {};
+	var noCache = new Date().getTime();
+	d3.json(window.location.search.slice(1,name.length) + "/clone_map.json"+"?_="+noCache, function(error, data) {
+		//console.log(error);
+		for (k in data) {
+			clone_map[k] = {}
+			for (i in all_nodes) {
+				clone_map[k][i] = [];
+			}
+			for (i in data[k]) {
+				clone_map[k][i] = data[k][i];
+			}
+		};
+		d3.select('#clone_loading_screen').style('visibility','hidden');
+		cloneDispatch.load(clone_map);
+		clone_key = document.getElementById('clone_key_menu').value;
+	});
 
 	popup.append("div")
 		.on('mousedown',function() {
@@ -99,10 +114,10 @@ function clone_viewer_setup() {
 		.on('mousedown',function() {
 			d3.event.stopPropagation();	
 		})
-		.append('label').text('Max clone size')
+		.append('label').text('Max group size')
 		.append("input")
 		.attr("type","text")
-		.attr('value','100')
+		.attr('value','0')
 		.attr('id','clone_size_input')
 		.style('margin-left','23px')
 		.on('input',darken_nodes);
@@ -183,7 +198,7 @@ function clone_viewer_setup() {
 
 	
 	show_waiting_wheel();
-	loading_screen.append('p').text('Loading clones')
+	loading_screen.append('p').text('Loading linkage data')
 	
 	function show_waiting_wheel() {
 		loading_screen.append('div').attr('id','clone_wheel_mask');
@@ -254,7 +269,7 @@ function clone_viewer_setup() {
 		popup.style('visibility','hidden');
 		reset_all_nodes();		
 		clear_clone_overlays();
-		targetCircle.clear()
+		targetCircle.clear();
 	}
 	
 	function update_highlight_size() {
@@ -298,7 +313,7 @@ function clone_viewer_setup() {
 		if  ((maxsize > 0)==false) { maxsize = 100000000; }
 
 		for (var i=0; i<all_nodes.length; i++) {
-			if (all_outlines[i].selected && clone_map[i].length < maxsize && node_status[i].source) { 				
+			if (all_outlines[i].selected && clone_map[clone_key][i].length < maxsize && node_status[i].source) { 				
 				if (! (i in clone_nodes)) {
 					activate_edges(i,false);				
 					if (show_source_nodes) {
@@ -339,7 +354,7 @@ function clone_mousemove() {
 	for (var i=0; i<all_nodes.length; i++) {
 		rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
 		if (rad <= get_clone_radius()) { 				
-			if (node_status[i].source && clone_map[i].length < maxsize) {
+			if (node_status[i].source && clone_map[clone_key][i].length < maxsize) {
 				if (! (i in clone_nodes)) {
 					activate_edges(i,false);				
 					if (show_source_nodes) {
@@ -410,18 +425,18 @@ function activate_node(i,stable) {
 function activate_edges(i,stable) {
 	if (! (i in clone_edges)) {		
 		var edge_list = [];
-		for (var j=0; j<clone_map[i].length; j++)  {	
+		for (var j=0; j<clone_map[clone_key][i].length; j++)  {	
 			//console.log([i,clone_map[i][j]]);
-			if (node_status[clone_map[i][j]].target) {
-				activate_node(clone_map[i][j],stable);	
+			if (node_status[clone_map[clone_key][i][j]].target) {
+				activate_node(clone_map[clone_key][i][j],stable);	
 				if (show_clone_edges) {
 					var source = i;
-					var target = clone_map[i][j];
+					var target = clone_map[clone_key][i][j];
 					var x1 = all_nodes[source].x;
 					var y1 = all_nodes[source].y;
 					var x2 = all_nodes[target].x;
 					var y2 = all_nodes[target].y;
-					var rgb = base_colors[clone_map[i][j]];
+					var rgb = base_colors[clone_map[clone_key][i][j]];
 					var color = rgbToHex(rgb.r,rgb.g,rgb.b);
 					var line = new PIXI.Graphics();
 					line.lineStyle(5, color, 1);
@@ -436,9 +451,9 @@ function activate_edges(i,stable) {
 	} 
 	
 	else if (stable) {
-		for (var j=0; j<clone_map[i].length; j++)  {
-			if (node_status[clone_map[i][j]].target) {	
-				activate_node(clone_map[i][j],stable);
+		for (var j=0; j<clone_map[clone_key][i].length; j++)  {
+			if (node_status[clone_map[clone_key][i][j]].target) {	
+				activate_node(clone_map[clone_key][i][j],stable);
 			}	
 		}
 	}

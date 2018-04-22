@@ -176,20 +176,30 @@ k = int(data.getvalue('k'))
 r = float(data.getvalue('r'))
 
 
-Epca = np.loadtxt(sub_dir + '/pca.csv', delimiter=',')
-if os.path.exists(sub_dir + '/total_counts.npy'):
-    total_counts = np.load(sub_dir + '/total_counts.npy')
+if os.path.exists(sub_dir + '/intermediates.npz'):
+    tmp = np.load(sub_dir + '/intermediates.npz')
+    Epca = tmp['Epca']
+    total_counts = tmp['total_counts']
+    del tmp
 else:
-    total_counts = np.ones(Epca.shape[0])
+    print 'Error: could not find "intermediates.npz"'
 
 doublet_scores, doublet_scores_sim, doub_neigh_parents = woublet(precomputed_pca = Epca, total_counts = total_counts, exp_doub_rate = 0.1, sim_doublet_ratio = r, k = k, use_approx_nn = True, get_doub_parents = True)
 np.save(sub_dir + '/doublet_scores.npy', doublet_scores)
 
 d = {}
 for i, neigh in enumerate(doub_neigh_parents):
-    d[str(i)] = neigh
-open(sub_dir+'/clone_map.json','w').write(json.dumps(doub_neigh_parents,indent=4, separators=(',', ': ')))
-
+    if len(neigh)>0:
+        d[i] = neigh
+if os.path.exists(sub_dir + '/clone_map.json'):
+    clone_map = json.load(open(sub_dir + '/clone_map.json'))
+else:
+    clone_map = {}
+clone_map['Doublet parents'] = d
+# clone_map['Random'] = {i:[0] for i in xrange(Epca.shape[0])}
+json.dump(clone_map,open(sub_dir+'/clone_map.json','w'))
+# with open(sub_dir+'/clone_map.json','w') as f:
+    # f.write(json.dumps(clone_map,indent=4, sort_keys=True).decode('utf-8'))
 
 # with open(sub_dir + '/clone_map.txt', 'w') as o:
 #     for cell in doub_neigh_parents:
@@ -197,36 +207,24 @@ open(sub_dir+'/clone_map.json','w').write(json.dumps(doub_neigh_parents,indent=4
 
 color_stats = json.load(open(sub_dir + '/color_stats.json'))
 overwrite = False
-if 'Doublet score' in color_stats:
-    overwrite = True
 color_stats['Doublet score'] = (np.mean(doublet_scores),np.std(doublet_scores),np.min(doublet_scores),np.max(doublet_scores),np.percentile(doublet_scores,99))
 save_color_stats(sub_dir + '/color_stats.json', color_stats)
 
-if not overwrite:
-    o = open(sub_dir + '/color_data_gene_sets.csv', 'a')
-    o.write('\nDoublet score,' + ','.join(['%.3f' %x for x in doublet_scores]))
-    o.close()
-else:
-    f = open(sub_dir + '/color_data_gene_sets.csv', 'r')
+
+with open(sub_dir + '/color_data_gene_sets.csv') as f:
     outLines = []
+    foundDoub = False
     for l in f:
         if l.startswith('Doublet score'):
-            if l.endswith('\n'):
-                ending = '\n'
-            else:
-                ending = ''
-            outLines.append('Doublet score,' + ','.join(['%.3f' %x for x in doublet_scores]) + ending)
+            foundDoub = True
+            outLines.append('Doublet score,' + ','.join(['%.3f' %x for x in doublet_scores]))
         else:
-            outLines.append(l)
-    f.close()
-    o = open(sub_dir + '/color_data_gene_sets.csv', 'w')
-    for l in outLines:
-        o.write(l)
-    o.close()
+            outLines.append(l.strip('\n'))
+    if not foundDoub:
+        outLines.append('Doublet score,' + ','.join(['%.3f' %x for x in doublet_scores]))
 
-    
-
-print ','.join(map(str,doublet_scores))
+with open(sub_dir + '/color_data_gene_sets.csv', 'w') as o:
+    o.write("\n".join(outLines))
 
 
 

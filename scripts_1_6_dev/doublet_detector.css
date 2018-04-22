@@ -7,7 +7,7 @@
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
 	overflow: hidden;
-	height: 70px;
+	height: 100px;
 	padding: 20px;	
 }
 
@@ -62,15 +62,14 @@
 	background-color: rgba(50,50,50,1.0);
 	top: 0px;
 	left: 0px;
-	padding-left: 20px;
-	padding-top: 20px;
 }
 
-#doublet_processing_mask > text {
+#doublet_processing_mask > div {
 	font-family: Arial, Helvetica, sans-serif;
 	color: rgb(220,220,220);
 	font-size: 14px;
 	user-select: none;
+	padding: 20px;
 }
 
 

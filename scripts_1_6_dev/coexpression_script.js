@@ -378,13 +378,15 @@ function coexpression_setup(project_directory) {
 function read_csv(text) {
 	dict = {};
 	text.split('\n').forEach(function(entry,index,array) {
-		items = entry.split(',')
-		gene = items[0]
-		exp_array = []
-		items.forEach(function(e,i,a) {
-			if (i > 0) { exp_array.push(parseFloat(e)); }
-		});
-		dict[gene] = exp_array
+		if (entry.length > 0) {
+			items = entry.split(',')
+			gene = items[0]
+			exp_array = []
+			items.forEach(function(e,i,a) {
+				if (i > 0) { exp_array.push(parseFloat(e)); }
+			});
+			dict[gene] = exp_array
+		}
 	});
 	return dict
 }

@@ -320,6 +320,16 @@ if os.path.exists(current_dir + '/clone_map.json'):
         if i in extra_filter_map and len(new_clone) > 0:
             new_clone_map[extra_filter_map[i]] = new_clone
     json.dump(new_clone_map,open(new_dir+'/clone_map.json','w'))
+
+################
+# Save PCA, gene filter, total counts
+if os.path.exists(base_dir + '/total_counts.txt'):
+    total_counts = np.loadtxt(base_dir + '/total_counts.txt')[cell_filter]
+    np.savez_compressed(new_dir + 'intermediates.npz', Epca = Epca, gene_filter = gene_filter, total_counts = total_counts)
+else:
+    np.savez_compressed(new_dir + 'intermediates.npz', Epca = Epca, gene_filter = gene_filter)
+
+        
 ################
 # Save run info
 import datetime

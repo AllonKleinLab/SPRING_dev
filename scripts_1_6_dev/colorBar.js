@@ -150,7 +150,7 @@ function colorBar(project_directory, color_menu_genes) {
 
 	setNodeColors = function setNodeColors() {
 		if (document.getElementById('gradient_button').checked) {
-			var current_selection = document.getElementById('gradient_menu').value
+			var current_selection = document.getElementById('gradient_menu').value;
 			var color_array = normalize(gene_set_color_array[current_selection]);
 			for (var i = 0; i < base_colors.length; i++) {
 				base_colors[i] = d3.rgb(gradient_color(color_array[i]));
@@ -503,7 +503,7 @@ function colorBar(project_directory, color_menu_genes) {
 		}
 	}
 
-	function update_slider() {
+	update_slider = function update_slider() {
 		d3.select("#label_column").selectAll("div").remove();
 		d3.select("#count_column").selectAll("div").remove();
 		if (document.getElementById('labels_button').checked) {

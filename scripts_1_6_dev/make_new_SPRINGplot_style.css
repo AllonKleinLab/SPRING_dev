@@ -2,14 +2,36 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 410px;
+	width: 420px;
 	background-color: rgba(50,50,50,.9);
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
 	overflow: scroll;
-	height: 620px;
+	height: 610px;
 	padding-bottom: 15px;
 }
+
+
+#make_new_SPRINGplot_popup::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+#make_new_SPRINGplot_popup::-webkit-scrollbar:vertical {
+    width: 11px;
+}
+#make_new_SPRINGplot_popup::-webkit-scrollbar:horizontal {
+    height: 0px;
+}
+#make_new_SPRINGplot_popup::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid rgba(50,50,50,1.0); 
+    background-color: rgba(0, 0, 0, .5);
+}
+#make_new_SPRINGplot_popup::-webkit-scrollbar-track { 
+    background-color: rgba(50,50,50,.9); 
+    border-radius: 8px; 
+} 
+
+
 
 #make_new_SPRINGplot_button_bar > * {
 	display: inline-block;
@@ -42,7 +64,6 @@
 	float: right;
 	margin-top: 4px;
 	margin-right: 35px;
-
 }
 
 .make_new_SPRINGplot_input_div > label {
@@ -188,3 +209,4 @@
 #make_new_SPRINGplot_message_div a:link { color: #00ff00; }
 #make_new_SPRINGplot_message_div a:visited { color: #00ff00; }
 #make_new_SPRINGplot_message_div a:hover { color: #000; background-color: #9cf; }
+

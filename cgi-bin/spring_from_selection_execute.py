@@ -143,6 +143,7 @@ def execute_spring(param_filename):
     update_log_html(logf, 'Loading counts data...')
     E = ssp.load_npz(base_dir + '/counts_norm.npz')
     E = E[cell_filter,:]
+    
     if not ssp.isspmatrix_csc(E):
         E = E.tocsc()
     t1 = time.time()
@@ -242,8 +243,6 @@ def execute_spring(param_filename):
     t1 = time.time()
     update_log(timef, 'PCA done -- %.2f' %(t1-t0))
 
-    np.savetxt(new_dir+'/pca.csv', Epca, delimiter=',')
-
     ################
     # Get KNN graph
     t0 = time.time()
@@ -325,18 +324,27 @@ def execute_spring(param_filename):
     ################
     # Save new clone data if it exists in base dir
     if os.path.exists(current_dir + '/clone_map.json'):
-        clone_map = json.load(open(current_dir + '/clone_map.json'))
+        clone_map_dict = json.load(open(current_dir + '/clone_map.json'))
         extra_filter_map = {i:j for j,i in enumerate(extra_filter)}
-        new_clone_map = {}
-        for i,clone in clone_map.items():
-            i = int(i)
-            new_clone = [extra_filter_map[j] for j in clone if j in extra_filter_map]
-            if i in extra_filter_map and len(new_clone) > 0:
-                new_clone_map[extra_filter_map[i]] = new_clone
-        json.dump(new_clone_map,open(new_dir+'/clone_map.json','w'))
+        new_clone_map_dict = {}
+        for k, clone_map in clone_map_dict.items():
+            new_clone_map = {}
+            for i,clone in clone_map.items():
+                i = int(i)
+                new_clone = [extra_filter_map[j] for j in clone if j in extra_filter_map]
+                if i in extra_filter_map and len(new_clone) > 0:
+                    new_clone_map[extra_filter_map[i]] = new_clone
+            new_clone_map_dict[k] = new_clone_map
+        json.dump(new_clone_map_dict,open(new_dir+'/clone_map.json','w'))
 
 
-
+    ################
+    # Save PCA, gene filter, total counts
+    if os.path.exists(base_dir + '/total_counts.txt'):
+        total_counts = np.loadtxt(base_dir + '/total_counts.txt')[cell_filter]
+        np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter, total_counts = total_counts)
+    else:
+        np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter)
 
 
 

@@ -11,7 +11,7 @@ function doublet_setup() {
 	button_bar.append('button').text('Close').on('click',hide_doublet_popup);
 
 	var text_box = popup.append('div').attr('id','doublet_description').append('text')
-		.text('Predict doublets. Set k and r appropriately.');
+		.text('Predict mixed-celltype doublets. Uses a kNN classifier to find cells that look like simulated doublets. k sets the number neighbors used in the classifier, and r is the ratio of simulated doublets to observed cells.');
 
 
 	var doublet_notify_popup= d3.select('#force_layout').append('div')
@@ -39,8 +39,8 @@ function doublet_setup() {
 	function doublet_popup_dragended() { }
 	
 	function show_processing_mask() {
-		popup.append('div').attr('id','doublet_processing_mask').append('text')
-			.text('Processing... you will be notified upon completion.')
+		popup.append('div').attr('id','doublet_processing_mask').append('div').append('text')
+			.text('Running doublet detector... you will be notified upon completion.')
 			.style('opacity', 0.0)
 			.transition()
 			.duration(500)
@@ -135,21 +135,38 @@ function doublet_setup() {
 				success: function(data) {
 					var t1 = new Date();
 					console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
+					show_doublet_notification();
+					if (d3.select('#clone_viewer_popup').style('visibility') == 'visible') {
+						$("#clone_viewer_popup").remove();
+						for (i=0; i<all_outlines.length; i++) {
+							node_status[i].source = false;
+							node_status[i].target = false;
+						}
+						for (i in clone_nodes) {
+							deactivate_nodes(i);
+						}
+						for (i in clone_edges) {
+							deactivate_edges(i);
+						}
+						targetCircle.clear();
+
+						clone_viewer_setup();
+						start_clone_viewer();
+					}
+					else {
+						$("#clone_viewer_popup").remove();
+						clone_viewer_setup();
+					}
+					
+					hide_processing_mask();
 					// open json file containing gene sets and populate drop down menu
-					d3.text(graph_directory+'/'+sub_directory+"/color_data_gene_sets.csv", function(text) {
+					var noCache = new Date().getTime();
+					d3.json(graph_directory+'/'+sub_directory+"/color_stats.json"+"?_="+noCache, function(data) { color_stats = data; });
+					d3.text(graph_directory+'/'+sub_directory+"/color_data_gene_sets.csv"+"?_="+noCache, function(text) {
 						gene_set_color_array = read_csv(text);
 						dispatch.load(gene_set_color_array,"gene_sets")	;
+						update_slider();
 					});
-					d3.json(graph_directory+'/'+sub_directory+"/color_stats.json", function(data) { color_stats = data; });
-
-					hide_processing_mask();
-					show_doublet_notification();
-					clone_viewer_setup();
-
-					
-
-
-			
 				}
 			});
 		 }

@@ -1,6 +1,7 @@
 function make_new_SPRINGplot_setup() {
 
-	MAXHEIGHT = 772;
+	MAXHEIGHT = 660;
+	STARTHEIGHT = 610;
 	custom_genes = '';
 	include_exclude = 'exclude';
 	var popup = d3.select('#force_layout').append('div')
@@ -44,7 +45,7 @@ function make_new_SPRINGplot_setup() {
 				o.style('height','1px');
  				o.style('height',(o[0][0].scrollHeight).toString()+"px");
  				if ( d3.select('#make_new_SPRINGplot_message_div').style('visibility')=='hidden') {
- 					popup.style('height',(d3.min([$('#newSPRING_description_box').height() + 597.223,MAXHEIGHT])).toString()+'px');
+ 					popup.style('height',(d3.min([$('#newSPRING_description_box').height() + 597.223,STARTHEIGHT])).toString()+'px');
  				} else {
  					popup.style('height',(d3.min([$('#newSPRING_description_box').height() + 745,MAXHEIGHT])).toString()+'px');
  				}
@@ -203,7 +204,7 @@ function show_make_new_SPRINGplot_popup() {
 	d3.select("#make_new_SPRINGplot_popup")
 		.style("left",(svg_width/2-mywidth/2).toString()+"px")
 		.style("top","10px").style('padding-bottom','0px')
-		.style('visibility','visible').style('height','620px');
+		.style('visibility','visible').style('height',STARTHEIGHT);
 
 }
 
@@ -251,7 +252,7 @@ function submit_new_SPRINGplot() {
 		var subplot_script = "cgi-bin/spring_from_selection2.py";
 	}
 	
-	var MAXHEIGHT = 772;
+	//var MAXHEIGHT = 772;
 
 	d3.select('#make_new_SPRINGplot_popup')
 		.transition().duration(200)

@@ -745,9 +745,7 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
 
         #print 'Saving SPRING files to %s' %save_path
         custom_colors['Total Counts'] = tot_counts_final
-        np.save(save_path + '/total_counts.npy', tot_counts_final)
-        np.savez_compressed(save_path + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter, tot_counts_final = tot_counts_final)
-        np.savetxt(save_path + '/pca.csv', Epca, delimiter=',', fmt='%.5f')
+        np.savez_compressed(save_path + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter, total_counts = tot_counts_final)
 
         if run_doub_detector:
             custom_colors['Doublet Score'] = doub_score
