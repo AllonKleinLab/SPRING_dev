@@ -179,7 +179,10 @@ r = float(data.getvalue('r'))
 if os.path.exists(sub_dir + '/intermediates.npz'):
     tmp = np.load(sub_dir + '/intermediates.npz')
     Epca = tmp['Epca']
-    total_counts = tmp['total_counts']
+    if 'total_counts' in tmp:
+        total_counts = tmp['total_counts']
+    else:
+        total_counts = None
     del tmp
 else:
     print 'Error: could not find "intermediates.npz"'
