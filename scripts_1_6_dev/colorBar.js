@@ -5,6 +5,7 @@ function colorBar(project_directory, color_menu_genes) {
 	*/
 	var color_profiles = {};
 	var color_option = "gradient"
+	var noCache = new Date().getTime();
 	color_max = 1;
 	color_stats = null;
 	var menuBar = d3.select("#color_chooser");
@@ -616,7 +617,7 @@ function colorBar(project_directory, color_menu_genes) {
 	all_gene_cellix_array = {};
 
 	// open json file containing gene sets and populate drop down menu
-	d3.text(project_directory+"/color_data_gene_sets.csv", function(text) {
+	d3.text(project_directory+"/color_data_gene_sets.csv"+"?_="+noCache, function(text) {
 		gene_set_color_array = read_csv(text);
 
         //gradientMenu.selectAll("option").remove();
@@ -626,7 +627,7 @@ function colorBar(project_directory, color_menu_genes) {
 
 
 	// open json file containing gene sets and populate drop down menu
-	d3.json(project_directory+"/categorical_coloring_data.json", function(data) {
+	d3.json(project_directory+"/categorical_coloring_data.json"+"?_="+noCache, function(data) {
 		categorical_coloring_data = data;
 		Object.keys(categorical_coloring_data).forEach(function(k) {
 			var label_counts = {}
@@ -649,7 +650,7 @@ function colorBar(project_directory, color_menu_genes) {
 	dispatch.load(tmpdict,"all_genes");
   }
 
-	d3.json(project_directory+"/color_stats.json", function(data) { color_stats = data; });
+	d3.json(project_directory+"/color_stats.json"+"?_="+noCache, function(data) { color_stats = data; });
 	addStreamExp(color_menu_genes);
 
 	var last_gene = "";
