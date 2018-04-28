@@ -44,11 +44,12 @@
 			<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
 			<a target="_blank" id="changeViewer_link">Dynamic mode</a>
 			<a href="javascript:start_clone_viewer()">Linkage broswer</a>
-			<a href="javascript:show_stickyNote_popup()">Sticky notes</a>
+			<!-- <a href="javascript:show_stickyNote_popup()">Sticky notes</a> -->
 			<a href="javascript:show_imputation_popup()">Smooth / Impute</a>
-			<a href="javascript:show_selection_logic_popup()">Selection logic</a>
+			<!-- <a href="javascript:show_selection_logic_popup()">Selection logic</a> -->
 			<a href="javascript:show_doublet_popup()">Doublet detector</a>
 			<a href="javascript:run_clustering()">Louvain clustering</a>
+			<a href="javascript:show_PAGA_popup()">Graph abstraction</a>
 			<a href="javascript:toggle_legend_hover_tooltip()" id="toggle_legend_hover_tooltip_button">Show clusters</a>
 		  </div>
 		</div>
@@ -113,6 +114,7 @@
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/doublet_detector.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/cluster2_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_logic.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/PAGA_viewer.css">
 <!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stratify.css"> -->
 <!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/gridstack.css"> -->
 
@@ -145,6 +147,7 @@
 <script src="scripts_1_6_dev/cluster2_script.js"></script>
 <script src="scripts_1_6_dev/selection_logic.js"></script>
 <script src="scripts_1_6_dev/text_annotations.js"></script>
+<script src="scripts_1_6_dev/PAGA_viewer.js"></script>
 
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/colorpicker.css">
 <script src="scripts_1_6_dev/colorpicker.js"></script>
@@ -189,6 +192,7 @@ function callback() {
 
 	selection_logic_setup();
 	colorpicker_setup();
+	PAGA_setup();
 	
 	//load_text_annotation();
 	//stratify_setup();

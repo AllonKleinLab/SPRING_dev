@@ -1376,10 +1376,10 @@ def save_spring_dir_sparse_hdf5(E,D,k,gene_list,project_directory, custom_colors
     open(project_directory+'graph_data.json','w').write(json.dumps(out,indent=4, separators=(',', ': ')))
 
 #
-def save_cell_groupings_only(project_directory, cell_groupings):
+def save_cell_groupings_only(project_directory, cell_groupings, label_colors=None):
     categorical_coloring_data = {}
     for k,labels in cell_groupings.items():
-        label_colors = {l:frac_to_hex(float(i)/len(set(labels))) for i,l in enumerate(list(set(labels)))}
+        if label_colors==None: label_colors = {l:frac_to_hex(float(i)/len(set(labels))) for i,l in enumerate(list(set(labels)))}
         categorical_coloring_data[k] = {'label_colors':label_colors, 'label_list':labels}
     json.dump(categorical_coloring_data,open(project_directory+'/categorical_coloring_data.json','w'),indent=4, sort_keys = True)
 

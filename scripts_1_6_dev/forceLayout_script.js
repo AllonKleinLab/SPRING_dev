@@ -44,15 +44,19 @@ function forceLayout(project_directory, sub_directory, callback) {
 
 	/////////////////////////////////////////////////////////////////////
 
-
- 	svg_graph = svg.append('svg:g')
+	
+	
+ 	svg_graph = svg.append('svg:g').call(zoomer)
  	.attr("id","svg_graph")
-	.call(zoomer)
+	
+	d3.select("#force_svg").append('g').attr('id','vis')
 
 
 	var rect = svg_graph.append('svg:rect')
-	.attr('width', width)
-	.attr('height', height)
+	.attr('width', width) //*1000)
+	.attr('height', height) //*1000)
+	//.attr('x',-width*500)
+	//.attr('y',-height*500)
 	.attr('fill', 'transparent')
 	.attr('stroke', 'transparent')
 	.attr('stroke-width', 1)
@@ -142,8 +146,6 @@ function forceLayout(project_directory, sub_directory, callback) {
 			}
 			*/
 			
-			
-			
 			dude.anchor.set(.5);
 			dude.scale.set(.5 * 32 / SPRITE_IMG_WIDTH);
 			dude.x = coordinates[i][0];
@@ -188,9 +190,7 @@ function forceLayout(project_directory, sub_directory, callback) {
 		
 		loadColors();	
 		load_edges();
-		d3.select("#force_svg").append('g').attr('id','vis')
-			
-        
+		
 	});
 
 	function load_edges() {
@@ -243,13 +243,13 @@ function forceLayout(project_directory, sub_directory, callback) {
 			var clicked_neg_sel = false;
 			for (i=0; i<all_nodes.length; i++) {
 				if (all_outlines[i].selected) {
-					rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
+					var rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
 					if (rad < all_nodes[i].scale.x * 20 ) { 
 						clicked_pos_sel = true;
 					}
 				}	
 				if (all_outlines[i].compared) {
-					rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
+					var rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
 					if (rad < all_nodes[i].scale.x * 20 ) { 
 						clicked_neg_sel = true;
 					}
@@ -277,7 +277,7 @@ function forceLayout(project_directory, sub_directory, callback) {
 						all_nodes[i].beingDragged = true;
 					}
 				}
-			}
+			}			
 		}
 	}
 
@@ -846,6 +846,8 @@ function center_view(on_selected) {
 			clone_edge_container.scale = sprites.scale;
 			clone_sprites.position = sprites.position;
 			clone_sprites.scale = sprites.scale;			
+			
+			d3.select('#vis').attr("transform","translate(" + [sprites.x,sprites.y] + ")" + " scale(" + sprites.scale.x + ")");
 			
 			zoomer.scale(sprites.scale.x);
 			step += 1;

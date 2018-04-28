@@ -107,7 +107,7 @@ function selection_setup() {
 		negative_select_rect.transition(5).attr("fill-opacity", selection_mode=='negative_select' ? .5 : 0.15);
 		deselect_rect.transition(5).attr("fill-opacity", selection_mode=='deselect' ? .5 : 0.15);
 		if (selection_mode != 'drag_pan_zoom') {
-			svg_graph.call(zoomer)
+			d3.select('#svg_graph').call(zoomer)
 			.on("mousedown.zoom", null)
 			.on("touchstart.zoom", null)																	  
 			.on("touchmove.zoom", null)																	   
@@ -123,7 +123,7 @@ function selection_setup() {
 			.on("touchmove.brush", null)																	   
 			.on("touchend.brush", null);																	   
 			brush.select('.background').style('cursor', 'auto')
-			svg_graph.call(zoomer);
+			d3.select('#svg_graph').call(zoomer);
 		}
 	}
 

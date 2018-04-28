@@ -109,7 +109,6 @@ function clone_viewer_setup() {
 		.style('margin-left','23px')
 		.on('input',darken_nodes);
 
-	console.log('BBOYYYY');
 	popup.append("div")
 		.on('mousedown',function() {
 			d3.event.stopPropagation();	
