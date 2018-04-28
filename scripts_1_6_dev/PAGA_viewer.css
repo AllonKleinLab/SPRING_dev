@@ -1,0 +1,76 @@
+#PAGA_popup {
+	position: absolute;
+	top: 70px;
+	left: 40px;
+	background-color: rgba(0,0,0,.7);
+	visibility: hidden;
+	border: solid 1px rgb(180,180,180);
+	overflow: hidden;
+	padding: 10px;
+	padding-right: 2px;
+	width: 260px;
+}
+
+#PAGA_title {
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	user-select: none;
+	font-size: 14px;
+	text-align: center;
+	position: relative;
+	float: left;
+	top: 30%;
+	left: 50%;
+	transform: translate(-55%, -50%);
+	font-weight: 550;
+}
+
+
+#PAGA_popup > div {
+	padding: 7px;
+	margin-left: 5px;
+}
+
+#PAGA_popup > div > button {
+	margin-right: 6px;
+	
+}
+
+
+
+#PAGA_popup > div > * > input[type=range] {
+	width: 100px;
+	margin-top: -2px;
+	margin-left: 25px;
+	color: white;
+}
+
+#PAGA_popup > div > * > input[type=text] {
+	width: 100px;
+	margin-top: -2px;
+	margin-left: 25px;
+	background-color: rgba(0,0,0,.1);
+	border: none;
+	font-size: 12px;
+	color: white;
+	text-align: center;
+}
+
+
+#PAGA_popup > div > label {
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	user-select: none;
+	font-size: 13px;
+}
+
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(1.4); /* IE */
+  -moz-transform: scale(1.4); /* FF */
+  -webkit-transform: scale(1.4); /* Safari and Chrome */
+  -o-transform: scale(1.4); /* Opera */
+  padding: 5px;
+  margin-top: 15px;
+}
