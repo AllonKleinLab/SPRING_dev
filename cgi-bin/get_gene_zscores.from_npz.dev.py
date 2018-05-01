@@ -33,7 +33,7 @@ comp_filter = data.getvalue('compared_cells')
 logf = 'tmplogenrich'
 update_log(logf, 'Enrichment log:', True)
 
-gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
+gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t', comments="")
 
 if str(sel_filter) != "None":
     sel_filter = np.sort(np.array(map(int,sel_filter.split(','))))

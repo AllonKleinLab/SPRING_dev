@@ -89,7 +89,7 @@ outdir = "downloads/" + selection_name + '.' + rand_suffix + '/'
 # Load data
 
 cell_filter = np.load(current_dir + '/cell_filter.npy')[extra_filter]
-gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
+gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t', comments="")
 
 t0 = time.time()
 # update_log_html(logf, 'Loading counts data...', True)
@@ -126,7 +126,7 @@ os.system('gzip "' + outdir + 'expr.csv"')
 
 # save coordinates
 print 'Saving coordinates'
-coords = np.loadtxt(current_dir + '/coordinates.txt', delimiter = ',')[:,1:]
+coords = np.loadtxt(current_dir + '/coordinates.txt', delimiter = ',', comments="")[:,1:]
 coords = coords[extra_filter,:]
 np.savetxt(outdir + 'coordinates.csv', np.hstack((np.arange(coords.shape[0])[:,None], coords)), fmt="%i,%.5f,%.5f")
 

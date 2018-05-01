@@ -132,7 +132,7 @@ def execute_spring(param_filename):
     cell_filter = np.load(current_dir + '/cell_filter.npy')[extra_filter]
     np.save(new_dir + '/cell_filter.npy', cell_filter)
     np.savetxt(new_dir + '/cell_filter.txt', cell_filter, fmt='%i')
-    gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
+    gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t', comments="")
     prefix_map = {}
     for g in gene_list: prefix_map[g.split()[0]] = g
     for g in gene_list: prefix_map[g.split()[-1]] = g
@@ -163,7 +163,7 @@ def execute_spring(param_filename):
     color_stats = {}
     for iG in range(E.shape[1]):
         pctls[iG] = np.percentile(E[:,iG].A, 99.6)
-        color_stats[gene_list[iG]] = (means[iG], stdevs[iG], 0, maxes[iG], pctls[iG])
+        color_stats[gene_list[iG]] = tuple(map(float,(means[iG], stdevs[iG], 0, maxes[iG], pctls[iG])))
     t1 = time.time()
     update_log(timef, 'Stats computed -- %.2f' %(t1-t0))
 
@@ -178,9 +178,9 @@ def execute_spring(param_filename):
         cols = l.strip('\n').split(',')
         custom_colors[cols[0]] = map(float, np.array(cols[1:])[extra_filter])
     for k,v in custom_colors.items():
-        color_stats[k] = (0,1,np.min(v),np.max(v)+.01,np.percentile(v,99))
+        color_stats[k] = tuple(map(float,(0,1,np.min(v),np.max(v)+.01,np.percentile(v,99))))
     with open(new_dir+'/color_stats.json','w') as f:
-        f.write(json.dumps(color_stats,indent=4, sort_keys=True).decode('utf-8'))
+        f.write(json.dumps(color_stats,indent=4, sort_keys=True))#.decode('utf-8'))
     with open(new_dir+'/color_data_gene_sets.csv','w') as f:
         for k,v in custom_colors.items():
             f.write(k + ',' + ','.join(map(str, v)) + '\n')
@@ -341,7 +341,7 @@ def execute_spring(param_filename):
     ################
     # Save PCA, gene filter, total counts
     if os.path.exists(base_dir + '/total_counts.txt'):
-        total_counts = np.loadtxt(base_dir + '/total_counts.txt')[cell_filter]
+        total_counts = np.loadtxt(base_dir + '/total_counts.txt', comments="")[cell_filter]
         np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter, total_counts = total_counts)
     else:
         np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter)

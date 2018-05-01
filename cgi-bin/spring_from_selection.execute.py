@@ -133,7 +133,7 @@ update_log_html(logf, include_exclude+repr(len(custom_genes)))
 cell_filter = np.load(current_dir + '/cell_filter.npy')[extra_filter]
 np.save(new_dir + '/cell_filter.npy', cell_filter)
 np.savetxt(new_dir + '/cell_filter.txt', cell_filter, fmt='%i')
-gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t')
+gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t', comments="")
 custom_genes = set([g for g in custom_genes if g in gene_list])
 
 t0 = time.time()
