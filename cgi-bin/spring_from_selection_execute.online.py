@@ -334,9 +334,9 @@ if os.path.exists(current_dir + '/clone_map.json'):
 # Save PCA, gene filter, total counts
 if os.path.exists(base_dir + '/total_counts.txt'):
     total_counts = np.loadtxt(base_dir + '/total_counts.txt', comments="")[cell_filter]
-    np.savez_compressed(new_dir + 'intermediates.npz', Epca = Epca, gene_filter = gene_filter, total_counts = total_counts)
+    np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter, total_counts = total_counts)
 else:
-    np.savez_compressed(new_dir + 'intermediates.npz', Epca = Epca, gene_filter = gene_filter)
+    np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter)
 
         
 ################
