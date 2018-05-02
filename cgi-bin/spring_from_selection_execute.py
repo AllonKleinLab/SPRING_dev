@@ -156,17 +156,23 @@ def execute_spring(param_filename):
     t0 = time.time()
     means = E.mean(0).A.squeeze()
     stdevs = np.sqrt(sparse_var(E, 0))
+    mins = E.min(0).A.squeeze()
     maxes = E.max(0).A.squeeze()
     color_stats = {}
 
-    pctls = np.zeros(E.shape[1])
-    color_stats = {}
+    pctl = 99.6
+    pctl_n = (100-pctl) / 100. * E.shape[0]
+    pctls = np.zeros(E.shape[1], dtype=float)
     for iG in range(E.shape[1]):
-        pctls[iG] = np.percentile(E[:,iG].A, 99.6)
-        color_stats[gene_list[iG]] = tuple(map(float,(means[iG], stdevs[iG], 0, maxes[iG], pctls[iG])))
+        n_nonzero = E.indptr[iG+1] - E.indptr[iG]
+        if n_nonzero > pctl_n:
+            pctls[iG] = np.percentile(E.data[E.indptr[iG]:E.indptr[iG+1]], 100 - 100 * pctl_n / n_nonzero)
+        else:
+            pctls[iG] = 0
+        color_stats[gene_list[iG]] = tuple(map(float, (means[iG], stdevs[iG], mins[iG], maxes[iG], pctls[iG])))
+
     t1 = time.time()
     update_log(timef, 'Stats computed -- %.2f' %(t1-t0))
-
 
     ################
     # Save color stats, custom colors
