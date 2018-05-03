@@ -48,7 +48,7 @@ def send_confirmation_email(user_email, subset_name, path):
     from email.MIMEMultipart import MIMEMultipart
     from email.MIMEText import MIMEText
 
-    fromaddr = "calebsw@gmail.com"
+    fromaddr = "singlecellspring@gmail.com"
     toaddr = user_email
     msg = MIMEMultipart()
     msg['From'] = fromaddr
@@ -60,7 +60,7 @@ def send_confirmation_email(user_email, subset_name, path):
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
-    server.login(fromaddr, "susannah11")
+    server.login(fromaddr, "Sequencing1")
     text = msg.as_string()
     server.sendmail(fromaddr, toaddr, text)
     server.quit()
