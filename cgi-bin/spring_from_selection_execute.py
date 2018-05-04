@@ -245,7 +245,11 @@ def execute_spring(param_filename):
     # PCA
     t0 = time.time()
     update_log_html(logf, 'Running PCA...')
-    Epca = get_PCA_sparseInput(E[:,gene_filter], numpc=num_pc, method='', base_ix=base_ix)
+    if E.shape[0] > 50000:
+        pca_method = 'sparse'
+    else:
+        pca_method = ''
+    Epca = get_PCA_sparseInput(E[:,gene_filter], numpc=num_pc, method=pca_method, base_ix=base_ix)
     t1 = time.time()
     update_log(timef, 'PCA done -- %.2f' %(t1-t0))
 
@@ -253,7 +257,11 @@ def execute_spring(param_filename):
     # Get KNN graph
     t0 = time.time()
     update_log_html(logf, 'Building kNN graph...')
-    links, knn_graph = get_knn_graph2(Epca, k=k_neigh, dist_metric = 'euclidean', approx=False)
+    if Epca.shape[0] > 50000:
+        approx = True
+    else:
+        approx = False
+    links, knn_graph = get_knn_graph2(Epca, k=k_neigh, dist_metric = 'euclidean', approx=approx)
     links = list(links)
     t1 = time.time()
     update_log(timef, 'KNN built -- %.2f' %(t1-t0))
