@@ -201,7 +201,7 @@ def execute_spring(param_filename):
     if len(cell_groupings) > 0:
         for k in cell_groupings:
             new_cell_groupings[k] = {}
-            new_cell_groupings[k]['label_list'] = [cell_groupings[k]['label_list'][i] for i in extra_filter]
+            new_cell_groupings[k]['label_list'] = [str(cell_groupings[k]['label_list'][i]) for i in extra_filter]
             uniq_groups = np.unique(np.array(new_cell_groupings[k]['label_list']))
 
             new_cell_groupings[k]['label_colors'] = {}
