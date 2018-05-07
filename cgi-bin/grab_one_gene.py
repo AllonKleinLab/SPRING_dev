@@ -88,7 +88,7 @@ update_log(logf, 'filtered array -- %.3f' %(t1-t0))
 t0 = time.time()
 print "Content-Type: text/plain"
 print
-print ','.join(map(strfloat,E))
+print '\n'.join(map(strfloat,E))
 t1 = time.time()
 update_log(logf, 'returned data -- %.3f' %(t1-t0))
 

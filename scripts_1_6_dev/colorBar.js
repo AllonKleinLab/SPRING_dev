@@ -178,8 +178,8 @@ function colorBar(project_directory, color_menu_genes) {
                 success: function(data) {
                     var t1 = new Date();
                     console.log('Read gene data: ', t1.getTime() - t0.getTime());
-                    green_array = data.split(',');
-                    green_array_raw = data.split(',');
+                    green_array = data.split('\n').slice(0,-1);
+                    green_array_raw = data.split('\n').slice(0,-1);
                     for (var i = 0; i < all_nodes.length; i++) {
 						//tmp = tmp + 1;
 						var rawval = green_array[i];
@@ -1036,9 +1036,9 @@ function colorBar(project_directory, color_menu_genes) {
                 success: function(data) {
                     var t1 = new Date();
                     console.log(t1.getTime() - t0.getTime());
-                    data = data.split('\n')[0].split('\t');
-                    termcol = data[0].split(',');
-                    scorecol = data[1].split(',');
+                    data = data.split('\t');
+                    termcol = data[0].split('\n');
+                    scorecol = data[1].split('\n').slice(0,-1);
                     actuallyRenderRankedText([termcol, scorecol]);
                 }
             });

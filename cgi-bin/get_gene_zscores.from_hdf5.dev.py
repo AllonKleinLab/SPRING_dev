@@ -128,4 +128,4 @@ hf.close()
 
 print "Content-Type: text/plain"
 print
-print ','.join(gene_list) + '\t' + ','.join(map(strfloat,scores))
+print '\n'.join(gene_list) + '\t' + '\n'.join(map(strfloat,scores))

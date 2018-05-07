@@ -182,7 +182,7 @@ function colorBar(project_directory, color_menu_genes) {
                 success: function(data) {
                     var t1 = new Date();
                     console.log('Read gene data: ', t1.getTime() - t0.getTime());
-                    green_array = data.split(',');
+                    green_array = data.split('\n').slice(0,-1);
 		        //	d3.select(".node").selectAll("circle")
 		        //		.style("fill", function(d) {
                 //            tmp = tmp + 1;
@@ -1004,9 +1004,9 @@ function colorBar(project_directory, color_menu_genes) {
                 success: function(data) {
                     var t1 = new Date();
                     console.log(t1.getTime() - t0.getTime());
-                    data = data.split('\n')[0].split('\t');
-                    termcol = data[0].split(',');
-                    scorecol = data[1].split(',');
+                    data = data.split('\t');
+                    termcol = data[0].split('\n');
+                    scorecol = data[1].split('\n').slice(0,-1);
                     actuallyRenderRankedText([termcol, scorecol]);
                 }
             });
