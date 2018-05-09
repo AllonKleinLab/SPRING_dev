@@ -7,7 +7,7 @@ To run SPRING Viewer locally, make sure Python 2.7 is installed (and that it's y
 `scipy`  
 `h5py`  
 `networkx`  
-`fa2`
+`fa2`  
 `python-louvain`
 
 We recommend Anaconda to manage your Python libraries. You can download it here (be sure to get the Python 2.7 version):   https://conda.io/miniconda.html. Libraries can then be installed using the command `conda`. To do so, open Terminal (Mac) or Anaconda Prompt (Windows) and enter:  
