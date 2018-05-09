@@ -7,7 +7,8 @@ To run SPRING Viewer locally, make sure Python 2.7 is installed (and that it's y
 `scipy`  
 `h5py`  
 `networkx`  
-`fa2`  
+`fa2`
+`python-louvain`
 
 We recommend Anaconda to manage your Python libraries. You can download it here (be sure to get the Python 2.7 version):   https://conda.io/miniconda.html. Libraries can then be installed using the command `conda`. To do so, open Terminal (Mac) or Anaconda Prompt (Windows) and enter:  
 
@@ -15,7 +16,7 @@ We recommend Anaconda to manage your Python libraries. You can download it here 
 
 The remaining libraries can be installed using `pip`. Note that if you're a Windows user, you'll first need to install Microsoft Visual C++ compiler for Python (available from http://aka.ms/vcpython27). Enter the following into Terminal or Anaconda Prompt:  
 
-`pip install networkx fa2`
+`pip install networkx fa2 python-louvain`
 
 
 ### Setting up a SPRING data directory
