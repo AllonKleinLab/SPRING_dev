@@ -200,6 +200,8 @@ function forceLayout(project_directory, sub_directory, callback) {
 		edge_container.alpha=0.5
 		all_edges = [];
 		all_edge_ends = [];
+		neighbors = {};
+		for (i=0; i<all_nodes.length; i++) { neighbors[i] = []; }
 		$.get(project_directory+'/'+sub_directory+'/edges.csv')
 			.done(function(text) { 
 				text.split('\n').forEach(function(entry,index) {
@@ -207,11 +209,15 @@ function forceLayout(project_directory, sub_directory, callback) {
 						items = entry.split(';')
 						var source = parseInt(items[0]);
 						var target = parseInt(items[1]);
+
+						neighbors[source].push(target);
+						neighbors[target].push(source);
+
 						var x1 = all_nodes[source].x;
 						var y1 = all_nodes[source].y;
 						var x2 = all_nodes[target].x;
 						var y2 = all_nodes[target].y;
-					
+						
 					
 						var color = 6579301;			
 						var s = new LineSprite(4, color, x1, y1, x2, y2);

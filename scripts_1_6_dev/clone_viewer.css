@@ -2,7 +2,7 @@
 	position: absolute;
 	top: 70px;
 	left: 40px;
-	background-color: rgba(170,170,1705.3);
+	background-color: rgba(170,170,170,5.3);
 	visibility: hidden;
 	border: solid 1px rgb(180,180,180);
 	overflow: hidden;

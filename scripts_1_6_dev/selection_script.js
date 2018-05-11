@@ -354,3 +354,17 @@ function loadSelectedCells(project_directory) {
 	});
 }
 
+function extend_selection() {
+
+	for (i=0; i<all_nodes.length; i++) {
+		if (all_outlines[i].selected) {
+			for (j in neighbors[i]) {
+				var jj = neighbors[i][j];
+				all_outlines[jj].alpha = all_nodes[i].alpha
+				all_outlines[jj].tint = '0xffff00';
+				all_outlines[jj].selected = true;
+			}
+		}
+	}
+}
+

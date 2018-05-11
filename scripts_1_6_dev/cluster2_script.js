@@ -40,6 +40,7 @@ function show_notification(myObject) {
 }
 
 function run_clustering() {
+	console.log('running!');
 	var t0 = new Date();
 	show_notification(d3.select("#cluster_started_popup"));
 	$.ajax({
@@ -47,6 +48,7 @@ function run_clustering() {
 		type: "POST",
 		data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory},
 		success: function(data) {
+			console.log(data);
 			var t1 = new Date();
 			console.log('Ran clustering: ', t1.getTime() - t0.getTime());
 			show_notification(d3.select("#cluster_finished_popup"));
