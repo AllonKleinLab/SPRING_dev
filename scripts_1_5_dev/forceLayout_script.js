@@ -450,8 +450,8 @@ function downloadSVG() {
 }
 
 function downloadPNG() {
-	if (d3.select("#sound_toggle").select("img").attr("src") == "scripts_1_5_dev/sound_effects/icon_speaker.svg") {
-		var snd = new Audio("scripts_1_5_dev/sound_effects/download_sound.wav"); snd.play(); }
+	//if (d3.select("#sound_toggle").select("img").attr("src") == "scripts_1_5_dev/sound_effects/icon_speaker.svg") {
+    //		var snd = new Audio("scripts_1_5_dev/sound_effects/download_sound.wav"); snd.play(); }
 	hideAccessories();
 	var svgElement = d3.select('svg')[0][0];
 	var simg = new Simg(svgElement);
