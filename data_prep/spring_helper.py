@@ -676,6 +676,16 @@ def save_spring_dir_sparse_hdf5(E,gene_list,project_directory, edges, custom_col
 def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = True, exclude_dominant_frac = 1.0, min_counts = 3, min_cells = 5, min_vscore_pctl = 75,show_vscore_plot = False, exclude_gene_names = None, num_pc = 30, sparse_pca = False, pca_norm = True, k_neigh = 4, cell_groupings = {}, num_force_iter = 100, output_spring = True, precomputed_pca = None, gene_filter = None, custom_colors = {}, exclude_corr_genes_list = None, exclude_corr_genes_minCorr = 0.2, dist_metric = 'euclidean', use_approxnn=False, run_doub_detector = False, dd_k=50, dd_frac=5, dd_approx=True, tot_counts_final = None):
     
     out = {}
+    info_dict = {}
+    info_dict['Date'] = '%s' %datetime.now()
+    info_dict['Nodes'] = E.shape[0]
+    info_dict['Num_Neighbors'] = k_neigh
+    info_dict['Num_Force_Iter'] = num_force_iter
+    info_dict['Gene_Var_Pctl'] = ''
+    info_dict['Min_Cells'] = ''
+    info_dict['Min_Counts'] = ''
+    info_dict['Filtered_Genes'] = ''
+    info_dict['Num_PCs'] = ''
 
     E = E.tocsc()
     if base_ix is None:
@@ -696,8 +706,13 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
             #print 'Filtering genes'
             if (min_counts > 0) or (min_cells > 0) or (min_vscore_pctl > 0): 
                 gene_filter = filter_genes(E, base_ix, min_vscore_pctl=min_vscore_pctl, min_counts=min_counts,min_cells=min_cells,show_vscore_plot = show_vscore_plot)
+
+                info_dict['Gene_Var_Pctl'] = min_vscore_pctl
+                info_dict['Min_Cells'] = min_cells
+                info_dict['Min_Counts'] = min_counts
             else:
                 gene_filter = np.arange(E.shape[1])
+
 
             if len(gene_filter) == 0:
                 print 'Error: No genes passed filter'
@@ -721,17 +736,19 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
                     sys.exit(2)
 
         out['gene_filter'] = gene_filter
+        info_dict['Filtered_Genes'] = len(gene_filter)
         # RUN PCA
         # if method == 'sparse': normalize by stdev
         # if method == anything else: z-score normalize
         #print 'Running PCA'
         num_pc = min(len(gene_filter), num_pc)
-        out['num_pc'] = num_pc
         Epca = get_pca(E[:,gene_filter], base_ix=base_ix, numpc=num_pc, keep_sparse=sparse_pca, normalize = pca_norm)
-        out['Epca'] = Epca
     else:
-    #     print 'Using user-supplied PCA coordinates'
         Epca = precomputed_pca
+
+    out['Epca'] = Epca
+    out['num_pc'] = Epca.shape[1]
+    info_dict['Num_PCs'] = Epca.shape[1]
 
     #print 'Building kNN graph'
 
@@ -781,16 +798,6 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
             np.savetxt(save_path + '/coordinates.txt',
                        np.hstack((np.arange(positions.shape[0])[:,None], positions)), fmt='%i,%.5f,%.5f')
          
-        info_dict = {}
-        info_dict['Date'] = '%s' %datetime.now()
-        info_dict['Nodes'] = Epca.shape[0]
-        info_dict['Filtered_Genes'] = len(gene_filter)
-        info_dict['Gene_Var_Pctl'] = min_vscore_pctl
-        info_dict['Min_Cells'] = min_cells
-        info_dict['Min_Counts'] = min_counts
-        info_dict['Num_Neighbors'] = k_neigh
-        info_dict['Num_PCs'] = num_pc
-        info_dict['Num_Force_Iter'] = num_force_iter
         with open(save_path+'/run_info.json','w') as f:
             f.write(json.dumps(info_dict,indent=4, sort_keys=True).decode('utf-8'))
          
