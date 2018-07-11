@@ -729,9 +729,9 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
         out['num_pc'] = num_pc
         Epca = get_pca(E[:,gene_filter], base_ix=base_ix, numpc=num_pc, keep_sparse=sparse_pca, normalize = pca_norm)
         out['Epca'] = Epca
-    # else:
+    else:
     #     print 'Using user-supplied PCA coordinates'
-    #     Epca = precomputed_pca
+        Epca = precomputed_pca
 
     #print 'Building kNN graph'
 
