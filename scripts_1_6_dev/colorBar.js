@@ -1258,12 +1258,12 @@ function count_clusters() {
 
 function toggle_legend_hover_tooltip() {
 	var button = d3.select('#toggle_legend_hover_tooltip_button')
-	if (button.text()=='Hide label box') {
-		button.text('Show label box');
+	if (button.text()=='Hide label tooltip') {
+		button.text('Show label tooltip');
 		d3.select('#legend_hover_tooltip').remove();
 	}
 	else {
-		button.text('Hide label box');
+		button.text('Hide label tooltip');
 		
 		var tooltip = d3.select('#force_layout').append('div').attr('id','legend_hover_tooltip')
 			.style('background-color','rgba(100,100,100,.92)')

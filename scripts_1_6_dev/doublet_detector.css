@@ -73,16 +73,19 @@
 }
 
 
+
+
+
 #doublet_notification {
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 350px;
+	width: 300px;
 	background-color: rgba(50,50,50,.9);
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
 	overflow: hidden;
-	height: 20px;
+	height: 80px;
 	padding: 0px;	
 	text-align: center;
 	vertical-align: middle;
@@ -94,4 +97,12 @@
 	font-size: 14px;
 	user-select: none;
 	
+}
+
+#doublet_notification > button {
+	float: middle;
+	padding: 3px;
+	margin-top: 10px;
+	background-color: rgb(80,80,80);
+	border: solid 1px rgb(150,150,150);
 }

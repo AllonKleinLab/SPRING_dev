@@ -75,33 +75,49 @@ function add_list_item(project_directory,sub_directory,order) {
 		list_item.append('text').attr('class','delete_button').text('Delete')
 			.on('click',function() {
 				d3.event.stopPropagation();
-				
-				sweetAlert({
-					title: "Are you sure?",
-					text: "Do you want to delete the SPRING subplot "+sub_directory+'?',
-					icon: "warning",
-					showCancelButton: true
-				}, function(isConfirm) {
-					console.log(isConfirm);
-					if (isConfirm) {
-						list_item
-							.style('z-index','-10')
-							.transition().duration(700).style('margin-top','-115px')
-							.each('end',function() {
-								list_item.remove();
-							});
+				d3.text(project_directory + '/' + sub_directory + '/mutability.txt', function(text) {
+					mutable = text;
+					if (mutable == null) {
+						sweetAlert({
+							title: "Are you sure?",
+							text: "Do you want to delete the SPRING subplot "+sub_directory+'?',
+							icon: "warning",
+							showCancelButton: true
+						}, function(isConfirm) {
+							console.log(isConfirm);
+							if (isConfirm) {
+								list_item
+									.style('z-index','-10')
+									.transition().duration(700).style('margin-top','-115px')
+									.each('end',function() {
+										list_item.remove();
+									});
 
-						$.ajax({
-							url:"cgi-bin/delete_subdirectory.py",
-							type:"POST",
-							data:{base_dir: project_directory, sub_dir:sub_directory},
-							success: function(python_data){
-								console.log(python_data);
+								$.ajax({
+									url:"cgi-bin/delete_subdirectory.py",
+									type:"POST",
+									data:{base_dir: project_directory, sub_dir:sub_directory},
+									success: function(python_data){
+										console.log(python_data);
+									}
+								});
 							}
 						});
 					}
-				});
+					else {
+						sweetAlert({
+							title: "This subplot cannot be deleted.",
+								icon: "warning",
+							showCancelButton: false,
+						}, function(isConfirm) {
+							console.log(isConfirm);
+							if (isConfirm) {
+							}
+						});
+					}
+				});				
 			});
+
 
 
 

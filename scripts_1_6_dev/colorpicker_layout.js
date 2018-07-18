@@ -83,27 +83,28 @@ function restore_colorpicker() {
 
 
 function show_colorpicker_popup(label) {
-
-	var current_track = document.getElementById('labels_menu').value;
-	var current_color = categorical_coloring_data[current_track]["label_colors"][label].replace('#','0x');	
-	var nodes = [];
-	categorical_coloring_data[current_track]['label_list'].forEach(function(l,i) {
-		if (label == l) { nodes.push(i); }
-	});
-	
-	d3.select('#colorpicker_popup').attr('current_nodes',nodes.join(','));
-	d3.select('#colorpicker_popup').attr('current_label',label);
-	d3.select('#colorpicker_popup').attr('current_color',current_color);
-	d3.select('#colorpicker_popup').attr('current_track',current_track);
+	if (mutable) {
+		var current_track = document.getElementById('labels_menu').value;
+		var current_color = categorical_coloring_data[current_track]["label_colors"][label].replace('#','0x');	
+		var nodes = [];
+		categorical_coloring_data[current_track]['label_list'].forEach(function(l,i) {
+			if (label == l) { nodes.push(i); }
+		});
 		
-	$('#colorpickerHolder').ColorPickerSetColor(current_color);
-	tmp_cat_coloring = Object.assign({},categorical_coloring_data[current_track]['label_colors']);
+		d3.select('#colorpicker_popup').attr('current_nodes',nodes.join(','));
+		d3.select('#colorpicker_popup').attr('current_label',label);
+		d3.select('#colorpicker_popup').attr('current_color',current_color);
+		d3.select('#colorpicker_popup').attr('current_track',current_track);
+			
+		$('#colorpickerHolder').ColorPickerSetColor(current_color);
+		tmp_cat_coloring = Object.assign({},categorical_coloring_data[current_track]['label_colors']);
 
-	var top = parseFloat(d3.select('body').style('height').replace('px','')) - 216;
-	var left = parseFloat(d3.select('body').style('width').replace('px','')) - 480;
-	d3.select('#colorpicker_popup').style('top', top.toString()+'px');
-	d3.select('#colorpicker_popup').style('left', left.toString()+'px');
-	d3.select('#colorpicker_popup').style('visibility','visible');
+		var top = parseFloat(d3.select('body').style('height').replace('px','')) - 216;
+		var left = parseFloat(d3.select('body').style('width').replace('px','')) - 480;
+		d3.select('#colorpicker_popup').style('top', top.toString()+'px');
+		d3.select('#colorpicker_popup').style('left', left.toString()+'px');
+		d3.select('#colorpicker_popup').style('visibility','visible');
+	}
 		
 }
 

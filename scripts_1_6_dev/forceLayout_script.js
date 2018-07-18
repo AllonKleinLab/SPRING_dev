@@ -9,7 +9,8 @@ function forceLayout(project_directory, sub_directory, callback) {
     
 	d3.text(project_directory + '/' + sub_directory + '/mutability.txt', function(text) {
 		mutable = text;
-		if (mutable == null) {mutable = 'true'; }
+		if (mutable == null) {mutable = true; }
+		else {mutable = false;}
 	});
 
 
@@ -630,7 +631,7 @@ function initiateButtons() {
 	d3.select('#move_right').on('click',function() { move_selection_aside('right'); });
 	
 	d3.select('#save_coords').select('button').on("click",function() {
-		if (mutable.slice(0,5) != 'false') {
+		if (mutable) {
 			var text = ""
 			d3.select(".node").selectAll("circle").each(function(d) {
 				text = text + d.number + "," + d.x.toString() + "," + d.y.toString() + "\n";
@@ -864,7 +865,7 @@ function center_view(on_selected) {
 
 
 function save_coords() {
-	if (mutable.slice(0,5) != 'false') {
+	if (mutable) {
 		var text = ""
 		for (i in coordinates) {
 			text = text + [i.toString(),all_nodes[i].x.toString(),all_nodes[i].y.toString()].join(',') + '\n';

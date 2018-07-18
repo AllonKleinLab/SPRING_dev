@@ -19,6 +19,11 @@ function doublet_setup() {
 	doublet_notify_popup.append('div').attr('id','doublet_notify_text').append('text')
 		.text('Doublet detector finished! See custom colors menu.');
 
+	doublet_notify_popup.append('button')
+		.text('Close')
+		.on('mousedown', hide_doublet_notification);
+
+
 
 	d3.select("#doublet_popup")
 		.call(d3.behavior.drag()
@@ -38,13 +43,13 @@ function doublet_setup() {
 	}
 	function doublet_popup_dragended() { }
 	
-	function show_processing_mask() {
-		popup.append('div').attr('id','doublet_processing_mask').append('div').append('text')
-			.text('Running doublet detector... you will be notified upon completion.')
-			.style('opacity', 0.0)
-			.transition()
-			.duration(500)
-			.style('opacity', 1.0);
+	// function show_processing_mask() {
+	// 	popup.append('div').attr('id','doublet_processing_mask').append('div').append('text')
+	// 		.text('Running doublet detector... you will be notified upon completion.')
+	// 		.style('opacity', 0.0)
+	// 		.transition()
+	// 		.duration(500)
+	// 		.style('opacity', 1.0);
 
 		// var opts = {
 		// 	  lines: 17 // The number of lines to draw
@@ -72,60 +77,66 @@ function doublet_setup() {
 		// var spinner = new Spinner(opts).spin(target);
 		// $(target).data('spinner', spinner);
 
-	}
+	// }
 
-	function hide_processing_mask() {
-		// $(".spinner").remove();
-		$("#doublet_processing_mask").remove();
+	// function hide_processing_mask() {
+	// 	// $(".spinner").remove();
+	// 	$("#doublet_processing_mask").remove();
 
-	}
+	// }
 
-	function hide_doublet_popup_slowly() {
-		d3.select("#doublet_popup").transition()
-		.duration(2000)
-		.transition()
-		.duration(500)
-		.style('opacity', 0.0)
-		.each("end", function() {
-			d3.select("#doublet_popup").style('visibility', 'hidden');
-			d3.select("#doublet_popup").style('opacity', '1.0');
-		});
+	// function hide_doublet_popup_slowly() {
+	// 	d3.select("#doublet_popup").transition()
+	// 	.duration(2000)
+	// 	.transition()
+	// 	.duration(500)
+	// 	.style('opacity', 0.0)
+	// 	.each("end", function() {
+	// 		d3.select("#doublet_popup").style('visibility', 'hidden');
+	// 		d3.select("#doublet_popup").style('opacity', '1.0');
+	// 	});
 
-	}
+	// }
 
-	function show_doublet_notification() {
 
-		var mywidth = parseInt(d3.select("#doublet_notification").style("width").split("px")[0])
-		var svg_width = parseInt(d3.select("svg").style("width").split("px")[0])
+	// function show_doublet_notification() {
 
-		d3.select("#doublet_notification")
-			.style("left",(svg_width/2-mywidth/2).toString()+"px")
-			.style("top","0px")
-			.style('opacity', 0.0)
-			.style('visibility','visible')
-			.transition()
-			.duration(1500)
-			.style('opacity', 1.0)
-			.transition()
-			.duration(2000)
-			.transition()
-			.duration(1500)
-			.style('opacity', 0.0)
-			.each("end", function() {
-				d3.select("#doublet_notification").style('visibility', 'hidden');
-			});
+	// 	var mywidth = parseInt(d3.select("#doublet_notification").style("width").split("px")[0])
+	// 	var svg_width = parseInt(d3.select("svg").style("width").split("px")[0])
 
-		//d3.select("#doublet_notification").transition(1500).style('visibility','hidden');
-	}
+	// 	d3.select("#doublet_notification")
+	// 		.style("left",(svg_width/2-mywidth/2).toString()+"px")
+	// 		.style("top","0px")
+	// 		.style('opacity', 0.0)
+	// 		.style('visibility','visible')
+	// 		.transition()
+	// 		.duration(1500)
+	// 		.style('opacity', 1.0)
+	// 		.transition()
+	// 		.duration(2000)
+	// 		.transition()
+	// 		.duration(1500)
+	// 		.style('opacity', 0.0)
+	// 		.each("end", function() {
+	// 			d3.select("#doublet_notification").style('visibility', 'hidden');
+	// 		});
+
+	// 	//d3.select("#doublet_notification").transition(1500).style('visibility','hidden');
+	// }
 
 	function run_doublet_detector() {
-		if ( true ) {
+		if ( mutable ) {
 			var t0 = new Date();
 			var k = $('#doublet_k_input').val();
 			var r = $('#doublet_r_input').val();
 
-			show_processing_mask();
-			hide_doublet_popup_slowly();
+			// show_processing_mask();
+			// hide_doublet_popup_slowly();
+
+			d3.select("#doublet_notification").select('text')
+			  .text('Running doublet detector... you will be notified upon completion.');
+			show_doublet_notification();
+			hide_doublet_popup();
 
 			console.log(k, r);
 			$.ajax({
@@ -135,6 +146,7 @@ function doublet_setup() {
 				success: function(data) {
 					var t1 = new Date();
 					console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
+					d3.select("#doublet_notification").select('text').text('Doublet detector finished! See Custom Colors menu.');
 					show_doublet_notification();
 					if (d3.select('#clone_viewer_popup').style('visibility') == 'visible') {
 						$("#clone_viewer_popup").remove();
@@ -169,20 +181,46 @@ function doublet_setup() {
 					});
 				}
 			});
-		 }
+		}
+		else {
+			d3.select("#doublet_notification").select('text').text('Sorry, this dataset cannot be edited.');
+			show_doublet_notification();
+		}
 	
 	}
 }
 
+function show_doublet_notification() {
+	var mywidth = parseInt(d3.select("#doublet_notification").style("width").split("px")[0]);
+	var svg_width = parseInt(d3.select("svg").style("width").split("px")[0]);
 
+	d3.select("#doublet_notification")
+		.style("left",(svg_width/2-mywidth/2).toString()+"px")
+		.style("top","0px")
+		.style('opacity', 0.0)
+		.style('visibility','visible')
+		.transition()
+		.duration(500)
+		.style('opacity', 1.0);
+}
+
+function hide_doublet_notification() {
+	console.log('hide');
+	d3.select("#doublet_notification").style('opacity', 0.0).style('visibility','hidden');
+}
 
 function show_doublet_popup() {
-
-	var mywidth = parseInt(d3.select("#doublet_popup").style("width").split("px")[0])
-	var svg_width = parseInt(d3.select("svg").style("width").split("px")[0])
-	d3.select("#doublet_popup")
-		.style("left",(svg_width/2-mywidth/2).toString()+"px")
-		.style("top","80px").style('visibility','visible');
+	if (mutable) {
+		var mywidth = parseInt(d3.select("#doublet_popup").style("width").split("px")[0]);
+		var svg_width = parseInt(d3.select("svg").style("width").split("px")[0]);
+		d3.select("#doublet_popup")
+			.style("left",(svg_width/2-mywidth/2).toString()+"px")
+			.style("top","80px").style('visibility','visible');
+	} 
+	else {
+		d3.select("#doublet_notification").select('text').text('Sorry, this dataset cannot be edited.');
+		show_doublet_notification();
+	}
 }
 
 function hide_doublet_popup() {
