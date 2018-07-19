@@ -169,8 +169,8 @@ function colorBar(project_directory, color_menu_genes) {
 		}
 		if (document.getElementById('channels_button').checked) {
             var t0 = new Date();
-            //var green_selection = document.getElementById('green_menu').value;
-						var green_selection = document.getElementById('autocomplete').value;
+		    var green_selection = document.getElementById('autocomplete').value;
+            console.log(green_selection);
             $.ajax({
                 url: "cgi-bin/grab_one_gene.py",
                 type: "POST",
@@ -181,7 +181,6 @@ function colorBar(project_directory, color_menu_genes) {
                     green_array = data.split('\n').slice(0,-1);
                     green_array_raw = data.split('\n').slice(0,-1);
                     for (var i = 0; i < all_nodes.length; i++) {
-						//tmp = tmp + 1;
 						var rawval = green_array[i];
 						var gg = normalize_one_val(rawval);
 						base_colors[i] = {r:0,g:Math.floor(gg*255),b:0};
@@ -678,6 +677,17 @@ function colorBar(project_directory, color_menu_genes) {
             gene_entered = true;
 	    }
 	  });
+	  $('#autocomplete').keydown(function(event){
+          if (event.keyCode==13) {
+              var submitGene = document.getElementById('autocomplete').value;
+              document.getElementById("gradient_button").checked = false;
+              document.getElementById("labels_button").checked = false;
+              document.getElementById("channels_button").checked = true;
+              update_slider();
+              last_gene = submitGene;
+              gene_entered = true;
+          }
+      });
 	}
 
 
