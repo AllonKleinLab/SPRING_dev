@@ -1,8 +1,3 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-
-<body>
-
 <div id="options_bar">
 	<div id="button_panel">
 		<!--
@@ -24,34 +19,34 @@
 		</div>
 
 		<div class="dropdown">
-		  <button id="download_dropdown_button">Download</button>
-		  <div id="download_dropdown" class="dropdown-content">
-		  	<a href="javascript:downloadCoordinates()">Coordinates</a>
-			<a href="javascript:downloadSelection()">Selected cells</a>
-			<a href="javascript:show_downloadSelectedExpr_popup()">SPRING data <br> for selection</a>
-            <!-- <a href="javascript:downloadEdges()">Edge list</a> -->
-			<a href="javascript:downloadRankedTerms()">Enriched terms</a>
+			<button id="download_dropdown_button">Download</button>
+			<div id="download_dropdown" class="dropdown-content">
+				<a href="javascript:downloadCoordinates()">Coordinates</a>
+				<a href="javascript:downloadSelection()">Selected cells</a>
+				<a href="javascript:show_downloadSelectedExpr_popup()">SPRING data <br> for selection</a>
+				<!-- <a href="javascript:downloadEdges()">Edge list</a> -->
+				<a href="javascript:downloadRankedTerms()">Enriched terms</a>
 
-			<a id="download_png">Screenshot</a>
-			<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> -->
-		  </div>
+				<a id="download_png">Screenshot</a>
+				<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> -->
+			</div>
 		</div>
 
 		<div class="dropdown">
-		 <button id="tools_dropdown_button">Tools</button>
-		  <div id="tools_dropdown" class="dropdown-content">
-		  	<a href="javascript:show_make_new_SPRINGplot_popup()">Make new subplot</a>
-			<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
-			<a target="_blank" id="changeViewer_link">Dynamic mode</a>
-			<a href="javascript:start_clone_viewer()">Linkage broswer</a>
-			<!-- <a href="javascript:show_stickyNote_popup()">Sticky notes</a> -->
-			<a href="javascript:show_imputation_popup()">Smooth / Impute</a>
-			<a href="javascript:show_selection_logic_popup()">Selection logic</a>
-			<a href="javascript:show_doublet_popup()">Doublet detector</a>
-			<a href="javascript:run_clustering()">Louvain clustering</a>
-			<a href="javascript:show_PAGA_popup()">Graph abstraction</a>
-			<a href="javascript:toggle_legend_hover_tooltip()" id="toggle_legend_hover_tooltip_button">Show label tooltip</a>
-		  </div>
+			<button id="tools_dropdown_button">Tools</button>
+			<div id="tools_dropdown" class="dropdown-content">
+				<a href="javascript:show_make_new_SPRINGplot_popup()">Make new subplot</a>
+				<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
+				<a target="_blank" id="changeViewer_link">Dynamic mode</a>
+				<a href="javascript:start_clone_viewer()">Linkage broswer</a>
+				<!-- <a href="javascript:show_stickyNote_popup()">Sticky notes</a> -->
+				<a href="javascript:show_imputation_popup()">Smooth / Impute</a>
+				<a href="javascript:show_selection_logic_popup()">Selection logic</a>
+				<a href="javascript:show_doublet_popup()">Doublet detector</a>
+				<a href="javascript:run_clustering()">Louvain clustering</a>
+				<a href="javascript:show_PAGA_popup()">Graph abstraction</a>
+				<a href="javascript:toggle_legend_hover_tooltip()" id="toggle_legend_hover_tooltip_button">Show label tooltip</a>
+			</div>
 		</div>
 		<div id="settings">
 			<button>Settings</button>
@@ -61,7 +56,7 @@
 		<div id="sound_toggle"> </div>
 	</div>
 	<div id="color_chooser"> </div>
-	<div id="fast_buttons_box"> 
+	<div id="fast_buttons_box">
 		<div id="deselect">
 			<button>(De)select All</button>
 		</div>
@@ -87,13 +82,13 @@
 	<div id="force_layout"> </div>
 	<div id="termsheet" class="sidebar">
 		<div class="column" id="termcolumn"> </div>
-		<div class="column" id="scorecolumn" > </div>
+		<div class="column" id="scorecolumn"> </div>
 	</div>
 	<div id="legend" class="sidebar">
 		<div class="column" id="count_column"> </div>
 		<div class="column" id="label_column"> </div>
 	</div>
-	
+
 </div>
 
 <div id="colorpicker_popup">
@@ -123,7 +118,8 @@
 
 <script src="scripts_1_6_dev/jquery-3.1.0.min.js"></script>
 <script src="scripts_1_6_dev/d3.min.js"></script>
-<script src="scripts_1_6_dev/d3-queue.v3.min.js"></script> <!-- SPARSE UPDATE -->
+<script src="scripts_1_6_dev/d3-queue.v3.min.js"></script>
+<!-- SPARSE UPDATE -->
 <script src="scripts_1_6_dev/colorBar.js"></script>
 <script src="scripts_1_6_dev/forceLayout_script.js"></script>
 <script src="scripts_1_6_dev/newSpringPlot.js"></script>
@@ -133,7 +129,7 @@
 <script src="scripts_1_6_dev/coexpression_script.js"></script>
 <script src="scripts_1_6_dev/diffex_script.js"></script>
 <script src="scripts_1_6_dev/simg.js"></script>
-<script src="scripts_1_6_dev/jspdf.min.js" ></script>
+<script src="scripts_1_6_dev/jspdf.min.js"></script>
 <script src="scripts_1_6_dev/canvg.min.js"></script>
 <script src="scripts_1_6_dev/FileSaver.js"></script>
 <script src="scripts_1_6_dev/spin.min.js"></script>
@@ -149,7 +145,7 @@
 <script src="scripts_1_6_dev/doublet_detector.js"></script>
 <script src="scripts_1_6_dev/cluster2_script.js"></script>
 <script src="scripts_1_6_dev/selection_logic.js"></script>
-<script src="scripts_1_6_dev/text_annotations.js"></script>
+<!--<script src="scripts_1_6_dev/text_annotations.js"></script>-->
 <script src="scripts_1_6_dev/PAGA_viewer.js"></script>
 
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/colorpicker.css">
@@ -161,93 +157,93 @@
 
 <script>
 
-var rotator_radius = null;
+	var rotator_radius = null;
 
-setup_download_dropdown();
-setup_tools_dropdown();
+	setup_download_dropdown();
+	setup_tools_dropdown();
 
-d3.select("#sound_toggle").append('img')
-	.attr('src', "scripts_1_6_dev/sound_effects/icon_mute.svg")
-	.on("click", function() {
-		if (d3.select("#sound_toggle").select("img").attr("src") == "scripts_1_6_dev/sound_effects/icon_speaker.svg") {
-			d3.select("#sound_toggle").select("img").attr("src","scripts_1_6_dev/sound_effects/icon_mute.svg"); }
-		else { d3.select("#sound_toggle").select("img").attr("src","scripts_1_6_dev/sound_effects/icon_speaker.svg"); } });
+	d3.select("#sound_toggle").append('img')
+		.attr('src', "scripts_1_6_dev/sound_effects/icon_mute.svg")
+		.on("click", function () {
+			if (d3.select("#sound_toggle").select("img").attr("src") == "scripts_1_6_dev/sound_effects/icon_speaker.svg") {
+				d3.select("#sound_toggle").select("img").attr("src", "scripts_1_6_dev/sound_effects/icon_mute.svg");
+			}
+			else { d3.select("#sound_toggle").select("img").attr("src", "scripts_1_6_dev/sound_effects/icon_speaker.svg"); }
+		});
 
 
 
-function callback() {
-	center_view(false);
-	sprites.visible = false;
-	edge_container.visible = false;
-	animation();
+	function callback() {
+		center_view(false);
+		sprites.visible = false;
+		edge_container.visible = false;
+		animation();
 
-	settings_setup();
-	selection_setup();
-	setup_layout_dropdown();
-	initiateButtons();
-	make_new_SPRINGplot_setup();
-	downloadSelectedExpr_setup();
-	clone_viewer_setup();
-	stickyNote_setup();
-	imputation_setup();
-	doublet_setup();
-	cluster_setup();
+		settings_setup();
+		selection_setup();
+		setup_layout_dropdown();
+		initiateButtons();
+		make_new_SPRINGplot_setup();
+		downloadSelectedExpr_setup();
+		clone_viewer_setup();
+		stickyNote_setup();
+		imputation_setup();
+		doublet_setup();
+		cluster_setup();
 
-	selection_logic_setup();
-	colorpicker_setup();
-	PAGA_setup();
-	
-	//load_text_annotation();
-	//stratify_setup();
-	//show_stratify_popup();
-	//start_clone_viewer();
-	//show_imputation_popup();
-	//show_colorpicker_popup('HSC_HSC_fate1');
-	
-	window.onclick = function(event) {
-		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }
-		if (!event.target.matches('#download_dropdown_button')) { closeDropdown(); }
-		if (!event.target.matches('#layout_dropdown_button')) { closeDropdown(); }
+		selection_logic_setup();
+		colorpicker_setup();
+		PAGA_setup();
+
+		//load_text_annotation();
+		//stratify_setup();
+		//show_stratify_popup();
+		//start_clone_viewer();
+		//show_imputation_popup();
+		//show_colorpicker_popup('HSC_HSC_fate1');
+
+		window.onclick = function (event) {
+			if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }
+			if (!event.target.matches('#download_dropdown_button')) { closeDropdown(); }
+			if (!event.target.matches('#layout_dropdown_button')) { closeDropdown(); }
+		}
+
 	}
 
-}
+	var name = window.location.search;
+	var my_origin = window.location.origin;
+	var my_pathname = window.location.pathname;
+	var path_split = my_pathname.split("/")
+	var path_start = path_split.slice(0, path_split.length - 1).join("/")
+	path_split[path_split.length - 1] = "springViewer_1_5_dev.html"
+	var dynamic_path = path_split.join("/")
 
-var name = window.location.search;
-var my_origin = window.location.origin;
-var my_pathname = window.location.pathname;
-var path_split = my_pathname.split("/")
-var path_start = path_split.slice(0, path_split.length-1).join("/")
-path_split[path_split.length-1] = "springViewer_1_5_dev.html"
-var dynamic_path = path_split.join("/")
+	d3.select("#changeViewer_link").attr("href", my_origin + dynamic_path + name);
+	base_dir_name = name.slice(1, name.length).split('/');
+	base_dir_name = base_dir_name.slice(0, base_dir_name.length - 1).join('/');
+	d3.select("#all_SPRINGplots_menu").attr("href", my_origin + path_start + "/currentDatasetsList.html?" + base_dir_name);
 
-d3.select("#changeViewer_link").attr("href", my_origin + dynamic_path + name);
-base_dir_name = name.slice(1,name.length).split('/');
-base_dir_name = base_dir_name.slice(0,base_dir_name.length-1).join('/');
-d3.select("#all_SPRINGplots_menu").attr("href", my_origin + path_start + "/currentDatasetsList.html?"+base_dir_name);
+	var force_on = 1;
+	var n_nodes = 0;
+	var colors_loaded = 0;
+	graph_directory = name.slice(1, name.length);
+	var tmp = graph_directory.split('/');
+	graph_directory = tmp.slice(0, tmp.length - 1).join('/');
+	sub_directory = tmp[tmp.length - 1];
 
-var force_on = 1;
-var n_nodes = 0;
-var colors_loaded = 0;
-graph_directory = name.slice(1,name.length);
-var tmp = graph_directory.split('/');
-graph_directory = tmp.slice(0,tmp.length-1).join('/');
-sub_directory = tmp[tmp.length-1];
+	document.title = tmp[tmp.length - 1];
 
-document.title = tmp[tmp.length-1];
+	clone_sprites = {};
+	clone_edge_container = {};
+	edge_container = [];
 
-clone_sprites = {};
-clone_edge_container = {};
-edge_container = [];
-
-d3.select("#force_layout").select("svg").remove()
-d3.select("#color_chooser").selectAll("div").remove()
-d3.select("#color_chooser").selectAll("input").remove()
-d3.select("#color_chooser").selectAll("select").remove()
-forceLayout(graph_directory, sub_directory, callback);
+	d3.select("#force_layout").select("svg").remove()
+	d3.select("#color_chooser").selectAll("div").remove()
+	d3.select("#color_chooser").selectAll("input").remove()
+	d3.select("#color_chooser").selectAll("select").remove()
+	forceLayout(graph_directory, sub_directory, callback);
 
 
 
 
 </script>
-
-</body>
