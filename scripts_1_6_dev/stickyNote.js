@@ -181,7 +181,7 @@ function stickyNote_setup() {
 
   function get_selected_cells() {
     let sel = [];
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       if (all_outlines[i].selected) {
         sel.push(i);
       }
@@ -274,7 +274,7 @@ function stickyNote_setup() {
 
   function show_selected() {
     let selected_cells = [];
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       if (all_outlines[i].selected) {
         selected_cells.push(i.toString());
       }

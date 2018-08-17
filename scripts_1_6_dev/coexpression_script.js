@@ -1,6 +1,6 @@
 // tslint:disable:forin variable-name no-console
 
-function coexpression_setup(project_directory) {
+export const coexpression_setup = project_directory => {
   let scatter_jitter = 5;
   let scatter_zoom = 1;
   let scatter_size = 6;
@@ -504,9 +504,9 @@ function coexpression_setup(project_directory) {
       })
       .style('r', scatter_size / (scatter_zoom + 0.1));
   }
-}
+};
 
-function make_coexpression_spinner(element) {
+export const make_coexpression_spinner = element => {
   let opts = {
     className: 'coexpression_spinner', // The CSS class to assign to the spinner
     color: 'gray', // #rgb or #rrggbb or array of colors
@@ -532,9 +532,9 @@ function make_coexpression_spinner(element) {
   let target = document.getElementById(element);
   let spinner = new Spinner(opts).spin(target);
   $(target).data('spinner', spinner);
-}
+};
 
-function pearsonCorrelation(xx, yy) {
+export const pearsonCorrelation = (xx, yy) => {
   let prefs = new Array(xx, yy);
   let p1 = 0;
   let p2 = 1;
@@ -575,4 +575,4 @@ function pearsonCorrelation(xx, yy) {
     return 0;
   }
   return num / den;
-}
+};

@@ -125,7 +125,7 @@ function imputation_setup() {
       let all_b = '';
       let sel = '';
       let sel_nodes = [];
-      for (i = 0; i < all_outlines.length; i++) {
+      for (let i = 0; i < all_outlines.length; i++) {
         let col = 0;
         if (all_nodes[i].tint === '0x000000' && clone_nodes[i] === undefined) {
           col = { r: 0, b: 0, g: 0 };

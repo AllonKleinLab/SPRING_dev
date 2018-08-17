@@ -161,7 +161,7 @@ function selection_setup() {
   function switch_pos_neg() {
     let pos_cells = [];
     let neg_cells = [];
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       if (all_outlines[i].selected) {
         pos_cells.push(i);
       }
@@ -169,12 +169,12 @@ function selection_setup() {
         neg_cells.push(i);
       }
     }
-    for (i = 0; i < neg_cells.length; i++) {
+    for (let i = 0; i < neg_cells.length; i++) {
       all_outlines[neg_cells[i]].tint = '0xffff00';
       all_outlines[neg_cells[i]].selected = true;
       all_outlines[neg_cells[i]].compared = false;
     }
-    for (i = 0; i < pos_cells.length; i++) {
+    for (let i = 0; i < pos_cells.length; i++) {
       all_outlines[pos_cells[i]].tint = '0x0000ff';
       all_outlines[pos_cells[i]].compared = true;
       all_outlines[pos_cells[i]].selected = false;
@@ -246,7 +246,7 @@ function selection_setup() {
     .extent(d3.brushX().extent(xScale), d3.brushY().extent(yScale))
     .on('brush', function() {
       let extent = d3.selectAll('.brush .extent')[0][0].getBoundingClientRect();
-      for (i = 0; i < all_nodes.length; i++) {
+      for (let i = 0; i < all_nodes.length; i++) {
         let d = all_nodes[i];
         let dim = document.getElementById('svg_graph').getBoundingClientRect();
         let x = d.x * sprites.scale.x + dim.left;
@@ -288,7 +288,7 @@ function selection_setup() {
       d3.event.target.clear();
       d3.select(this).call(d3.event.target);
       selected = [];
-      for (i in all_outlines) {
+      for (let i in all_outlines) {
         if (all_outlines.selected) {
           selected.push(i);
         }
@@ -325,7 +325,7 @@ function selection_setup() {
   update_selected_count = function() {
     let num_selected = 0;
     let num_compared = 0;
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       if (all_outlines[i].selected) {
         num_selected += 1;
       }
@@ -423,7 +423,7 @@ function selection_setup() {
 
 function deselect_all() {
   any_selected = false;
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     if (all_outlines[i].selected) {
       any_selected = true;
     }
@@ -433,7 +433,7 @@ function deselect_all() {
   }
   if (any_selected) {
     rotation_hide();
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       all_outlines[i].alpha = 0;
       all_outlines[i].selected = false;
       all_outlines[i].compared = false;
@@ -443,7 +443,7 @@ function deselect_all() {
     }
   }
   if (!any_selected) {
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       all_outlines[i].alpha = all_nodes[i].alpha;
       all_outlines[i].tint = '0xffff00';
       all_outlines[i].selected = true;
@@ -475,7 +475,7 @@ function loadSelectedCells(project_directory) {
 }
 
 function extend_selection() {
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     if (all_outlines[i].selected) {
       for (j in neighbors[i]) {
         let jj = neighbors[i][j];

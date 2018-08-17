@@ -58,7 +58,7 @@ function populate_subdirs_list(project_directory) {
     success: function(output_message) {
       let subdirs = output_message.split(',');
       console.log(subdirs);
-      for (i in subdirs) {
+      for (let i in subdirs) {
         add_sticky_subdir(project_directory, subdirs[i], i + 1);
       }
     },

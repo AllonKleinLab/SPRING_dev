@@ -100,11 +100,11 @@ function selection_logic_setup() {
   }
 
   function set_selections(sel) {
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       all_outlines[i].selected = false;
       all_outlines[i].alpha = 0;
     }
-    for (i = 0; i < sel.length; i++) {
+    for (let i = 0; i < sel.length; i++) {
       all_outlines[sel[i]].tint = '0xffff00';
       all_outlines[sel[i]].selected = true;
       all_outlines[sel[i]].alpha = all_nodes[sel[i]].alpha;
@@ -137,7 +137,7 @@ function selection_logic_setup() {
 
   function get_selected_cells() {
     let sel = [];
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       if (all_outlines[i].selected) {
         sel.push(i);
       }

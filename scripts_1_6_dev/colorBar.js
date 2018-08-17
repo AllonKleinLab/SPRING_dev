@@ -592,7 +592,7 @@ function colorBar(project_directory, color_menu_genes) {
       color_array = base_colors.map(average_color);
     }
     if (color_array != null) {
-      for (i = 0; i < all_nodes.length; i++) {
+      for (let i = 0; i < all_nodes.length; i++) {
         const x = color_array[i];
         if (x >= lower_bound && (x <= upper_bound || upper_bound > slider_scale.domain()[1] * 0.98)) {
           all_outlines[i].selected = true;
@@ -1093,7 +1093,7 @@ function colorBar(project_directory, color_menu_genes) {
 
   function renderRankedText(tracks, version) {
     any_selected = false;
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       if (all_outlines[i].selected || all_outlines[i].compared) {
         any_selected = true;
       }
@@ -1171,7 +1171,7 @@ function colorBar(project_directory, color_menu_genes) {
   // preload_enrichments();
   function preload_enrichments() {
     const sel2text = '';
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       sel2text = sel2text + ',' + i.toString();
     }
     sel2text = sel2text.slice(1, sel2text.length);
@@ -1322,7 +1322,7 @@ function colorBar(project_directory, color_menu_genes) {
 
   downloadRankedTerms = function downloadRankedTerms() {
     const num_selected = 0;
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       if (all_outlines[i].selected) {
         num_selected += 1;
       }
@@ -1450,7 +1450,7 @@ function make_legend(cat_color_map, cat_label_list) {
 
 function categorical_click(d, cat_label_list) {
   all_selected = true;
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     if (cat_label_list[i] === d) {
       if (!(all_outlines[i].selected || all_outlines[i].compared)) {
         all_selected = false;
@@ -1459,7 +1459,7 @@ function categorical_click(d, cat_label_list) {
   }
 
   const my_nodes = [];
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     if (cat_label_list[i] === d) {
       my_nodes.push(i);
       if (all_selected) {
@@ -1490,26 +1490,26 @@ function categorical_click(d, cat_label_list) {
 function shrinkNodes(scale, numsteps, my_nodes) {
   const current_radii = {};
   const nodes = [];
-  for (ii in my_nodes) {
+  for (let ii in my_nodes) {
     // console.log(['A',my_nodes[ii], all_nodes[my_nodes[ii]].active_scaling]);
     if (all_nodes[my_nodes[ii]].active_scaling !== true) {
       nodes.push(my_nodes[ii]);
     }
   }
-  for (ii in nodes) {
+  for (let ii in nodes) {
     current_radii[ii] = all_nodes[nodes[ii]].scale.x;
     all_nodes[nodes[ii]].active_scaling = true;
   }
   const refreshIntervalId = setInterval(() => {
     if (scale < 1) {
-      for (ii in nodes) {
+      for (let ii in nodes) {
         current_radii[ii] = all_nodes[nodes[ii]].scale.x;
         all_nodes[nodes[ii]].active_scaling = false;
         // console.log(['B',nodes[ii], all_nodes[nodes[ii]].active_scaling]);
       }
       clearInterval(refreshIntervalId);
     } else {
-      for (ii in nodes) {
+      for (let ii in nodes) {
         const i = nodes[ii];
         all_outlines[i].scale.set(scale * current_radii[ii]);
         all_nodes[i].scale.set(scale * current_radii[ii]);
@@ -1530,7 +1530,7 @@ function count_clusters() {
     Object.keys(cat_color_map).forEach(d => {
       counts[d] = 0;
     });
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       if (all_outlines[i].selected || all_outlines[i].compared) {
         counts[cat_label_list[i]] += 1;
       }
@@ -1588,7 +1588,7 @@ function toggle_legend_hover_tooltip() {
         let y = d3.event.clientY - dim.top;
         x = (x - sprites.position.x) / sprites.scale.x;
         y = (y - sprites.position.y) / sprites.scale.y;
-        for (i = 0; i < all_nodes.length; i++) {
+        for (let i = 0; i < all_nodes.length; i++) {
           rad = Math.sqrt((all_nodes[i].x - x) ** 2 + (all_nodes[i].y - y) ** 2);
           if (rad < all_nodes[i].scale.x * 20) {
             hover_clusters.push(cat_label_list[i]);
@@ -1650,7 +1650,7 @@ function get_hover_cells(e) {
   x = (x - sprites.position.x) / sprites.scale.x;
   y = (y - sprites.position.y) / sprites.scale.y;
   const hover_cells = [];
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     if (all_outlines[i].selected) {
       rad = Math.sqrt((all_nodes[i].x - x) ** 2 + (all_nodes[i].y - y) ** 2);
       if (rad < all_nodes[i].scale.x * 20) {

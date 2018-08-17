@@ -185,7 +185,7 @@ function populate_subdirs_list(project_directory) {
     data: { path: project_directory, filename: 'run_info.json' },
     success: function(output_message) {
       let subdirs = output_message.split(',');
-      for (i in subdirs) {
+      for (let i in subdirs) {
         add_list_item(project_directory, subdirs[i], i + 1);
       }
     },

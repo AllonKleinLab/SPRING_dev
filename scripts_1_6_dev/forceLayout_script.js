@@ -218,7 +218,7 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
     }
 
     let stashed_coordinates = [{}];
-    for (i in all_nodes) {
+    for (let i in all_nodes) {
       stashed_coordinates[0][i] = [all_nodes[i].x, all_nodes[i].y];
     }
 
@@ -230,11 +230,11 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
         .on('end', dragended),
     );
 
-    loadColors();
-    load_edges();
+    loadColors(graph_directory, sub_directory);
+    load_edges(all_nodes, sprites, app);
   });
 
-  function load_edges() {
+  function load_edges(all_nodes, sprites, app) {
     let edge_container = new PIXI.ParticleContainer(all_nodes.length * 20, {
       alpha: true,
       position: true,
@@ -248,14 +248,14 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
     let all_edges = [];
     let all_edge_ends = [];
     let neighbors = {};
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       neighbors[i] = [];
     }
     $.get(project_directory + '/' + sub_directory + '/edges.csv')
       .done(function(text) {
         text.split('\n').forEach(function(entry, index) {
           if (entry.length > 0) {
-            items = entry.split(';');
+            let items = entry.split(';');
             let source = parseInt(items[0], 10);
             let target = parseInt(items[1], 10);
 
@@ -516,7 +516,7 @@ function animation() {
           all_outlines[i].y = tmp_coordinates[i][1];
         }
 
-        // 				for (i=0; i<all_edges.length; i++) {
+        // 				for (let i=0; i<all_edges.length; i++) {
         // 					all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
         // 					all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
         // 					all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
@@ -605,7 +605,7 @@ function toggleForce() {
   }
 }
 
-function loadColors() {
+function loadColors(graph_directory, sub_directory) {
   d3.select('#load_colors').remove();
   let base_dir = graph_directory;
   let sub_dir = graph_directory + '/' + sub_directory;
@@ -669,7 +669,7 @@ function downloadSelection() {
   d3.text(cell_filter_filename).then(text => {
     let cell_nums = text.split('\n');
     let text = '';
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       if (all_outlines[i].selected) {
         text = text + i.toString() + ',' + cell_nums[i] + '\n';
       }
@@ -680,7 +680,7 @@ function downloadSelection() {
 
 function downloadCoordinates() {
   let text = '';
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     text += i.toString() + ',' + all_nodes[i].x.toString() + ',' + all_nodes[i].y.toString() + '\n';
   }
   downloadFile(text, 'coordinates.txt');
@@ -813,7 +813,7 @@ function showLayoutDropdown() {
 function closeDropdown() {
   let dropdowns = document.getElementsByClassName('dropdown-content');
   let i;
-  for (i = 0; i < dropdowns.length; i++) {
+  for (let i = 0; i < dropdowns.length; i++) {
     let openDropdown = dropdowns[i];
     if (openDropdown.classList.contains('show')) {
       openDropdown.classList.remove('show');
@@ -902,12 +902,12 @@ function center_view(on_selected) {
   let all_xs = [];
   let all_ys = [];
   let num_selected = 0;
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     if (all_outlines[i].selected) {
       num_selected += 1;
     }
   }
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     if (!on_selected || all_outlines[i].selected || num_selected === 0) {
       all_xs.push(all_nodes[i].x);
       all_ys.push(all_nodes[i].y);
@@ -960,7 +960,7 @@ function center_view(on_selected) {
 function save_coords() {
   if (mutable) {
     let text = '';
-    for (i in coordinates) {
+    for (let i in coordinates) {
       text = text + [i.toString(), all_nodes[i].x.toString(), all_nodes[i].y.toString()].join(',') + '\n';
     }
     let name = window.location.search;

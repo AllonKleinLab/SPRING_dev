@@ -77,10 +77,10 @@ function clone_viewer_setup() {
     //console.log(error);
     for (k in data) {
       clone_map[k] = {};
-      for (i in all_nodes) {
+      for (let i in all_nodes) {
         clone_map[k][i] = [];
       }
-      for (i in data[k]) {
+      for (let i in data[k]) {
         clone_map[k][i] = data[k][i];
       }
     }
@@ -292,17 +292,17 @@ function clone_viewer_setup() {
   );
 
   function reset_all_nodes() {
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       node_status[i].source = false;
       node_status[i].target = false;
     }
   }
 
   function clear_clone_overlays() {
-    for (i in clone_nodes) {
+    for (let i in clone_nodes) {
       deactivate_nodes(i);
     }
-    for (i in clone_edges) {
+    for (let i in clone_edges) {
       deactivate_edges(i);
     }
   }
@@ -318,14 +318,14 @@ function clone_viewer_setup() {
 
   function update_highlight_size() {
     let my_scale = parseFloat(d3.select('#clone_node_size_slider')[0][0].value) / 10;
-    for (i in clone_nodes) {
+    for (let i in clone_nodes) {
       clone_nodes[i].scale.x = all_nodes[i].scale.x * my_scale;
       clone_nodes[i].scale.y = all_nodes[i].scale.x * my_scale;
     }
   }
 
   function burn() {
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       if (clone_nodes[i] === undefined && all_nodes[i].tint === '0x000000') {
         base_colors[i] = { r: 0, g: 0, b: 0 };
       }
@@ -343,12 +343,12 @@ function clone_viewer_setup() {
   }
 
   function extend_from_selection() {
-    for (i in clone_nodes) {
+    for (let i in clone_nodes) {
       if (!clone_nodes[i].active_stable) {
         deactivate_nodes(i);
       }
     }
-    for (i in clone_edges) {
+    for (let i in clone_edges) {
       deactivate_edges(i);
     }
 
@@ -385,12 +385,12 @@ function clone_mousemove() {
   targetCircle.x = x;
   targetCircle.y = y;
 
-  for (i in clone_nodes) {
+  for (let i in clone_nodes) {
     if (!clone_nodes[i].active_stable) {
       deactivate_nodes(i);
     }
   }
-  for (i in clone_edges) {
+  for (let i in clone_edges) {
     deactivate_edges(i);
   }
   let maxsize = parseFloat(d3.select('#clone_size_input')[0][0].value);
@@ -550,13 +550,13 @@ function draw_target_circle() {
 
 function set_source_from_selection() {
   let none_selected = true;
-  for (i = 0; i < all_outlines.length; i++) {
+  for (let i = 0; i < all_outlines.length; i++) {
     if (all_outlines[i].selected) {
       none_selected = false;
       i = all_outlines.length;
     }
   }
-  for (i = 0; i < all_outlines.length; i++) {
+  for (let i = 0; i < all_outlines.length; i++) {
     if (all_outlines[i].selected || none_selected) {
       node_status[i].source = true;
     }
@@ -565,14 +565,14 @@ function set_source_from_selection() {
 
 function set_target_from_selection() {
   let none_selected = true;
-  for (i = 0; i < all_outlines.length; i++) {
+  for (let i = 0; i < all_outlines.length; i++) {
     if (all_outlines[i].selected) {
       none_selected = false;
       i = all_outlines.length;
     }
   }
 
-  for (i = 0; i < all_outlines.length; i++) {
+  for (let i = 0; i < all_outlines.length; i++) {
     if (all_outlines[i].selected || none_selected) {
       node_status[i].target = true;
     }
@@ -581,7 +581,7 @@ function set_target_from_selection() {
 
 function darken_nodes() {
   let darkness = parseFloat(d3.select('#clone_darkness_slider')[0][0].value) / 100;
-  for (i = 0; i < all_nodes.length; i++) {
+  for (let i = 0; i < all_nodes.length; i++) {
     let cc = base_colors[i];
     let r = Math.floor(cc.r * darkness);
     let b = Math.floor(cc.b * darkness);

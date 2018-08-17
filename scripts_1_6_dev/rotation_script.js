@@ -4,7 +4,7 @@ function rotation_update() {
   let selected = [];
   let stash_i = stashed_coordinates.length;
   stashed_coordinates.push({});
-  for (i in all_nodes) {
+  for (let i in all_nodes) {
     if (all_outlines[i].selected) {
       selected.push(i);
     }
@@ -27,7 +27,7 @@ function rotation_update() {
 
   let all_xs = [];
   let all_ys = [];
-  for (i in all_nodes) {
+  for (let i in all_nodes) {
     if (all_outlines[i].selected) {
       all_xs.push(all_nodes[i].x);
       all_ys.push(all_nodes[i].y);
@@ -36,7 +36,7 @@ function rotation_update() {
   let cx = d3.sum(all_xs) / all_xs.length;
   let cy = d3.sum(all_ys) / all_ys.length;
   let dels = [];
-  for (i = 0; i < all_xs.length; i++) {
+  for (let i = 0; i < all_xs.length; i++) {
     dels.push(Math.sqrt(Math.pow(all_xs[i] - cx, 2) + Math.pow(all_ys[i] - cy, 2)));
   }
   rotator_radius = d3.median(dels) * 1.5;
@@ -145,7 +145,7 @@ function rotation_update() {
     }
 
     if (Math.abs(rot) < 1) {
-      for (i in all_outlines) {
+      for (let i in all_outlines) {
         if (all_outlines[i].selected) {
           let d = all_nodes[i];
           let dx = d.x - cxFromD3;

@@ -196,14 +196,14 @@ function doublet_setup() {
           show_doublet_notification();
           if (d3.select('#clone_viewer_popup').style('visibility') === 'visible') {
             $('#clone_viewer_popup').remove();
-            for (i = 0; i < all_outlines.length; i++) {
+            for (let i = 0; i < all_outlines.length; i++) {
               node_status[i].source = false;
               node_status[i].target = false;
             }
-            for (i in clone_nodes) {
+            for (let i in clone_nodes) {
               deactivate_nodes(i);
             }
-            for (i in clone_edges) {
+            for (let i in clone_edges) {
               deactivate_edges(i);
             }
             targetCircle.clear();

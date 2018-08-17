@@ -321,7 +321,7 @@ function submit_new_SPRINGplot() {
   // When finished...
   let sel2text = '';
   let com2text = '';
-  for (i = 0; i < all_outlines.length; i++) {
+  for (let i = 0; i < all_outlines.length; i++) {
     if (all_outlines[i].selected) {
       sel2text = sel2text + ',' + i.toString();
     }

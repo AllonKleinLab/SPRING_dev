@@ -147,7 +147,7 @@ function settings_setup() {
 
   function check_any_selected() {
     let any_selected = false;
-    for (i = 0; i < all_outlines.length; i++) {
+    for (let i = 0; i < all_outlines.length; i++) {
       if (all_outlines[i].selected) {
         any_selected = true;
       }
@@ -158,7 +158,7 @@ function settings_setup() {
   function node_size_change(val) {
     val = (val / 50) ** 2.5 * 50 * (32 / SPRITE_IMG_WIDTH);
     let any_selected = check_any_selected();
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       if (!any_selected || all_outlines[i].selected) {
         all_nodes[i].scale.set(val / 100);
         all_outlines[i].scale.set(val / 100);
@@ -168,7 +168,7 @@ function settings_setup() {
 
   function node_opacity_change(val) {
     let any_selected = check_any_selected();
-    for (i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < all_nodes.length; i++) {
       if (!any_selected || all_outlines[i].selected) {
         all_nodes[i].alpha = val / 100;
         if (all_outlines[i].selected || all_outlines[i].compared) {
