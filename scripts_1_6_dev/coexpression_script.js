@@ -1,3 +1,5 @@
+import { read_csv } from "./util";
+
 export const coexpression_setup = project_directory => {
   let scatter_jitter = 5;
   let scatter_zoom = 1;
@@ -51,7 +53,7 @@ export const coexpression_setup = project_directory => {
   });
 
   d3.select('#coexpression_zoom_slider').on('input', function() {
-    scatter_zoom = parseFloat((100 - this.value) / 100);
+    scatter_zoom = (100 - this.value) / 100;
     quick_scatter_update();
   });
 
@@ -144,9 +146,9 @@ export const coexpression_setup = project_directory => {
   }
 
   function load_cluster_expression(list, lengths_list, expression_dict) {
-    name = list[0];
+    let name = list[0];
     list = list.slice(1, list.length);
-    d3.text(project_directory + '/cluster_expression/' + name + '.csv', function(text) {
+    d3.text(project_directory + '/cluster_expression/' + name + '.csv').then(text => {
       let tmp_expression_dict = read_csv(text);
       let random_key = Object.keys(tmp_expression_dict)[0];
       lengths_list.push(tmp_expression_dict[random_key].length);

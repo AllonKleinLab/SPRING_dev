@@ -1,13 +1,13 @@
-clone_nodes = {};
-clone_edges = {};
-node_status = {};
+export const clone_nodes = {};
+export const clone_edges = {};
+export const node_status = {};
 
-function clone_viewer_setup() {
-  clone_edge_container = new PIXI.Container();
+export const clone_viewer_setup = () => {
+  let clone_edge_container = new PIXI.Container();
   clone_edge_container.position = sprites.position;
   clone_edge_container.scale = sprites.scale;
 
-  clone_sprites = new PIXI.Container(all_nodes.length, {
+  let clone_sprites = new PIXI.particles.ParticleContainer(all_nodes.length, {
     alpha: true,
     position: true,
     rotation: true,
@@ -17,12 +17,12 @@ function clone_viewer_setup() {
   clone_sprites.position = sprites.position;
   clone_sprites.scale = sprites.scale;
 
-  targetCircle = new PIXI.Graphics();
+  let targetCircle = new PIXI.Graphics();
   targetCircle.alpha = 0;
   clone_sprites.addChild(targetCircle);
 
-  show_clone_edges = false;
-  show_source_nodes = false;
+  let show_clone_edges = false;
+  let show_source_nodes = false;
 
   app.stage.addChild(clone_edge_container);
   app.stage.addChild(clone_sprites);
@@ -51,7 +51,7 @@ function clone_viewer_setup() {
       clone_key = document.getElementById('clone_key_menu').value;
     });
 
-  cloneDispatch = d3.dispatch('load', 'statechange');
+  let cloneDispatch = d3.dispatch('load', 'statechange');
   cloneDispatch.on('load', function(data) {
     cloneKeyMenu.selectAll('option').remove();
     cloneKeyMenu
@@ -70,11 +70,11 @@ function clone_viewer_setup() {
     });
   });
 
-  clone_map = {};
+  const clone_map = {};
   let noCache = new Date().getTime();
-  d3.json(window.location.search.slice(1, name.length) + '/clone_map.json' + '?_=' + noCache, function(error, data) {
+  d3.json(window.location.search.slice(1, name.length) + '/clone_map.json' + '?_=' + noCache).then(data => {
     //console.log(error);
-    for (k in data) {
+    for (let k in data) {
       clone_map[k] = {};
       for (let i in all_nodes) {
         clone_map[k][i] = [];

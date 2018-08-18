@@ -1,4 +1,4 @@
-function selection_setup() {
+export const selection_setup = () => {
   selection_mode = 'drag_pan_zoom';
   let svg_width = parseInt(d3.select('svg').attr('width'), 10);
 
@@ -321,7 +321,7 @@ function selection_setup() {
   let pos_count_extended = false;
   let neg_count_extended = false;
 
-  update_selected_count = function() {
+  const update_selected_count = () => {
     let num_selected = 0;
     let num_compared = 0;
     for (let i = 0; i < all_nodes.length; i++) {
@@ -420,7 +420,7 @@ function selection_setup() {
   }
 }
 
-function deselect_all() {
+export const deselect_all = () => {
   any_selected = false;
   for (let i = 0; i < all_nodes.length; i++) {
     if (all_outlines[i].selected) {
@@ -454,11 +454,11 @@ function deselect_all() {
   update_selected_count();
 }
 
-function loadSelectedCells(project_directory) {
+export const loadSelectedCells = (project_directory) => {
   // load selected cells if it exists
   selection_filename = project_directory + '/selected_cells.txt';
   new_selection = [];
-  d3.text(selection_filename, function(text) {
+  d3.text(selection_filename).then(text => {
     text.split('\n').forEach(function(entry, index, array) {
       if (entry !== '') {
         new_selection.push(parseInt(entry, 10));
@@ -473,7 +473,7 @@ function loadSelectedCells(project_directory) {
   });
 }
 
-function extend_selection() {
+export const extend_selection = () => {
   for (let i = 0; i < all_nodes.length; i++) {
     if (all_outlines[i].selected) {
       for (j in neighbors[i]) {

@@ -51,7 +51,7 @@ function hide_notification() {
     .style('visibility', 'hidden');
 }
 
-function run_clustering() {
+export const run_clustering = (mutable, graph_directory, sub_directory) => {
   if (mutable) {
     console.log('running!');
     let t0 = new Date();
@@ -74,7 +74,7 @@ function run_clustering() {
 
         d3.json(graph_directory + '/' + sub_directory + '/categorical_coloring_data.json' + '?_=' + noCache).then(
           json => {
-            categorical_coloring_data = json;
+            let categorical_coloring_data = json;
             Object.keys(categorical_coloring_data).forEach(function(k) {
               let label_counts = {};
               Object.keys(categorical_coloring_data[k].label_colors).forEach(function(n) {

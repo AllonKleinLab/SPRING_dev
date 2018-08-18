@@ -1,4 +1,4 @@
-function colorBar(project_directory, color_menu_genes) {
+export const colorBar = (project_directory, color_menu_genes) => {
   /* -----------------------------------------------------------------------------------
 										   Top menu bar
 	*/

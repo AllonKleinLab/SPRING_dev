@@ -1,4 +1,4 @@
-function doublet_setup() {
+export const doublet_setup = () => {
   let popup = d3
     .select('#force_layout')
     .append('div')
@@ -57,11 +57,10 @@ function doublet_setup() {
     .on('mousedown', hide_doublet_notification);
 
   d3.select('#doublet_popup').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', doublet_popup_dragstarted)
+    d3.drag()
+      .on('start', doublet_popup_dragstarted)
       .on('drag', doublet_popup_dragged)
-      .on('dragend', doublet_popup_dragended),
+      .on('end', doublet_popup_dragended),
   );
 
   function doublet_popup_dragstarted() {
@@ -263,14 +262,14 @@ function show_doublet_notification() {
     .style('opacity', 1.0);
 }
 
-function hide_doublet_notification() {
+export const  hide_doublet_notification = () => {
   console.log('hide');
   d3.select('#doublet_notification')
     .style('opacity', 0.0)
     .style('visibility', 'hidden');
 }
 
-function show_doublet_popup() {
+export const show_doublet_popup = () => {
   if (mutable) {
     let mywidth = parseInt(
       d3
@@ -298,6 +297,6 @@ function show_doublet_popup() {
   }
 }
 
-function hide_doublet_popup() {
+export const hide_doublet_popup = () => {
   d3.select('#doublet_popup').style('visibility', 'hidden');
 }

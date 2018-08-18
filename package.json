@@ -1,0 +1,13 @@
+{
+  "name": "SPRING_dev",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/cBioCenter/SPRING_dev",
+  "author": "Drew Diamantoukos <MercifulCode@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/d3": "^5.0.0",
+    "@types/jquery": "^3.3.6",
+    "@types/pixi.js": "^4.8.0"
+  }
+}

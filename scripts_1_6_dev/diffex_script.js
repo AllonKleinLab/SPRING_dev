@@ -1,5 +1,4 @@
-'use strict';
-function diffex_setup(project_directory) {
+export const diffex_setup = (project_directory) => {
   let scatter_zoom = 0.2;
   let scatter_size = 4;
   let scatter_jitter = 0;

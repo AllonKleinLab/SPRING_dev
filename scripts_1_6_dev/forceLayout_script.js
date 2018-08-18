@@ -1,3 +1,5 @@
+import { colorBar } from "./colorBar";
+
 export const forceLayout = (project_directory, graph_directory, sub_directory, callback) => {
   d3.select('#toggleforce')
     .select('button')
@@ -405,7 +407,7 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
   }
 };
 
-function move_selection_aside(side) {
+export const move_selection_aside = (side) => {
   // find left and right most edge of selected and non selected cells
   let sel_x = [];
   let non_x = [];
@@ -448,7 +450,7 @@ function move_selection_aside(side) {
   next_frame(6, -1);
 }
 
-function revert_positions() {
+export const revert_positions = () => {
   let stash_i = stashed_coordinates.length - 1;
   for (let i in stashed_coordinates[stash_i]) {
     move_node(i, stashed_coordinates[stash_i][i][0], stashed_coordinates[stash_i][i][1]);
@@ -457,14 +459,14 @@ function revert_positions() {
   stashed_coordinates = stashed_coordinates.slice(0, stashed_coordinates.length - 1);
 }
 
-function move_node(i, x, y) {
+export const move_node = (i, x, y) => {
   all_nodes[i].x = x;
   all_nodes[i].y = y;
   all_outlines[i].x = x;
   all_outlines[i].y = y;
 }
 
-function adjust_edges() {
+export const adjust_edges = () => {
   for (let i in all_edges) {
     all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
     all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
@@ -474,7 +476,7 @@ function adjust_edges() {
   }
 }
 
-function animation() {
+export const animation = () => {
   console.log('ANIM');
   // check if animation exists. if so, hide sprites and load it
 
@@ -558,7 +560,7 @@ function animation() {
     });
 }
 
-function blend_edges() {
+export const blend_edges = () => {
   edge_container.alpha = 0;
   edge_container.visible = true;
 
@@ -576,7 +578,7 @@ function blend_edges() {
   next_frame(-1, 0, 0.5, 10);
 }
 
-function UrlExists(url) {
+export const UrlExists = (url) => {
   $.get(url)
     .done(function() {
       console.log('yes');
@@ -586,7 +588,7 @@ function UrlExists(url) {
     });
 }
 
-function toggleForce() {
+export const toggleForce = () => {
   if (force_on === 1) {
     console.log('turning force off');
     d3.select('#toggleforce')
@@ -604,7 +606,7 @@ function toggleForce() {
   }
 }
 
-function loadColors(graph_directory, sub_directory) {
+export const loadColors = (graph_directory, sub_directory) => {
   d3.select('#load_colors').remove();
   let base_dir = graph_directory;
   let sub_dir = graph_directory + '/' + sub_directory;
@@ -620,7 +622,7 @@ function loadColors(graph_directory, sub_directory) {
   });
 }
 
-function makeTextFile(text) {
+export const makeTextFile = (text) => {
   let textFile = '';
   let data = new Blob([text], { type: 'text/plain' });
 
@@ -632,7 +634,7 @@ function makeTextFile(text) {
   return textFile;
 }
 
-function downloadFile(text, name) {
+export const downloadFile = (text, name) => {
   if (
     d3
       .select('#sound_toggle')
@@ -649,24 +651,24 @@ function downloadFile(text, name) {
   hiddenElement.click();
 }
 
-function hideAccessories() {
+export const hideAccessories = () => {
   d3.selectAll('.other_frills').style('visibility', 'hidden');
   d3.selectAll('.selection_option').style('visibility', 'hidden');
   d3.selectAll('.colorbar_item').style('visibility', 'hidden');
   d3.select('svg').style('background-color', 'white');
 }
 
-function showAccessories() {
+export const showAccessories = () => {
   d3.selectAll('.other_frills').style('visibility', 'visible');
   d3.selectAll('.selection_option').style('visibility', 'visible');
   d3.selectAll('.colorbar_item').style('visibility', 'visible');
   d3.select('svg').style('background-color', '#D6D6D6');
 }
 
-function downloadSelection() {
+export const downloadSelection = () => {
   let cell_filter_filename = window.location.search.slice(1, name.length) + '/cell_filter.txt';
-  d3.text(cell_filter_filename).then(text => {
-    let cell_nums = text.split('\n');
+  d3.text(cell_filter_filename).then(cellText => {
+    let cell_nums = cellText.split('\n');
     let text = '';
     for (let i = 0; i < all_nodes.length; i++) {
       if (all_outlines[i].selected) {
@@ -677,7 +679,7 @@ function downloadSelection() {
   });
 }
 
-function downloadCoordinates() {
+export const downloadCoordinates = () => {
   let text = '';
   for (let i = 0; i < all_nodes.length; i++) {
     text += i.toString() + ',' + all_nodes[i].x.toString() + ',' + all_nodes[i].y.toString() + '\n';
@@ -685,7 +687,7 @@ function downloadCoordinates() {
   downloadFile(text, 'coordinates.txt');
 }
 
-function initiateButtons() {
+export const initiateButtons = () => {
   d3.select('#help').on('click', function() {
     let win = window.open('helppage.html', '_blank');
     win.focus();
@@ -762,13 +764,13 @@ function initiateButtons() {
     });
 }
 
-function download_png() {
+export const download_png = () => {
   let path = window.location.search.split('/');
   path = path[path.length - 2] + '_' + path[path.length - 1] + '.png';
   download_sprite_as_png(app.renderer, app.stage, path);
 }
 
-function download_sprite_as_png(renderer, sprite, fileName) {
+export const download_sprite_as_png = (renderer, sprite, fileName) => {
   renderer.extract.canvas(sprite).toBlob(function(b) {
     let a = document.createElement('a');
     document.body.append(a);
@@ -779,7 +781,7 @@ function download_sprite_as_png(renderer, sprite, fileName) {
   }, 'image/png');
 }
 
-function showToolsDropdown() {
+export const showToolsDropdown = () => {
   if (d3.select('#tools_dropdown').style('height') === 'auto') {
     closeDropdown();
     collapse_settings();
@@ -789,7 +791,7 @@ function showToolsDropdown() {
   }
 }
 
-function showDownloadDropdown() {
+export const showDownloadDropdown = () => {
   if (d3.select('#download_dropdown').style('height') === 'auto') {
     closeDropdown();
     collapse_settings();
@@ -799,7 +801,7 @@ function showDownloadDropdown() {
   }
 }
 
-function showLayoutDropdown() {
+export const showLayoutDropdown = () => {
   if (d3.select('#layout_dropdown').style('height') === 'auto') {
     closeDropdown();
     collapse_settings();
@@ -809,7 +811,7 @@ function showLayoutDropdown() {
   }
 }
 
-function closeDropdown() {
+export const closeDropdown = () => {
   let dropdowns = document.getElementsByClassName('dropdown-content');
   let i;
   for (let i = 0; i < dropdowns.length; i++) {
@@ -829,12 +831,12 @@ export const setup_tools_dropdown = () => {
   d3.select('#tools_dropdown_button').on('click', showToolsDropdown);
 };
 
-function setup_layout_dropdown() {
+export const setup_layout_dropdown = () => {
   //d3.select("#layout_dropdown_button").on("mouseover",showLayoutDropdown);
   d3.select('#layout_dropdown_button').on('click', showLayoutDropdown);
 }
 
-function fix() {
+export const fix = () => {
   if (d3.selectAll('.selected')[0].length === 0) {
     d3.selectAll('.node circle').each(function(d) {
       d.fixed = true;
@@ -845,7 +847,7 @@ function fix() {
   });
 }
 
-function unfix() {
+export const unfix = () => {
   d3.selectAll('.selected').each(function(d) {
     d.fixed = false;
   });
@@ -856,16 +858,16 @@ function unfix() {
   }
 }
 
-function componentToHex(c) {
+export const componentToHex = (c) => {
   let hex = c.toString(16);
   return hex.length === 1 ? '0' + hex : hex;
 }
 
-function rgbToHex(r, g, b) {
+export const rgbToHex = (r, g, b) => {
   return '0x' + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
-function redraw() {
+export const redraw = () => {
   if (!being_dragged) {
     let dim = document.getElementById('svg_graph').getBoundingClientRect();
     let x = d3.event.sourceEvent.clientX;
@@ -897,7 +899,7 @@ function redraw() {
   }
 }
 
-function center_view(on_selected) {
+export const center_view = (on_selected) => {
   let all_xs = [];
   let all_ys = [];
   let num_selected = 0;
@@ -956,7 +958,7 @@ function center_view(on_selected) {
   })();
 }
 
-function save_coords() {
+export const save_coords = () => {
   if (mutable) {
     let text = '';
     for (let i in coordinates) {

@@ -1,4 +1,9 @@
-import { forceLayout, setup_tools_dropdown, setup_download_dropdown } from './forceLayout_script.js';
+/// <reference types="d3" />
+///<reference types="jquery" />
+///<reference types="pixi.js" />
+
+import { forceLayout, setup_tools_dropdown, setup_download_dropdown, center_view, animation, setup_layout_dropdown, initiateButtons, closeDropdown } from './forceLayout_script.js';
+import { doublet_setup } from './doublet_detector.js';
 
 let rotator_radius = null;
 
@@ -25,7 +30,7 @@ d3.select('#sound_toggle')
     }
   });
 
-function callback() {
+const callback = () => {
   center_view(false);
   sprites.visible = false;
   edge_container.visible = false;
@@ -76,8 +81,8 @@ path_split[path_split.length - 1] = 'springViewer_1_5_dev.html';
 let dynamic_path = path_split.join('/');
 
 d3.select('#changeViewer_link').attr('href', my_origin + dynamic_path + name);
-let base_dir_name = name.slice(1, name.length).split('/');
-base_dir_name = base_dir_name.slice(0, base_dir_name.length - 1).join('/');
+let base_dirs = name.slice(1, name.length).split('/');
+let base_dir_name = base_dirs.slice(0, base_dirs.length - 1).join('/');
 d3.select('#all_SPRINGplots_menu').attr('href', my_origin + path_start + '/currentDatasetsList.html?' + base_dir_name);
 
 let force_on = 1;

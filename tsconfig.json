@@ -1,6 +1,14 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "noEmit": true
+    "checkJs": true,
+    "lib": [
+      "dom",
+      "es2015"
+    ],
+    "noEmit": true,
+    "types": [
+      "./spring.d.ts",
+    ]
   }
 }
