@@ -1,5 +1,6 @@
-function LineSprite(thickness, color, x1, y1, x2, y2) {
-  PIXI.Sprite.call(this, this.getTexture(thickness, color));
+export class LineSprite {
+  constructor(thickness, color, x1, y1, x2, y2) {
+    PIXI.Sprite.call(this, this.getTexture(thickness, color));
   this._thickness = thickness;
   this._color = color;
   this.x1 = x1;
@@ -8,7 +9,9 @@ function LineSprite(thickness, color, x1, y1, x2, y2) {
   this.y2 = y2;
   this.updatePosition();
   this.anchor.x = 0.5;
+  }
 }
+
 
 LineSprite.textureCache = {};
 LineSprite.maxWidth = 100;

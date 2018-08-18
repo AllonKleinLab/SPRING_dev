@@ -1,4 +1,5 @@
-import { colorBar } from "./colorBar";
+import colorBar from "./colorBar";
+import { LineSprite } from "./LineSprite";
 
 export const forceLayout = (project_directory, graph_directory, sub_directory, callback) => {
   d3.select('#toggleforce')

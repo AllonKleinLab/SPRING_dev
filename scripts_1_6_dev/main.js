@@ -1,9 +1,8 @@
-/// <reference types="d3" />
-///<reference types="jquery" />
-///<reference types="pixi.js" />
-
 import { forceLayout, setup_tools_dropdown, setup_download_dropdown, center_view, animation, setup_layout_dropdown, initiateButtons, closeDropdown } from './forceLayout_script.js';
 import { doublet_setup } from './doublet_detector.js';
+import { selection_setup } from './selection_script.js';
+import { clone_viewer_setup } from './clone_viewer.js';
+import { cluster_setup } from './cluster_script.js';
 
 let rotator_radius = null;
 

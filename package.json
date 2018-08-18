@@ -5,6 +5,9 @@
   "repository": "https://github.com/cBioCenter/SPRING_dev",
   "author": "Drew Diamantoukos <MercifulCode@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json"
+  },
   "devDependencies": {
     "@types/d3": "^5.0.0",
     "@types/jquery": "^3.3.6",

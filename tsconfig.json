@@ -1,14 +1,22 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "lib": [
       "dom",
       "es2015"
     ],
-    "noEmit": true,
-    "types": [
-      "./spring.d.ts",
-    ]
-  }
+    "module": "amd",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    // "outFile": "dist/bundle.js",
+    "target": "es5",
+  },
+  "include": [
+    "./scripts_1_6_dev",
+    "./spring.d.ts"
+  ],
+  "exclude": [
+    "./node_modules",
+  ]
 }

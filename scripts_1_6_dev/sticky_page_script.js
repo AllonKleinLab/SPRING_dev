@@ -1,5 +1,7 @@
+import { openInNewTab } from "./util";
+
 function add_sticky_subdir(project_directory, sub_directory, order) {
-  d3.json(project_directory + '/' + sub_directory + '/sticky_notes_data.json', function(data) {
+  d3.json(project_directory + '/' + sub_directory + '/sticky_notes_data.json').then(data => {
     let list_item = d3
       .select('#dataset_list')
       .append('li')
@@ -46,7 +48,7 @@ function add_sticky_subdir(project_directory, sub_directory, order) {
   });
 }
 
-function populate_subdirs_list(project_directory) {
+function populate_sticky_subdirs_list(project_directory) {
   let title = project_directory.split('/');
   title = title[title.length - 1];
   d3.select('#project_directory_title').text('Sticky notes from "' + title + '"');
@@ -65,7 +67,3 @@ function populate_subdirs_list(project_directory) {
   });
 }
 
-function openInNewTab(url) {
-  let win = window.open(url, '_blank');
-  win.focus();
-}

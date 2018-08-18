@@ -1,5 +1,7 @@
+import { openInNewTab } from "./util";
+
 function add_list_item(project_directory, sub_directory, order) {
-  d3.json(project_directory + '/' + sub_directory + '/run_info.json', function(data) {
+  d3.json(project_directory + '/' + sub_directory + '/run_info.json').then(data => {
     data.Date = data.Date.split(' ')[0];
     let list_item = d3
       .select('#dataset_list')
@@ -169,7 +171,7 @@ function add_list_item(project_directory, sub_directory, order) {
   });
 }
 
-function populate_subdirs_list(project_directory) {
+function populate_dataset_subdirs_list(project_directory) {
   let title = project_directory.split('/');
   title = title[title.length - 1];
   d3.select('#project_directory_title').text('SPRING subplots of "' + title + '"');
@@ -190,9 +192,4 @@ function populate_subdirs_list(project_directory) {
     type: 'POST',
     url: 'cgi-bin/list_directories_with_filename.py',
   });
-}
-
-function openInNewTab(url) {
-  let win = window.open(url, '_blank');
-  win.focus();
 }

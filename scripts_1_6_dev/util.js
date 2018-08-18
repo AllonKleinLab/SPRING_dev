@@ -1,10 +1,10 @@
 export const read_csv = text => {
-  dict = {};
+  const dict = {};
   text.split('\n').forEach((entry, index, array) => {
     if (entry.length > 0) {
-      items = entry.split(',');
-      gene = items[0];
-      exp_array = [];
+      let items = entry.split(',');
+      let gene = items[0];
+      const exp_array = [];
       items.forEach((e, i, a) => {
         if (i > 0) {
           exp_array.push(parseFloat(e));
@@ -15,3 +15,9 @@ export const read_csv = text => {
   });
   return dict;
 };
+
+
+export const openInNewTab = (url) => {
+  let win = window.open(url, '_blank');
+  win.focus();
+}
