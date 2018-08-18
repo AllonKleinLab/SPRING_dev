@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function LineSprite(thickness, color, x1, y1, x2, y2) {
   PIXI.Sprite.call(this, this.getTexture(thickness, color));
   this._thickness = thickness;

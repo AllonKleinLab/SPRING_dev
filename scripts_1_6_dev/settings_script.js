@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function settings_setup() {
   let dropdown = d3
     .select('#button_panel')

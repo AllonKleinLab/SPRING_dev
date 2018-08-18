@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function stickyNote_setup() {
   let popup = d3
     .select('#force_layout')

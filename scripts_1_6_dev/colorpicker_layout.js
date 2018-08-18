@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 tmp_cat_coloring = null;
 
 (function($) {

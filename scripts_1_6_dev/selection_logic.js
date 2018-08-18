@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function selection_logic_setup() {
   let selection_data = {};
 

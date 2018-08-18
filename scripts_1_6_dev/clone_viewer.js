@@ -1,4 +1,3 @@
-// tslint:disable:forin variable-name
 clone_nodes = {};
 clone_edges = {};
 node_status = {};

@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 export const coexpression_setup = project_directory => {
   let scatter_jitter = 5;
   let scatter_zoom = 1;

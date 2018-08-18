@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function cluster_setup() {
   let cluster_popup = d3
     .select('#force_layout')

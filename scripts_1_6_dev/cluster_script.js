@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 export const cluster_setup = project_directory => {
   spectrum_dropdown = false;
   explain_dropdown = false;

@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 'use strict';
 function diffex_setup(project_directory) {
   let scatter_zoom = 0.2;

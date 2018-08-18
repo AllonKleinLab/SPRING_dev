@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 export const read_csv = text => {
   dict = {};
   text.split('\n').forEach((entry, index, array) => {

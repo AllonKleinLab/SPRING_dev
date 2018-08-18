@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function newSpringPlot(callback) {
   console.log('boop');
 

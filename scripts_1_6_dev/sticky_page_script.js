@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function add_sticky_subdir(project_directory, sub_directory, order) {
   d3.json(project_directory + '/' + sub_directory + '/sticky_notes_data.json', function(data) {
     let list_item = d3

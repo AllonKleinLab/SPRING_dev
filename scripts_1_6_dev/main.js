@@ -1,4 +1,3 @@
-// tslint:disable:forin variable-name no-console
 import { forceLayout, setup_tools_dropdown, setup_download_dropdown } from './forceLayout_script.js';
 
 let rotator_radius = null;

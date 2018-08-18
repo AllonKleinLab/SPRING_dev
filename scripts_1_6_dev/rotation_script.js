@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function rotation_update() {
   let selected = [];
   let stash_i = stashed_coordinates.length;

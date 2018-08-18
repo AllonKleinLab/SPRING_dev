@@ -1,4 +1,3 @@
-// tslint:disable:forin variable-name no-console
 function selection_setup() {
   selection_mode = 'drag_pan_zoom';
   let svg_width = parseInt(d3.select('svg').attr('width'), 10);

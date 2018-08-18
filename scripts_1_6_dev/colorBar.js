@@ -1,5 +1,3 @@
-// tslint:disable:variable-name no-console forin
-
 function colorBar(project_directory, color_menu_genes) {
   /* -----------------------------------------------------------------------------------
 										   Top menu bar

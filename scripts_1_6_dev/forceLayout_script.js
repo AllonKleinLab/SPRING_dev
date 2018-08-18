@@ -1,4 +1,3 @@
-// tslint:disable:forin variable-name no-console
 export const forceLayout = (project_directory, graph_directory, sub_directory, callback) => {
   d3.select('#toggleforce')
     .select('button')

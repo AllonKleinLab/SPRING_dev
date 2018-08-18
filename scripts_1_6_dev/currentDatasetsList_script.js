@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function add_list_item(project_directory, sub_directory, order) {
   d3.json(project_directory + '/' + sub_directory + '/run_info.json', function(data) {
     data.Date = data.Date.split(' ')[0];

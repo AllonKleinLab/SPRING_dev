@@ -1,5 +1,3 @@
-// tslint:disable:forin variable-name no-console
-
 function make_new_SPRINGplot_setup() {
   MAXHEIGHT = 660;
   STARTHEIGHT = 610;
