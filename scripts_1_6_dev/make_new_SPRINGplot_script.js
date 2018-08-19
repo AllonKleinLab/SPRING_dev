@@ -1,8 +1,12 @@
-function make_new_SPRINGplot_setup() {
-  MAXHEIGHT = 660;
-  STARTHEIGHT = 610;
-  custom_genes = '';
-  include_exclude = 'exclude';
+import * as d3 from 'd3';
+import { graph_directory } from './main';
+
+const MAXHEIGHT = 660;
+const STARTHEIGHT = 610;
+
+export const make_new_SPRINGplot_setup = ()=> {
+  let custom_genes = '';
+  const include_exclude = 'exclude';
   let popup = d3
     .select('#force_layout')
     .append('div')
@@ -209,7 +213,7 @@ function make_new_SPRINGplot_setup() {
     .attr('id', 'gene_list_upload_input')
     .on('change', function() {
       if (d3.select('#gene_list_upload_input')[0][0].files.length > 0) {
-        reader = new FileReader();
+        let reader = new FileReader();
         let file = d3.select('#gene_list_upload_input')[0][0].files[0];
         reader.readAsText(file, 'UTF-8');
         reader.onload = function(evt) {
@@ -266,15 +270,14 @@ function make_new_SPRINGplot_setup() {
   }
 
   d3.select('#make_new_SPRINGplot_popup').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', make_new_SPRINGplot_popup_dragstarted)
+    d3.drag()
+      .on('start', make_new_SPRINGplot_popup_dragstarted)
       .on('drag', make_new_SPRINGplot_popup_dragged)
-      .on('dragend', make_new_SPRINGplot_popup_dragended),
+      .on('end', make_new_SPRINGplot_popup_dragended),
   );
 }
 
-function hide_make_new_SPRINGplot_popup() {
+export const hide_make_new_SPRINGplot_popup = () => {
   d3.select('#make_new_SPRINGplot_popup').style('visibility', 'hidden');
   d3.select('#gene_list_upload_wrapper').style('padding', '4px 8px 4px 8px');
   d3.select('#gene_list_upload_wrapper').style('background-color', 'rgba(0,0,0,.7)');
@@ -340,6 +343,9 @@ function submit_new_SPRINGplot() {
   let nIter = $('#input_nIter').val();
   let animate = d3.select('#input_animation').text();
   let this_url = window.location.href;
+
+  let output_message = '';
+  let subplot_script = '';
 
   if (running_online) {
     output_message = 'Checking input...';

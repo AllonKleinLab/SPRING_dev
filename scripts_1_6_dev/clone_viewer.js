@@ -1,9 +1,14 @@
+import * as d3 from 'd3';
+import { sprites, all_nodes, app, all_outlines, svg_graph } from './forceLayout_script';
+
 export const clone_nodes = {};
 export const clone_edges = {};
 export const node_status = {};
 
+export let clone_sprites = new PIXI.particles.ParticleContainer();
+
 export const clone_viewer_setup = () => {
-  let clone_edge_container = new PIXI.Container();
+  let clone_edge_container = new PIXI.particles.ParticleContainer();
   clone_edge_container.position = sprites.position;
   clone_edge_container.scale = sprites.scale;
 
@@ -14,6 +19,7 @@ export const clone_viewer_setup = () => {
     scale: true,
     uvs: true,
   });
+  
   clone_sprites.position = sprites.position;
   clone_sprites.scale = sprites.scale;
 
@@ -40,6 +46,8 @@ export const clone_viewer_setup = () => {
     .text('Linkage browser')
     .attr('id', 'clone_title');
 
+  let clone_key = '';
+
   let cloneKeyMenu = popup
     .append('div')
     .append('select')
@@ -59,19 +67,20 @@ export const clone_viewer_setup = () => {
       .data(Object.keys(data))
       .enter()
       .append('option')
-      .attr('value', function(d) {
+      .attr('value', (d) => {
         return d;
       })
-      .text(function(d) {
+      .text((d) => {
         return d;
       });
-    cloneDispatch.on('statechange', function(state) {
+    cloneDispatch.on('statechange', (state) => {
       select.property('value', state.id);
     });
   });
 
   const clone_map = {};
   let noCache = new Date().getTime();
+  let name = window.location.search.split('/')[2];
   d3.json(window.location.search.slice(1, name.length) + '/clone_map.json' + '?_=' + noCache).then(data => {
     //console.log(error);
     for (let k in data) {
@@ -283,11 +292,10 @@ export const clone_viewer_setup = () => {
   }
 
   d3.select('#clone_viewer_popup').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', clone_viewer_popup_dragstarted)
+    d3.drag()
+      .on('start', clone_viewer_popup_dragstarted)
       .on('drag', clone_viewer_popup_dragged)
-      .on('dragend', clone_viewer_popup_dragended),
+      .on('end', clone_viewer_popup_dragended),
   );
 
   function reset_all_nodes() {
@@ -449,7 +457,7 @@ function clone_click() {
 	*/
 }
 
-function activate_node(i, stable) {
+export const activate_node = (i, stable) => {
   if (!(i in clone_nodes)) {
     let circ = PIXI.Sprite.fromImage('stuff/disc.png');
     circ.anchor.set(0.5);

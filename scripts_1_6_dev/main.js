@@ -1,8 +1,14 @@
-import { forceLayout, setup_tools_dropdown, setup_download_dropdown, center_view, animation, setup_layout_dropdown, initiateButtons, closeDropdown } from './forceLayout_script.js';
+import * as d3 from 'd3';
+
+import { forceLayout, setup_tools_dropdown, setup_download_dropdown, center_view, animation, setup_layout_dropdown, initiateButtons, closeDropdown, edge_container } from './forceLayout_script.js';
 import { doublet_setup } from './doublet_detector.js';
 import { selection_setup } from './selection_script.js';
-import { clone_viewer_setup } from './clone_viewer.js';
+import { clone_viewer_setup, clone_sprites } from './clone_viewer.js';
 import { cluster_setup } from './cluster_script.js';
+import { settings_setup, collapse_settings } from './settings_script.js';
+import { make_new_SPRINGplot_setup } from './make_new_SPRINGplot_script.js';
+import { downloadSelectedExpr_setup } from './downloadSelectedExpr_script.js';
+import { stickyNote_setup } from './stickyNote.js';
 
 let rotator_radius = null;
 
@@ -31,7 +37,8 @@ d3.select('#sound_toggle')
 
 const callback = () => {
   center_view(false);
-  sprites.visible = false;
+
+  clone_sprites.visible = false;
   edge_container.visible = false;
   animation();
 
@@ -84,19 +91,14 @@ let base_dirs = name.slice(1, name.length).split('/');
 let base_dir_name = base_dirs.slice(0, base_dirs.length - 1).join('/');
 d3.select('#all_SPRINGplots_menu').attr('href', my_origin + path_start + '/currentDatasetsList.html?' + base_dir_name);
 
-let force_on = 1;
 let n_nodes = 0;
 let colors_loaded = 0;
-let graph_directory = name.slice(1, name.length);
+export let graph_directory = name.slice(1, name.length);
 let tmp = graph_directory.split('/');
 graph_directory = tmp.slice(0, tmp.length - 1).join('/');
-let sub_directory = tmp[tmp.length - 1];
+export let sub_directory = tmp[tmp.length - 1];
 
 document.title = tmp[tmp.length - 1];
-
-let clone_sprites = {};
-let clone_edge_container = {};
-let edge_container = [];
 
 d3.select('#force_layout')
   .select('svg')
@@ -111,4 +113,4 @@ d3.select('#color_chooser')
   .selectAll('select')
   .remove();
 
-forceLayout(graph_directory, graph_directory, sub_directory, callback);
+forceLayout(graph_directory, callback);

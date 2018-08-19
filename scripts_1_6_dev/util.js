@@ -1,3 +1,5 @@
+export const  SPRITE_IMG_WIDTH = 32;
+
 export const read_csv = text => {
   const dict = {};
   text.split('\n').forEach((entry, index, array) => {

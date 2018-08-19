@@ -1,3 +1,11 @@
+import * as d3 from 'd3';
+import { all_outlines, zoomer, all_nodes, xScale, yScale, sprites } from './forceLayout_script';
+import { count_clusters } from './colorBar';
+
+let selection_mode = '';
+let brush = {};
+let brusher = () => {}
+
 export const selection_setup = () => {
   selection_mode = 'drag_pan_zoom';
   let svg_width = parseInt(d3.select('svg').attr('width'), 10);
@@ -209,9 +217,9 @@ export const selection_setup = () => {
   }
 
   function keydown() {
-    shiftKey = d3.event.shiftKey;
-    metaKey = d3.event.metaKey; // command key on a mac
-    keyCode = d3.event.keyCode;
+    let shiftKey = d3.event.shiftKey;
+    let metaKey = d3.event.metaKey; // command key on a mac
+    let keyCode = d3.event.keyCode;
 
     if (shiftKey && keyCode !== 27) {
       selection_mode = 'positive_select';
@@ -226,9 +234,9 @@ export const selection_setup = () => {
   }
 
   function keyup() {
-    shiftKey = d3.event.shiftKey || d3.event.metaKey;
-    ctrlKey = d3.event.ctrlKey;
-    keyCode = 0;
+    let shiftKey = d3.event.shiftKey || d3.event.metaKey;
+    let ctrlKey = d3.event.ctrlKey;
+    let keyCode = 0;
     selection_mode = 'drag_pan_zoom';
     switch_mode();
   }
@@ -240,9 +248,12 @@ export const selection_setup = () => {
   let base_radius = parseInt(d3.select('#settings_range_node_size').attr('value'), 10) / 100;
   let large_radius = base_radius * 3;
 
-  brusher = d3
+  // const xBrushExtent = d3.brushX().extent(xScale)
+  // const yBrushExtent = d3.brushY().extent(yScale);
+
+  let brusher = d3
     .brush()
-    .extent(d3.brushX().extent(xScale), d3.brushY().extent(yScale))
+    // .extent([xBrushExtent, yBrushExtent])
     .on('brush', function() {
       let extent = d3.selectAll('.brush .extent')[0][0].getBoundingClientRect();
       for (let i = 0; i < all_nodes.length; i++) {
@@ -253,7 +264,7 @@ export const selection_setup = () => {
         x = x + sprites.position.x;
         y = y + sprites.position.y;
 
-        inrect = extent.left <= x && x < extent.right && extent.top <= y && y < extent.bottom;
+        let inrect = extent.left <= x && x < extent.right && extent.top <= y && y < extent.bottom;
         let o = all_outlines[i];
         if (selection_mode === 'positive_select' || selection_mode === 'negative_select') {
           o.selected = (o.selected && !o.compared) || (selection_mode === 'positive_select' && inrect);
@@ -286,7 +297,7 @@ export const selection_setup = () => {
     .on('end', function() {
       d3.event.target.clear();
       d3.select(this).call(d3.event.target);
-      selected = [];
+      let selected = [];
       for (let i in all_outlines) {
         if (all_outlines.selected) {
           selected.push(i);

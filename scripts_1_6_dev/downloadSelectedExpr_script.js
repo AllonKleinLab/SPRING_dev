@@ -1,4 +1,6 @@
-function downloadSelectedExpr_setup() {
+import * as d3 from 'd3';
+
+export const downloadSelectedExpr_setup = () => {
   let popup = d3
     .select('#force_layout')
     .append('div')
@@ -91,11 +93,10 @@ function downloadSelectedExpr_setup() {
   }
 
   d3.select('#downloadSelectedExpr_popup').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', downloadSelectedExpr_popup_dragstarted)
+    d3.drag()
+      .on('start', downloadSelectedExpr_popup_dragstarted)
       .on('drag', downloadSelectedExpr_popup_dragged)
-      .on('dragend', downloadSelectedExpr_popup_dragended),
+      .on('end', downloadSelectedExpr_popup_dragended),
   );
 }
 

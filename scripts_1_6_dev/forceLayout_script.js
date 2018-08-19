@@ -1,7 +1,37 @@
-import colorBar from "./colorBar";
-import { LineSprite } from "./LineSprite";
+import * as d3 from 'd3';
 
-export const forceLayout = (project_directory, graph_directory, sub_directory, callback) => {
+import { colorBar } from "./colorBar";
+import { LineSprite } from "./LineSprite";
+import { graph_directory, sub_directory } from './main';
+import { SPRITE_IMG_WIDTH } from './util';
+import { clone_sprites } from './clone_viewer';
+
+export let all_nodes = [];
+export let all_outlines = [];
+export let being_dragged = false;
+
+export let width = window.innerWidth - 15;
+export let height = window.innerHeight - 70;
+
+export let app = {};
+export let sprites = new PIXI.particles.ParticleContainer();
+export let edge_container = new PIXI.particles.ParticleContainer();
+export let clone_edge_container = new PIXI.particles.ParticleContainer();
+
+export let coordinates = new Array();
+export let stashed_coordinates = new Array();
+
+export let force_on = 1;
+export let all_edges = new Array();
+export let all_edge_ends = new Array();
+
+export let xScale = d3.scaleLinear();
+export let yScale = d3.scaleLinear();
+export let zoomer = () => {};
+
+export let svg_graph = {};
+
+export const forceLayout = (project_directory, callback) => {
   d3.select('#toggleforce')
     .select('button')
     .on('click', toggleForce);
@@ -28,17 +58,15 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
     }
   });
 
-  let width = window.innerWidth - 15;
-  let height = window.innerHeight - 70;
   let keyCode = 0;
-  let being_dragged = false;
+  
 
   let nodeGraph = null;
-  let xScale = d3
+  xScale = d3
     .scaleLinear()
     .domain([0, width])
     .range([0, width]);
-  let yScale = d3
+  yScale = d3
     .scaleLinear()
     .domain([0, height])
     .range([0, height]);
@@ -57,7 +85,7 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
     .style('position', 'absolute')
     .style('top', '0px');
 
-  let zoomer = d3
+  zoomer = d3
     .zoom()
     .scaleExtent([0.02, 10])
     .on('zoom', () => {
@@ -67,7 +95,7 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
     });
   /////////////////////////////////////////////////////////////////////
 
-  let svg_graph = svg
+  svg_graph = svg
     .append('svg:g')
     .call(zoomer)
     .attr('id', 'svg_graph');
@@ -141,7 +169,6 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
   d3.select('#toggle_edges_layout').on('click', toggle_edges);
 
   // Read coordinates file if it exists
-  let coordinates = [];
   d3.text(coordinates_filename).then(text => {
     text.split('\n').forEach(function(entry, index, array) {
       let items = entry.split(',');
@@ -153,11 +180,11 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
       }
     });
 
-    let app = new PIXI.Application(width, height, { backgroundColor: '0xdcdcdc' });
+    app = new PIXI.Application(width, height, { backgroundColor: 0xdcdcdc });
     //app = new PIXI.Application(width,height, {backgroundColor: '0xb0b0b0'});
     document.getElementById('pixi_canvas_holder').appendChild(app.view);
 
-    let sprites = new PIXI.Container(coordinates.length, {
+    sprites = new PIXI.particles.ParticleContainer(coordinates.length, {
       alpha: true,
       position: true,
       rotation: true,
@@ -165,15 +192,15 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
       uvs: true,
     });
 
+    sprites.interactive = true;
+    sprites.interactiveChildren = true;
+
     // create an array to store all the sprites
-    let all_nodes = [];
-    let all_outlines = [];
     let totalSprites = app.renderer instanceof PIXI.WebGLRenderer ? coordinates.length : 100;
     let base_colors = [];
     let sprite_chooser = Math.random();
     for (let i = 0; i < totalSprites; i++) {
       let dude = PIXI.Sprite.fromImage('stuff/disc.png');
-      let SPRITE_IMG_WIDTH = 32;
       /*
 			if (sprite_chooser < 1/10) {
 				let dude = PIXI.Sprite.fromImage('stuff/mark.png')
@@ -237,18 +264,20 @@ export const forceLayout = (project_directory, graph_directory, sub_directory, c
   });
 
   function load_edges(all_nodes, sprites, app) {
-    let edge_container = new PIXI.ParticleContainer(all_nodes.length * 20, {
+    edge_container = new PIXI.particles.ParticleContainer(all_nodes.length * 20, {
       alpha: true,
       position: true,
       rotation: true,
       scale: true,
       uvs: true,
     });
+    edge_container.interactive = true;
+    edge_container.interactiveChildren = true;
+    console.log(edge_container);
     edge_container.position = sprites.position;
     edge_container.scale = sprites.scale;
     edge_container.alpha = 0.5;
-    let all_edges = [];
-    let all_edge_ends = [];
+    console.log(edge_container);
     let neighbors = {};
     for (let i = 0; i < all_nodes.length; i++) {
       neighbors[i] = [];
@@ -892,6 +921,8 @@ export const redraw = () => {
 
     //text_container.position = sprites.position;
     //text_container.scale = sprites.scale;
+
+    console.log(sprites);
 
     d3.select('#vis').attr(
       'transform',

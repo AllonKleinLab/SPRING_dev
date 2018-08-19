@@ -1,4 +1,8 @@
-function settings_setup() {
+import * as d3 from 'd3';
+import { closeDropdown, edge_container, app, rgbToHex, all_nodes, all_outlines } from './forceLayout_script';
+import { SPRITE_IMG_WIDTH } from './util';
+
+export const settings_setup = () => {
   let dropdown = d3
     .select('#button_panel')
     .append('div')
@@ -177,8 +181,8 @@ function settings_setup() {
   }
 
   function background_color_change(val) {
-    let val = parseInt(val, 10);
-    app.renderer.backgroundColor = rgbToHex(val, val, val);
+    const parsedVal = parseInt(val, 10);
+    app.renderer.backgroundColor = rgbToHex(parsedVal, parsedVal, parsedVal);
     /*
 		if (val < 125) {
 			text_anos.ba.style.fill = '#B8B8B8';
@@ -247,14 +251,14 @@ function settings_setup() {
   }
 }
 
-function toggle_settings() {
+export const toggle_settings = () => {
   if (d3.select('#settings_dropdown').style('visibility') === 'hidden') {
     expand_settings();
   } else {
     collapse_settings();
   }
 }
-function expand_settings() {
+export const expand_settings = () => {
   closeDropdown();
   if (d3.select('#settings_dropdown').style('visibility') === 'hidden') {
     setTimeout(function() {
@@ -265,7 +269,7 @@ function expand_settings() {
   }
 }
 
-function collapse_settings() {
+export const collapse_settings = () => {
   if (
     parseInt(
       d3

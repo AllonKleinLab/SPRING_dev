@@ -1,3 +1,11 @@
+import * as d3 from 'd3';
+import { rgbToHex, all_nodes, all_outlines } from './forceLayout_script';
+import { graph_directory, sub_directory } from './main';
+
+export let gene_set_color_array = new Array();
+export let categorical_coloring_data = {};
+export let drag_mode = '';
+
 export const colorBar = (project_directory, color_menu_genes) => {
   /* -----------------------------------------------------------------------------------
 										   Top menu bar
@@ -143,8 +151,8 @@ export const colorBar = (project_directory, color_menu_genes) => {
     // @ts-ignore
     .range(['black', 'red', 'yellow']);
 
-  const green_array = null;
-  const green_array_raw = null;
+  let green_array = new Array();
+  let green_array_raw = new Array();
 
   function normalize(x) {
     const min = 0;
@@ -324,11 +332,11 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .attr('id', 'track')
     .attr('x1', slider_scale.range()[0])
     .attr('x2', slider_scale.range()[1])
-    .select(function() {
+    .select(() => {
       return this.parentNode.appendChild(this.cloneNode(true));
     })
     .attr('id', 'track-inset')
-    .select(function() {
+    .select(() => {
       return this.parentNode.appendChild(this.cloneNode(true));
     })
     .attr('id', 'track-overlay');
@@ -351,7 +359,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .attr('r', 8);
 
   const left_bracket = slider
-    .append('rect', '#track-overlay')
+    .insert('rect', '#track-overlay')
     .attr('class', 'colorbar_item')
     .attr('id', 'left_bracket')
     .style('fill', 'yellow')
@@ -362,7 +370,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .style('visibility', 'hidden');
 
   const right_bracket = slider
-    .append('rect', '#track-overlay')
+    .insert('rect', '#track-overlay')
     .attr('class', 'colorbar_item')
     .attr('id', 'right_bracket')
     .style('fill', 'yellow')
@@ -373,7 +381,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .style('visibility', 'hidden');
 
   const left_bracket_label = slider
-    .append('text', '#track-overlay')
+    .insert('text', '#track-overlay')
     .attr('class', 'bracket_label')
     .attr('id', 'left_bracket_label')
     .attr('x', 110)
@@ -383,7 +391,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .text('');
 
   const right_bracket_label = slider
-    .append('text', '#track-overlay')
+    .insert('text', '#track-overlay')
     .attr('class', 'bracket_label')
     .attr('id', 'right_bracket_label')
     .attr('x', 240)
@@ -392,7 +400,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .text('');
 
   const ceiling_bracket = slider
-    .append('rect', '#track-overlay')
+    .insert('rect', '#track-overlay')
     .attr('class', 'colorbar_item')
     .attr('id', 'ceiling_bracket')
     .style('fill', 'yellow')
@@ -403,7 +411,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .style('visibility', 'hidden');
 
   const floor_bracket = slider
-    .append('rect', '#track-overlay')
+    .insert('rect', '#track-overlay')
     .attr('class', 'colorbar_item')
     .attr('id', 'floor_bracket')
     .style('fill', 'yellow')
@@ -447,7 +455,6 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .select('button')
     .on('click', toggle_slider_select);
 
-  const drag_mode = null;
   slider.call(
     d3
       .drag()
@@ -577,7 +584,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     left_bracket_label.text(lower_bound.toFixed(2));
     right_bracket_label.text(upper_bound.toFixed(2));
 
-    const color_array = null;
+    let color_array = null;
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
       color_array = gene_set_color_array[current_selection];
@@ -621,7 +628,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
       d3.select('#legend_mask')
         .transition()
         .attr('x', svg_width - 177)
-        .each('end', function() {
+        .on('end', () => {
           make_legend(cat_color_map, cat_label_list);
         });
       const max = d3.max(base_colors.map(max_color));
@@ -656,6 +663,8 @@ export const colorBar = (project_directory, color_menu_genes) => {
 
     slider_ticks.remove();
     d3.select('.ticks').remove();
+
+    let ticknum = 0;
 
     if (max < 1) {
       ticknum = max * 10;
@@ -720,7 +729,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     updateColorMax();
   }
 
-  set_slider_position_only = function set_slider_position_only(h) {
+  function set_slider_position_only(h) {
     handle.attr('cx', slider_scale(slider_scale.invert(h)));
     slider_gradient.attr('width', Math.max(slider_scale(slider_scale.invert(h)) - 6, 0));
     color_max = slider_scale.invert(h);
@@ -731,12 +740,12 @@ export const colorBar = (project_directory, color_menu_genes) => {
 	*/
 
   function read_csv(text) {
-    dict = {};
+    let dict = {};
     text.split('\n').forEach((entry, index, array) => {
       if (entry.length > 0) {
-        items = entry.split(',');
-        gene = items[0];
-        exp_array = [];
+        let items = entry.split(',');
+        let gene = items[0];
+        let exp_array = [];
         items.forEach((e, i, a) => {
           if (i > 0) {
             exp_array.push(parseFloat(e));
@@ -748,8 +757,8 @@ export const colorBar = (project_directory, color_menu_genes) => {
     return dict;
   }
 
-  all_gene_color_array = {};
-  all_gene_cellix_array = {};
+  let all_gene_color_array = {};
+  let all_gene_cellix_array = {};
 
   // open json file containing gene sets and populate drop down menu
   d3.text(project_directory + '/color_data_gene_sets.csv' + '?_=' + noCache).then(text => {
@@ -890,7 +899,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .attr('width', 200)
     .attr('height', d3.select('svg').attr('height'));
 
-  exoutGenesButtonLabel = d3
+  let exoutGenesButtonLabel = d3
     .select('svg')
     .append('text')
     .attr('class', 'colorbar_item')
@@ -1318,7 +1327,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     hiddenElement.click();
   }
 
-  downloadRankedTerms = function downloadRankedTerms() {
+  function downloadRankedTerms() {
     const num_selected = 0;
     for (let i = 0; i < all_nodes.length; i++) {
       if (all_outlines[i].selected) {
@@ -1517,7 +1526,7 @@ function shrinkNodes(scale, numsteps, my_nodes) {
   }, 5);
 }
 
-function count_clusters() {
+export const count_clusters = () => {
   const name = document.getElementById('labels_menu').value;
   if (name.length > 0) {
     const cat_color_map = categorical_coloring_data[name].label_colors;

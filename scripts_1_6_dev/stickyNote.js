@@ -1,4 +1,6 @@
-function stickyNote_setup() {
+import * as d3 from 'd3';
+
+export const stickyNote_setup = () => {
   let popup = d3
     .select('#force_layout')
     .append('div')
