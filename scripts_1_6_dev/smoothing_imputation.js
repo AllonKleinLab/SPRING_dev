@@ -1,7 +1,8 @@
 import * as d3 from 'd3';
-import { all_outlines, all_nodes, base_colors } from './forceLayout_script';
+import { all_outlines, all_nodes, base_colors, app } from './forceLayout_script';
 import { clone_nodes } from './clone_viewer';
 import { graph_directory, sub_directory } from './main';
+import { average_color } from './colorBar';
 
 export const imputation_setup =  () => {
   let popup = d3

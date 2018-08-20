@@ -73,9 +73,10 @@ export const clone_viewer_setup = () => {
   });
 
   const clone_map = {};
-  let noCache = new Date().getTime();
-  let name = window.location.search.split('/')[2];
-  d3.json(window.location.search.slice(1, name.length) + '/clone_map.json' + '?_=' + noCache).then(data => {
+  const noCache = new Date().getTime();
+  const name = window.location.search.split('/')[2];
+  const filePath = window.location.search.slice(1, name.length) + '/clone_map.json';
+  d3.json(filePath + '?_=' + noCache).then(data => {
     //console.log(error);
     for (let k in data) {
       clone_map[k] = {};
@@ -89,7 +90,7 @@ export const clone_viewer_setup = () => {
     d3.select('#clone_loading_screen').style('visibility', 'hidden');
     cloneDispatch.load(clone_map);
     clone_key = document.getElementById('clone_key_menu').value;
-  });
+  }).catch(err => err);
 
   popup
     .append('div')

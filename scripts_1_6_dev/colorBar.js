@@ -1,7 +1,8 @@
 import * as d3 from 'd3';
-import { rgbToHex, all_nodes, all_outlines, app, base_colors, sprites } from './forceLayout_script';
+import { rgbToHex, all_outlines, app, sprites } from './forceLayout_script';
 import { graph_directory, sub_directory } from './main';
 import { update_selected_count } from './selection_script';
+import { show_colorpicker_popup } from './colorpicker_layout';
 
 export let gene_set_color_array = new Array();
 export let categorical_coloring_data = {};
@@ -9,8 +10,9 @@ export let drag_mode = '';
 export let all_selected = false;
 
 let rankedMask = null;
+let slider_ticks = null;
 
-export const colorBar = (project_directory, color_menu_genes) => {
+export const colorBar = (project_directory, color_menu_genes, all_nodes, base_colors) => {
   /* -----------------------------------------------------------------------------------
 										   Top menu bar
 	*/
@@ -623,8 +625,6 @@ export const colorBar = (project_directory, color_menu_genes) => {
   }
 
   const update_slider = () => {
-    console.log('update slider called');
-
     d3.select('#label_column')
       .selectAll('div')
       .remove();
@@ -644,8 +644,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
           make_legend(cat_color_map, cat_label_list);
         });
 
-    console.log(base_colors);
-      let max = d3.max(base_colors.map(max_color));
+      let max = parseInt(d3.max(base_colors.map(max_color)), 10);
       if (max === 0) {
         max = 255;
       }
@@ -659,49 +658,53 @@ export const colorBar = (project_directory, color_menu_genes) => {
       if (color_stats == null) {
         return;
       }
+      let geneName = '';
       if (document.getElementById('gradient_button').checked) {
-        const name = document.getElementById('gradient_menu').value;
+        geneName = document.getElementById('gradient_menu').value;
         d3.selectAll('#gradient_bar').attr('fill', 'url(#yellow_gradient)');
         d3.selectAll('#handle').style('fill', '#FFFF99');
       } else {
         // const name = document.getElementById('green_menu').value;
-        const name = document.getElementById('autocomplete').value;
-        console.log('Gene = ', name);
+        geneName = document.getElementById('autocomplete').value;
         d3.selectAll('#gradient_bar').attr('fill', 'url(#green_gradient)');
         d3.selectAll('#handle').style('fill', d3.rgb(0, 255, 0).toString());
       }
-      const max = color_stats[name][3];
-      slider_scale.domain([0, max * 1.05]);
-      set_slider_position_only(slider_scale(color_stats[name][4]));
+      if (color_stats[geneName]) {
+        const max = color_stats[geneName][3];
+        slider_scale.domain([0, max * 1.05]);
+        set_slider_position_only(slider_scale(color_stats[geneName][4]));
+      }
     }
 
-    slider_ticks.remove();
-    d3.select('.ticks').remove();
+    if (slider_ticks) {
+      slider_ticks.remove();
+      d3.select('.ticks').remove();
+    }
 
     let ticknum = 0;
 
-    if (max < 1) {
-      ticknum = max * 10;
-    } else if (max < 2) {
-      ticknum = max * 5;
-    } else if (max < 10) {
-      ticknum = max;
-    } else if (max < 50) {
-      ticknum = max / 5;
-    } else if (max < 100) {
-      ticknum = max / 10;
-    } else if (max < 200) {
-      ticknum = max / 20;
-    } else if (max < 1000) {
-      ticknum = max / 100;
-    } else if (max < 20000) {
-      ticknum = max / 1000;
-    } else if (max < 200000) {
-      ticknum = max / 10000;
-    } else if (max < 2000000) {
-      ticknum = max / 100000;
-    } else if (max < 20000000) {
-      ticknum = max / 1000000;
+    if (color_max < 1) {
+      ticknum = color_max * 10;
+    } else if (color_max < 2) {
+      ticknum = color_max * 5;
+    } else if (color_max < 10) {
+      ticknum = color_max;
+    } else if (color_max < 50) {
+      ticknum = color_max / 5;
+    } else if (color_max < 100) {
+      ticknum = color_max / 10;
+    } else if (color_max < 200) {
+      ticknum = color_max / 20;
+    } else if (color_max < 1000) {
+      ticknum = color_max / 100;
+    } else if (color_max < 20000) {
+      ticknum = color_max / 1000;
+    } else if (color_max < 200000) {
+      ticknum = color_max / 10000;
+    } else if (color_max < 2000000) {
+      ticknum = color_max / 100000;
+    } else if (color_max < 20000000) {
+      ticknum = color_max / 1000000;
     }
 
     slider_ticks = slider

@@ -37,7 +37,7 @@ export let zoomer = d3.zoom();
 
 export let svg_graph = {};
 
-export const forceLayout = (project_directory, callback) => {
+export const forceLayout = (project_directory, sub_directory, callback) => {
   d3.select('#toggleforce')
     .select('button')
     .on('click', toggleForce);
@@ -52,16 +52,16 @@ export const forceLayout = (project_directory, callback) => {
     snd.play();
   }
 
-  let graphData_filename = project_directory + '/' + sub_directory + '/graph_data.json';
-  let coordinates_filename = graph_directory + '/' + sub_directory + '/coordinates.txt';
-
-  d3.text(project_directory + '/' + sub_directory + '/mutability.txt').then(text => {
+  const graphData_filename = project_directory + '/' + sub_directory + '/graph_data.json';
+  const coordinates_filename = graph_directory + '/' + sub_directory + '/coordinates.txt';
+  const filePath = project_directory + '/' + sub_directory + '/mutability.txt'
+  d3.text(filePath).then(text => {
     if (text === null) {
       mutable = true;
     } else {
       mutable = false;
     }
-  });
+  }).catch(err => console.log(`Unable to get mutability.txt at ${filePath}\n${err}`));
 
   let keyCode = 0;
   
@@ -256,9 +256,8 @@ export const forceLayout = (project_directory, callback) => {
         .on('end', dragended),
     );
 
-    loadColors(graph_directory, sub_directory);
+    loadColors(graph_directory, sub_directory, all_nodes, base_colors);
     load_edges(all_nodes, sprites, app);
-    console.log('base colors setup done?');
   });
 
   function load_edges(all_nodes, sprites, app) {
@@ -497,8 +496,8 @@ export const adjust_edges = () => {
 
 export const animation = () => {
   // check if animation exists. if so, hide sprites and load it
-  $.get(graph_directory + '/' + sub_directory + '/animation.txt')
-    .done(function(data) {
+  const filePath = graph_directory + '/' + sub_directory + '/animation.txt';
+  d3.text(filePath).then(data => {
       let animation_frames = [];
       data.split('\n').forEach(function(line) {
         if (line.length > 0) {
@@ -571,10 +570,10 @@ export const animation = () => {
 
       next_frame_anim(-1);
     })
-    .fail(function() {
+    .catch(err => {
       sprites.visible = true;
       edge_container.visible = true;
-    });
+  });
 }
 
 export const blend_edges = () => {
@@ -623,16 +622,15 @@ export const toggleForce = () => {
   }
 }
 
-export const loadColors = (graph_directory, sub_directory) => {
+export const loadColors = (graph_directory, sub_directory, all_nodes, base_colors) => {
   d3.select('#load_colors').remove();
   let base_dir = graph_directory;
   let sub_dir = graph_directory + '/' + sub_directory;
+
   $.ajax({
-    data: { base_dir: base_dir },
+    data: { base_dir: base_dir},
     success: function(python_data) {
-      //console.log(python_data);
-      //colorBar(sub_dir, python_data);
-      colorBar(sub_dir, python_data);
+      colorBar(sub_dir, python_data, all_nodes, base_colors);
     },
     type: 'POST',
     url: 'cgi-bin/load_counts.py',

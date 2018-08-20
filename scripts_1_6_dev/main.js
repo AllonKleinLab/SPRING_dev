@@ -12,8 +12,7 @@ import { stickyNote_setup } from './stickyNote.js';
 import { imputation_setup } from './smoothing_imputation.js';
 import { selection_logic_setup } from './selection_logic.js';
 import { PAGA_setup } from './PAGA_viewer.js';
-
-let rotator_radius = null;
+import { colorpicker_setup } from './colorpicker_layout.js';
 
 setup_download_dropdown();
 setup_tools_dropdown();
@@ -84,35 +83,33 @@ const callback = () => {
 let name = window.location.search;
 let my_origin = window.location.origin;
 let my_pathname = window.location.pathname;
-let path_split = my_pathname.split('/');
-let path_start = path_split.slice(0, path_split.length - 1).join('/');
-let dynamic_path = path_split.join('/');
+let path_split = my_pathname.split("/")
+let path_start = path_split.slice(0, path_split.length-1).join("/")
+path_split[path_split.length-1] = "springViewer_1_5_dev.html"
 
-d3.select('#changeViewer_link').attr('href', my_origin + dynamic_path + name);
-let base_dirs = name.slice(1, name.length).split('/');
-let base_dir_name = base_dirs.slice(0, base_dirs.length - 1).join('/');
-d3.select('#all_SPRINGplots_menu').attr('href', my_origin + path_start + '/currentDatasetsList.html?' + base_dir_name);
+let dynamic_path = path_split.join("/")
 
-let n_nodes = 0;
-let colors_loaded = 0;
-export let graph_directory = name.slice(1, name.length);
+d3.select("#changeViewer_link").attr("href", my_origin + dynamic_path + name);
+let base_dirs = name.slice(1,name.length).split('/');
+let base_dir_name = base_dirs.slice(0,base_dirs.length-1).join('/');
+
+d3.select("#all_SPRINGplots_menu").attr("href", my_origin + path_start + "/currentDatasetsList.html?"+base_dir_name);
+
+var force_on = 1;
+var n_nodes = 0;
+var colors_loaded = 0;
+
+export let graph_directory = name.slice(1,name.length);
 let tmp = graph_directory.split('/');
-graph_directory = tmp.slice(0, tmp.length - 1).join('/');
-export let sub_directory = tmp[tmp.length - 1];
+graph_directory = tmp.slice(0,tmp.length-1).join('/');
 
-document.title = tmp[tmp.length - 1];
+export let sub_directory = tmp[tmp.length-1];
 
-d3.select('#force_layout')
-  .select('svg')
-  .remove();
-d3.select('#color_chooser')
-  .selectAll('div')
-  .remove();
-d3.select('#color_chooser')
-  .selectAll('input')
-  .remove();
-d3.select('#color_chooser')
-  .selectAll('select')
-  .remove();
+document.title = tmp[tmp.length-1];
 
-forceLayout(graph_directory, callback);
+d3.select("#force_layout").select("svg").remove()
+d3.select("#color_chooser").selectAll("div").remove()
+d3.select("#color_chooser").selectAll("input").remove()
+d3.select("#color_chooser").selectAll("select").remove()
+
+forceLayout(graph_directory, sub_directory, callback);

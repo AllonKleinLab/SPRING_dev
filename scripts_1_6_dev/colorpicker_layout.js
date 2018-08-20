@@ -1,4 +1,9 @@
-tmp_cat_coloring = null;
+import * as d3 from 'd3';
+
+import { mutable } from "./forceLayout_script";
+import { categorical_coloring_data } from "./colorBar";
+
+let tmp_cat_coloring = null;
 
 (function($) {
   let initLayout = function() {
@@ -8,11 +13,11 @@ tmp_cat_coloring = null;
   EYE.register(initLayout, 'init');
 })(jQuery);
 
-function colorpicker_submit(hex) {
+export const  colorpicker_submit = (hex) => {
   console.log(hex);
 }
 
-function colorpicker_setup() {
+export const colorpicker_setup = () => {
   let popup = d3.select('#colorpicker_popup');
   popup.attr('current_color', '');
   popup.attr('current_nodes', '');
@@ -27,7 +32,7 @@ function colorpicker_setup() {
       .on('end', colorpicker_popup_dragended),
   );
 
-  button_bar = d3.select('#colorpicker_button_bar');
+  let button_bar = d3.select('#colorpicker_button_bar');
   button_bar
     .append('button')
     .text('Close')
@@ -74,7 +79,7 @@ function colorpicker_setup() {
   }
 }
 
-function restore_colorpicker() {
+export const  restore_colorpicker = () => {
   setNodeColors();
   let current_label = d3.select('#colorpicker_popup').attr('current_label');
   if (current_label !== '') {
@@ -93,7 +98,7 @@ function restore_colorpicker() {
   }
 }
 
-function show_colorpicker_popup(label) {
+export const  show_colorpicker_popup = (label) => {
   if (mutable) {
     let current_track = document.getElementById('labels_menu').value;
     let current_color = categorical_coloring_data[current_track].label_colors[label].replace('#', '0x');
@@ -132,7 +137,7 @@ function show_colorpicker_popup(label) {
   }
 }
 
-function close_colorpicker_popup() {
+export const  close_colorpicker_popup = () => {
   d3.select('#colorpicker_popup').style('visibility', 'hidden');
   d3.select('#colorpicker_popup').attr('current_nodes', '');
   d3.select('#colorpicker_popup').attr('current_label', '');
@@ -141,7 +146,7 @@ function close_colorpicker_popup() {
   tmp_cat_coloring = null;
 }
 
-function colorpicker_update() {
+export const  colorpicker_update = () => {
   let rgb = d3.select('.colorpicker_new_color').style('background-color');
   rgb = rgb
     .replace('rgb(', '')
@@ -174,7 +179,7 @@ function colorpicker_update() {
   }
 }
 
-function save_colorpicker_colors() {
+export const save_colorpicker_colors = () => {
   let current_track = document.getElementById('labels_menu').value;
   if (current_track === d3.select('#colorpicker_popup').attr('current_track')) {
     if (tmp_cat_coloring != null) {

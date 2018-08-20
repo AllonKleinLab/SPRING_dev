@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import { all_nodes, all_outlines, stashed_coordinates, sprites } from "./forceLayout_script";
+import { all_nodes, all_outlines, stashed_coordinates, sprites, adjust_edges, move_node } from "./forceLayout_script";
 import { deselect_all } from './selection_script';
 
 export const rotation_update = () => {
@@ -42,7 +42,7 @@ export const rotation_update = () => {
   for (let i = 0; i < all_xs.length; i++) {
     dels.push(Math.sqrt(Math.pow(all_xs[i] - cx, 2) + Math.pow(all_ys[i] - cy, 2)));
   }
-  rotator_radius = d3.median(dels) * 1.5;
+  let rotator_radius = d3.median(dels) * 1.5;
   d3.select('#rotation_pivot')
     .attr('r', d3.min([13 / zoomer.scale(), (rotator_radius + 30) / 3]))
     .style('stroke-width', d3.min([3 / zoomer.scale(), 10]))
@@ -167,13 +167,13 @@ export const rotation_update = () => {
   }
 }
 
-function rotation_show() {
+export const rotation_show = () => {
   d3.select('#rotation_outer_circ').style('visibility', 'visible');
   d3.select('#rotation_inner_circ').style('visibility', 'visible');
   d3.select('#rotation_pivot').style('visibility', 'visible');
 }
 
-function rotation_hide() {
+export const rotation_hide = () => {
   d3.select('#rotation_outer_circ').style('visibility', 'hidden');
   d3.select('#rotation_inner_circ').style('visibility', 'hidden');
   d3.select('#rotation_pivot').style('visibility', 'hidden');
