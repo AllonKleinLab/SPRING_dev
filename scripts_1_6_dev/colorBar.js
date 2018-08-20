@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
-import { rgbToHex, all_outlines, app, sprites } from './forceLayout_script';
+import { rgbToHex, all_outlines, app, sprites, all_nodes } from './forceLayout_script';
 import { graph_directory, sub_directory } from './main';
-import { update_selected_count } from './selection_script';
+import { update_selected_count, selection_mode } from './selection_script';
 import { show_colorpicker_popup } from './colorpicker_layout';
 
 export let gene_set_color_array = new Array();
@@ -433,7 +433,7 @@ export const colorBar = (project_directory, color_menu_genes, all_nodes, base_co
     .attr('y', 6)
     .style('visibility', 'hidden');
 
-  const slider_ticks = slider
+  let slider_ticks = slider
     .insert('g', '#track-overlay')
     .attr('class', 'colorbar_item')
     .attr('id', 'ticks')
@@ -966,7 +966,7 @@ export const colorBar = (project_directory, color_menu_genes, all_nodes, base_co
       rankedMask
         .transition()
         .attr('x', 0)
-        .each('end', () => {
+        .each(() => {
           renderRankedText(all_gene_color_array, 1);
         });
       rankedGenesButtonRect.transition().attr('x', 0);
@@ -1080,7 +1080,7 @@ export const colorBar = (project_directory, color_menu_genes, all_nodes, base_co
       rankedMask
         .transition()
         .attr('x', 0)
-        .each('end', () => {
+        .each(() => {
           renderRankedText(gene_set_color_array, 0);
         });
       rankedGenesButtonRect.transition().attr('x', 0);
@@ -1116,7 +1116,7 @@ export const colorBar = (project_directory, color_menu_genes, all_nodes, base_co
   }
 
   function renderRankedText(tracks, version) {
-    any_selected = false;
+    let any_selected = false;
     for (let i = 0; i < all_outlines.length; i++) {
       if (all_outlines[i].selected || all_outlines[i].compared) {
         any_selected = true;
@@ -1406,7 +1406,7 @@ function make_legend(cat_color_map, cat_label_list) {
 
   d3.select('#count_column')
     .on('mouseenter', () => {
-      d3.selectAll('.text_count_div').each(function() {
+      d3.selectAll('.text_count_div').each(() => {
         const pct = d3
           .select(this)
           .select('p')
@@ -1414,7 +1414,7 @@ function make_legend(cat_color_map, cat_label_list) {
       });
     })
     .on('mouseleave', () => {
-      d3.selectAll('.text_count_div').each(function() {
+      d3.selectAll('.text_count_div').each(() => {
         d3.select(this)
           .select('p')
           .text(d3.select(this).attr('count'));
@@ -1435,7 +1435,7 @@ function make_legend(cat_color_map, cat_label_list) {
 
   d3.select('#label_column')
     .selectAll('div')
-    .each(function(d) {
+    .each((d) => {
       d3.select(this)
         .append('div')
         .style('background-color', cat_color_map[d])
@@ -1452,7 +1452,7 @@ function make_legend(cat_color_map, cat_label_list) {
         .style('margin-top', '-6px')
         .style('margin-left', '3px')
         .on('click', () => {
-          categorical_click(d, cat_label_list);
+          categorical_click(d, cat_label_list, all_nodes);
         });
     });
   d3.selectAll('.legend_row')
@@ -1469,10 +1469,10 @@ function make_legend(cat_color_map, cat_label_list) {
     .selectAll('p')
     .style('width', '150px');
 
-  count_clusters();
+  count_clusters(all_nodes);
 }
 
-function categorical_click(d, cat_label_list) {
+function categorical_click(d, cat_label_list, all_nodes) {
   all_selected = true;
   for (let i = 0; i < all_nodes.length; i++) {
     if (cat_label_list[i] === d) {
@@ -1505,13 +1505,13 @@ function categorical_click(d, cat_label_list) {
   }
 
   if (all_nodes.length < 25000) {
-    shrinkNodes(6, 10, my_nodes);
+    shrinkNodes(6, 10, my_nodes, all_nodes);
   }
   update_selected_count();
-  count_clusters();
+  count_clusters(all_nodes);
 }
 
-function shrinkNodes(scale, numsteps, my_nodes) {
+export const shrinkNodes = (scale, numsteps, my_nodes, all_nodes) => {
   const current_radii = {};
   const nodes = [];
   for (let ii in my_nodes) {
@@ -1543,7 +1543,7 @@ function shrinkNodes(scale, numsteps, my_nodes) {
   }, 5);
 }
 
-export const count_clusters = () => {
+export const count_clusters = (all_nodes) => {
   const name = document.getElementById('labels_menu').value;
   if (name.length > 0) {
     

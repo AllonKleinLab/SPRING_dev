@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
-import { count_clusters } from './colorBar';
+import { count_clusters, shrinkNodes } from './colorBar';
 import { update_selected_count } from './selection_script';
-import { all_outlines } from './forceLayout_script';
+import { all_outlines, all_nodes } from './forceLayout_script';
 
 export const stickyNote_setup = () => {
   let popup = d3
@@ -120,10 +120,11 @@ export const stickyNote_setup = () => {
     return note;
   }
 
-  function activate_note(note) {
+  function activate_note(note = d3.selection()) {
     if (note.attr('active') !== 'true') {
       note.select('p').style('visibility', 'hidden');
-      $(note.select('textarea')[0][0]).focus();
+      console.log(note.select('textarea'));
+      $(note.select('textarea')).focus();
 
       // 			let emails = note.attr('emails');
       // 			if (emails.length > 0) {
@@ -145,9 +146,9 @@ export const stickyNote_setup = () => {
           all_outlines[d].alpha = 1;
         }
       });
-    count_clusters();
+    count_clusters(all_nodes);
     update_selected_count();
-    shrinkNodes(10, 10, my_nodes);
+    shrinkNodes(10, 10, my_nodes, all_nodes);
   }
 
   function deactivate_all() {

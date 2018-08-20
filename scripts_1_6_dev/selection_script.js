@@ -306,7 +306,7 @@ export const selection_setup = () => {
         }
       }
       update_selected_count();
-      count_clusters();
+      count_clusters(all_nodes);
     })
     .on('end', function() {
       d3.event.target.clear();
@@ -473,7 +473,7 @@ export const deselect_all = () => {
       // 				all_nodes[i].scale.set(large_radius);
     }
   }
-  count_clusters();
+  count_clusters(all_nodes);
   update_selected_count();
 }
 

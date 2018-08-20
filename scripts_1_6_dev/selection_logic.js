@@ -1,4 +1,7 @@
 import * as d3 from 'd3';
+import { count_clusters } from './colorBar';
+import { all_nodes, all_outlines } from './forceLayout_script';
+import { update_selected_count } from './selection_script';
 
 export const selection_logic_setup = () => {
   let selection_data = {};
@@ -110,7 +113,7 @@ export const selection_logic_setup = () => {
       all_outlines[sel[i]].alpha = all_nodes[sel[i]].alpha;
     }
     update_selected_count();
-    count_clusters();
+    count_clusters(all_nodes);
   }
 
   function clear_options() {

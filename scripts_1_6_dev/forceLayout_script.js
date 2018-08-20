@@ -64,17 +64,7 @@ export const forceLayout = (project_directory, sub_directory, callback) => {
   }).catch(err => console.log(`Unable to get mutability.txt at ${filePath}\n${err}`));
 
   let keyCode = 0;
-  
-
   let nodeGraph = null;
-  xScale = d3
-    .scaleLinear()
-    .domain([0, width])
-    .range([0, width]);
-  yScale = d3
-    .scaleLinear()
-    .domain([0, height])
-    .range([0, height]);
 
   let svg = d3
     .select('#force_layout')
@@ -94,8 +84,6 @@ export const forceLayout = (project_directory, sub_directory, callback) => {
     .zoom()
     .scaleExtent([0.02, 10])
     .on('zoom', () => {
-      d3.event.transform.rescaleX(xScale);
-      d3.event.transform.rescaleY(yScale);
       redraw();
     });
   /////////////////////////////////////////////////////////////////////
@@ -883,20 +871,20 @@ export const rgbToHex = (r, g, b) => {
 }
 
 export const redraw = () => {
-  if (!being_dragged) {
+  if (!being_dragged && d3.event.sourceEvent) {
     let dim = document.getElementById('svg_graph').getBoundingClientRect();
     let x = d3.event.sourceEvent.clientX;
     let y = d3.event.sourceEvent.clientY;
     x = (x - sprites.position.x) / sprites.scale.x;
     y = (y - sprites.position.y) / sprites.scale.y;
 
-    let extraX = x * (d3.event.scale - sprites.scale.x);
-    let extraY = y * (d3.event.scale - sprites.scale.y);
+    let extraX = x * (d3.event.transform.k - sprites.scale.x);
+    let extraY = y * (d3.event.transform.k - sprites.scale.y);
     sprites.position.x += d3.event.sourceEvent.movementX - extraX;
     sprites.position.y += d3.event.sourceEvent.movementY - extraY;
 
-    sprites.scale.x = d3.event.scale;
-    sprites.scale.y = d3.event.scale;
+    sprites.scale.x = d3.event.transform.k;
+    sprites.scale.y = d3.event.transform.k;
     edge_container.position = sprites.position;
     edge_container.scale = sprites.scale;
     clone_edge_container.position = sprites.position;
@@ -907,11 +895,9 @@ export const redraw = () => {
     //text_container.position = sprites.position;
     //text_container.scale = sprites.scale;
 
-    console.log(sprites);
-
     d3.select('#vis').attr(
       'transform',
-      'translate(' + [sprites.x, sprites.y] + ')' + ' scale(' + sprites.scale.x + ')',
+      'translate(' + [sprites.position.x, sprites.position.y] + ')' + ' scale(' + sprites.scale.x + ')',
     );
   }
 }
@@ -965,7 +951,7 @@ export const center_view = (on_selected) => {
 
       d3.select('#vis').attr(
         'transform',
-        'translate(' + [sprites.x, sprites.y] + ')' + ' scale(' + sprites.scale.x + ')',
+        'translate(' + [sprites.position.x, sprites.position.y] + ')' + ' scale(' + sprites.scale.x + ')',
       );
 
       // zoomer.scale(sprites.scale.x);
@@ -982,7 +968,7 @@ export const save_coords = () => {
       text = text + [i.toString(), all_nodes[i].x.toString(), all_nodes[i].y.toString()].join(',') + '\n';
     }
     let name = window.location.search;
-    path = name.slice(1, name.length) + '/coordinates.txt';
+    let path = name.slice(1, name.length) + '/coordinates.txt';
     $.ajax({
       data: { path: path, content: text },
       type: 'POST',
