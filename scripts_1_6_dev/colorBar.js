@@ -1,10 +1,14 @@
 import * as d3 from 'd3';
-import { rgbToHex, all_nodes, all_outlines } from './forceLayout_script';
+import { rgbToHex, all_nodes, all_outlines, app, base_colors, sprites } from './forceLayout_script';
 import { graph_directory, sub_directory } from './main';
+import { update_selected_count } from './selection_script';
 
 export let gene_set_color_array = new Array();
 export let categorical_coloring_data = {};
 export let drag_mode = '';
+export let all_selected = false;
+
+let rankedMask = null;
 
 export const colorBar = (project_directory, color_menu_genes) => {
   /* -----------------------------------------------------------------------------------
@@ -186,6 +190,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
       const color_array = normalize(gene_set_color_array[current_selection]);
+
       for (let i = 0; i < base_colors.length; i++) {
         base_colors[i] = d3.rgb(gradient_color(color_array[i]));
       }
@@ -193,9 +198,10 @@ export const colorBar = (project_directory, color_menu_genes) => {
     }
     if (document.getElementById('labels_button').checked) {
       const name = document.getElementById('labels_menu').value;
-      const cat_color_map = categorical_coloring_data[name].label_colors;
-      const cat_label_list = categorical_coloring_data[name].label_list;
-      for (const i = 0; i < base_colors.length; i++) {
+      const cat_color_map = categorical_coloring_data.Sample.label_colors;
+      const cat_label_list = categorical_coloring_data.Sample.label_list;
+
+      for (let i = 0; i < base_colors.length; i++) {
         base_colors[i] = d3.rgb(cat_color_map[cat_label_list[i]]);
       }
       update_tints();
@@ -203,7 +209,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     if (document.getElementById('channels_button').checked) {
       const t0 = new Date();
       const green_selection = document.getElementById('autocomplete').value;
-      console.log(green_selection);
+
       $.ajax({
         data: { base_dir: graph_directory, sub_dir: graph_directory + '/' + sub_directory, gene: green_selection },
         success: function(data) {
@@ -211,7 +217,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
           console.log('Read gene data: ', t1.getTime() - t0.getTime());
           green_array = data.split('\n').slice(0, -1);
           green_array_raw = data.split('\n').slice(0, -1);
-          for (const i = 0; i < all_nodes.length; i++) {
+          for (let i = 0; i < all_nodes.length; i++) {
             const rawval = green_array[i];
             const gg = normalize_one_val(rawval);
             base_colors[i] = { r: 0, g: Math.floor(gg * 255), b: 0 };
@@ -237,7 +243,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
       const color_array = normalize(gene_set_color_array[current_selection]);
-      for (const i = 0; i < base_colors.length; i++) {
+      for (let i = 0; i < base_colors.length; i++) {
         base_colors[i] = d3.rgb(gradient_color(color_array[i]));
       }
       update_tints();
@@ -308,7 +314,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
   green_gradient
     .append('stop')
     .attr('offset', '100%')
-    .attr('stop-color', d3.rgb(0, 255, 0))
+    .attr('stop-color', d3.rgb(0, 255, 0).toString())
     .attr('stop-opacity', 1);
 
   const slider_scale = d3
@@ -333,11 +339,15 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .attr('x1', slider_scale.range()[0])
     .attr('x2', slider_scale.range()[1])
     .select(() => {
-      return this.parentNode.appendChild(this.cloneNode(true));
+      if(this.parentNode) {
+        return this.parentNode.appendChild(this.cloneNode(true));
+      }
     })
     .attr('id', 'track-inset')
     .select(() => {
-      return this.parentNode.appendChild(this.cloneNode(true));
+      if(this.parentNode) {
+        return this.parentNode.appendChild(this.cloneNode(true));
+      }
     })
     .attr('id', 'track-overlay');
 
@@ -613,6 +623,8 @@ export const colorBar = (project_directory, color_menu_genes) => {
   }
 
   const update_slider = () => {
+    console.log('update slider called');
+
     d3.select('#label_column')
       .selectAll('div')
       .remove();
@@ -631,7 +643,9 @@ export const colorBar = (project_directory, color_menu_genes) => {
         .on('end', () => {
           make_legend(cat_color_map, cat_label_list);
         });
-      const max = d3.max(base_colors.map(max_color));
+
+    console.log(base_colors);
+      let max = d3.max(base_colors.map(max_color));
       if (max === 0) {
         max = 255;
       }
@@ -654,7 +668,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
         const name = document.getElementById('autocomplete').value;
         console.log('Gene = ', name);
         d3.selectAll('#gradient_bar').attr('fill', 'url(#green_gradient)');
-        d3.selectAll('#handle').style('fill', d3.rgb(0, 255, 0));
+        d3.selectAll('#handle').style('fill', d3.rgb(0, 255, 0).toString());
       }
       const max = color_stats[name][3];
       slider_scale.domain([0, max * 1.05]);
@@ -888,7 +902,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
     .text('Show enriched genes')
     .attr('pointer-events', 'none');
 
-  const rankedMask = d3
+  rankedMask = d3
     .select('svg')
     .append('rect')
     .attr('class', 'colorbar_item')
@@ -1212,7 +1226,7 @@ export const colorBar = (project_directory, color_menu_genes) => {
         compared_nodes.push(i);
       }
     }
-    scoremap = d3.map();
+    let scoremap = d3.map();
     const scoretotal = 0;
     const selected_score = 0;
     const compared_score = 0;
@@ -1529,11 +1543,12 @@ function shrinkNodes(scale, numsteps, my_nodes) {
 export const count_clusters = () => {
   const name = document.getElementById('labels_menu').value;
   if (name.length > 0) {
-    const cat_color_map = categorical_coloring_data[name].label_colors;
-    const cat_label_list = categorical_coloring_data[name].label_list;
-    const cat_counts = categorical_coloring_data[name].label_counts;
+    
+    const cat_color_map = categorical_coloring_data.Sample.label_colors;
+    const cat_label_list = categorical_coloring_data.Sample.label_list;
+    const cat_counts = categorical_coloring_data.Sample.label_counts;
 
-    counts = {};
+    let counts = {};
     Object.keys(cat_color_map).forEach(d => {
       counts[d] = 0;
     });
@@ -1562,7 +1577,7 @@ export const count_clusters = () => {
   }
 }
 
-function toggle_legend_hover_tooltip() {
+export const toggle_legend_hover_tooltip = () => {
   const button = d3.select('#toggle_legend_hover_tooltip_button');
   if (button.text() === 'Hide label tooltip') {
     button.text('Show label tooltip');
@@ -1650,7 +1665,7 @@ function toggle_legend_hover_tooltip() {
   }
 }
 
-function get_hover_cells(e) {
+export const get_hover_cells = (e) => {
   const dim = document.getElementById('svg_graph').getBoundingClientRect();
   let x = e.clientX - dim.left;
   let y = e.clientY - dim.top;
@@ -1659,7 +1674,7 @@ function get_hover_cells(e) {
   const hover_cells = [];
   for (let i = 0; i < all_nodes.length; i++) {
     if (all_outlines[i].selected) {
-      rad = Math.sqrt((all_nodes[i].x - x) ** 2 + (all_nodes[i].y - y) ** 2);
+      const rad = Math.sqrt((all_nodes[i].x - x) ** 2 + (all_nodes[i].y - y) ** 2);
       if (rad < all_nodes[i].scale.x * 20) {
         hover_cells.push(i);
       }
@@ -1668,14 +1683,14 @@ function get_hover_cells(e) {
   return hover_cells;
 }
 
-function max_color(c) {
+export const max_color = (c) => {
   return d3.max([c.r, c.b, c.g]);
 }
 
-function min_color(c) {
+export const min_color = (c) => {
   return d3.min([c.r, c.b, c.g]);
 }
 
-function average_color(c) {
+export const average_color = (c) => {
   return d3.mean([c.r, c.b, c.g]);
 }

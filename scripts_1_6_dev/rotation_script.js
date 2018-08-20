@@ -1,4 +1,9 @@
-function rotation_update() {
+import * as d3 from 'd3';
+
+import { all_nodes, all_outlines, stashed_coordinates, sprites } from "./forceLayout_script";
+import { deselect_all } from './selection_script';
+
+export const rotation_update = () => {
   let selected = [];
   let stash_i = stashed_coordinates.length;
   stashed_coordinates.push({});
@@ -14,7 +19,7 @@ function rotation_update() {
   }
   let real_scale = 1;
 
-  vis = d3.select('#vis');
+  const vis = d3.select('#vis');
   vis.attr('transform', 'translate(' + [sprites.x, sprites.y] + ')' + ' scale(' + sprites.scale.x + ')');
   vis.append('circle').attr('id', 'rotation_outer_circ');
   vis.append('circle').attr('id', 'rotation_inner_circ');
@@ -63,19 +68,17 @@ function rotation_update() {
     });
 
   d3.select('#rotation_pivot').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', pivot_dragstarted)
+    d3.drag()
+      .on('start', pivot_dragstarted)
       .on('drag', pivot_dragged)
-      .on('dragend', pivot_dragended),
+      .on('end', pivot_dragended),
   );
 
   d3.select('#rotation_outer_circ').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', handle_dragstarted)
+    d3.drag()
+      .on('start', handle_dragstarted)
       .on('drag', handle_dragged)
-      .on('dragend', handle_dragended),
+      .on('end', handle_dragended),
   );
 
   function pivot_dragstarted() {

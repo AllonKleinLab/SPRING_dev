@@ -1,4 +1,9 @@
-function imputation_setup() {
+import * as d3 from 'd3';
+import { all_outlines, all_nodes, base_colors } from './forceLayout_script';
+import { clone_nodes } from './clone_viewer';
+import { graph_directory, sub_directory } from './main';
+
+export const imputation_setup =  () => {
   let popup = d3
     .select('#force_layout')
     .append('div')
@@ -43,11 +48,10 @@ function imputation_setup() {
     .text('Smooth gene expression on the graph. Increase N or decrease 	\u03B2 to enhance the degree of smoothing.');
 
   d3.select('#imputation_popup').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', imputation_popup_dragstarted)
+    d3.drag()
+      .on('start', imputation_popup_dragstarted)
       .on('drag', imputation_popup_dragged)
-      .on('dragend', imputation_popup_dragended),
+      .on('end', imputation_popup_dragended),
   );
 
   function imputation_popup_dragstarted() {
@@ -124,7 +128,7 @@ function imputation_setup() {
       let sel = '';
       let sel_nodes = [];
       for (let i = 0; i < all_outlines.length; i++) {
-        let col = 0;
+        let col = {};
         if (all_nodes[i].tint === '0x000000' && clone_nodes[i] === undefined) {
           col = { r: 0, b: 0, g: 0 };
         } else {
@@ -160,16 +164,19 @@ function imputation_setup() {
         success: function(data) {
           let t1 = new Date();
           console.log('Smoothed the data: ', t1.getTime() - t0.getTime());
-          datasplit = data.split('|');
+          let datasplit = data.split('|');
           let new_min = parseFloat(datasplit[0]) - 0.02;
           let new_max = parseFloat(datasplit[1]);
 
+          let current_min = 0;
+          let current_max = 0;
+          
           if (document.getElementById('channels_button').checked) {
             current_min = 0;
-            current_max = d3.max(green_array);
+            current_max = parseFloat(d3.max(green_array));
           } else {
-            let current_max = d3.max(base_colors.map(max_color));
-            let current_min = d3.min(base_colors.map(min_color));
+            current_max = parseFloat(d3.max(base_colors.map(max_color)));
+            current_min = parseFloat(d3.min(base_colors.map(min_color)));
           }
 
           function nrm(x) {

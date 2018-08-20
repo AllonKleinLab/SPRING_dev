@@ -1,4 +1,7 @@
 import * as d3 from 'd3';
+import { count_clusters } from './colorBar';
+import { update_selected_count } from './selection_script';
+import { all_outlines } from './forceLayout_script';
 
 export const stickyNote_setup = () => {
   let popup = d3
@@ -75,14 +78,14 @@ export const stickyNote_setup = () => {
   sticky_path = sticky_path.slice(1, sticky_path.length) + '/sticky_notes_data.json';
   $.get(sticky_path)
     .done(function() {
-      d3.json(sticky_path, function(data) {
+      d3.json(sticky_path).then(data => {
         data.forEach(function(d) {
           new_note(d);
         });
       });
     })
     .fail(function() {
-      note = new_note();
+      const note = new_note();
       activate_note(note);
     });
 
@@ -282,7 +285,7 @@ export const stickyNote_setup = () => {
     d3.selectAll('.sticky_note').style('background-color', 'rgba(0,0,0,.5)');
     d3.selectAll('.sticky_note').each(function() {
       let note = d3.select(this);
-      bound_cells = note.attr('bound_cells').split(',');
+      const bound_cells = note.attr('bound_cells').split(',');
       if (bound_cells.filter(n => selected_cells.includes(n)).length > 0) {
         note.style('background-color', 'rgba(255,255,0,.4)');
         $(sticky_div[0][0]).prepend(note[0][0]);
@@ -291,11 +294,10 @@ export const stickyNote_setup = () => {
   }
 
   d3.select('#stickyNote_popup').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', stickyNote_popup_dragstarted)
+    d3.drag()
+      .on('start', stickyNote_popup_dragstarted)
       .on('drag', stickyNote_popup_dragged)
-      .on('dragend', stickyNote_popup_dragended),
+      .on('end', stickyNote_popup_dragended),
   );
 }
 

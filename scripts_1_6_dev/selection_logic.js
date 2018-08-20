@@ -1,4 +1,6 @@
-function selection_logic_setup() {
+import * as d3 from 'd3';
+
+export const selection_logic_setup = () => {
   let selection_data = {};
 
   let popup = d3
@@ -167,11 +169,10 @@ function selection_logic_setup() {
   }
 
   d3.select('#selection_logic_popup').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', selection_logic_popup_dragstarted)
+    d3.drag()
+      .on('start', selection_logic_popup_dragstarted)
       .on('drag', selection_logic_popup_dragged)
-      .on('dragend', selection_logic_popup_dragended),
+      .on('end', selection_logic_popup_dragended),
   );
 }
 

@@ -1,4 +1,6 @@
-function PAGA_setup() {
+import * as d3 from 'd3';
+
+export const PAGA_setup = () => {
   let popup = d3
     .select('#force_layout')
     .append('div')
@@ -93,11 +95,10 @@ function PAGA_setup() {
     .on('click', hide_PAGA_popup);
 
   popup.call(
-    d3.behavior
-      .drag()
-      .on('dragstart', PAGA_popup_dragstarted)
+    d3.drag()
+      .on('start', PAGA_popup_dragstarted)
       .on('drag', PAGA_popup_dragged)
-      .on('dragend', PAGA_popup_dragended),
+      .on('end', PAGA_popup_dragended),
   );
 
   let noCache = new Date().getTime();
@@ -124,11 +125,10 @@ function PAGA_setup() {
         .append('circle')
         .attr('class', 'PAGA_node')
         .call(
-          d3.behavior
-            .drag()
-            .on('dragstart', dragstarted)
+          d3.drag()
+            .on('start', dragstarted)
             .on('drag', dragged)
-            .on('dragend', dragended),
+            .on('end', dragended),
         )
         .on('click', function(d) {
           if (!d3.event.defaultPrevented) {

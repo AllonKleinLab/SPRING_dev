@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { closeDropdown, edge_container, app, rgbToHex, all_nodes, all_outlines } from './forceLayout_script';
+import { closeDropdown, edge_container, _app, rgbToHex, all_nodes, all_outlines } from './forceLayout_script';
 import { SPRITE_IMG_WIDTH } from './util';
 
 export const settings_setup = () => {
@@ -182,7 +182,7 @@ export const settings_setup = () => {
 
   function background_color_change(val) {
     const parsedVal = parseInt(val, 10);
-    app.renderer.backgroundColor = rgbToHex(parsedVal, parsedVal, parsedVal);
+    _app.renderer.backgroundColor = rgbToHex(parsedVal, parsedVal, parsedVal);
     /*
 		if (val < 125) {
 			text_anos.ba.style.fill = '#B8B8B8';

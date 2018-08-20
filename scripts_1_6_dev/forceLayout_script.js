@@ -5,6 +5,8 @@ import { LineSprite } from "./LineSprite";
 import { graph_directory, sub_directory } from './main';
 import { SPRITE_IMG_WIDTH } from './util';
 import { clone_sprites } from './clone_viewer';
+import { selection_mode } from './selection_script';
+import { collapse_settings } from './settings_script';
 
 export let all_nodes = [];
 export let all_outlines = [];
@@ -13,10 +15,14 @@ export let being_dragged = false;
 export let width = window.innerWidth - 15;
 export let height = window.innerHeight - 70;
 
-export let app = {};
-export let sprites = new PIXI.particles.ParticleContainer();
-export let edge_container = new PIXI.particles.ParticleContainer();
-export let clone_edge_container = new PIXI.particles.ParticleContainer();
+export let app = new PIXI.Application(width, height, { backgroundColor: 0xdcdcdc });
+export let mutable = null;
+
+export let clone_edge_container = new PIXI.Container();
+export let edge_container = new PIXI.Container();
+export let sprites = new PIXI.Container();
+
+export let base_colors = new Array();
 
 export let coordinates = new Array();
 export let stashed_coordinates = new Array();
@@ -27,7 +33,7 @@ export let all_edge_ends = new Array();
 
 export let xScale = d3.scaleLinear();
 export let yScale = d3.scaleLinear();
-export let zoomer = () => {};
+export let zoomer = d3.zoom();
 
 export let svg_graph = {};
 
@@ -50,8 +56,7 @@ export const forceLayout = (project_directory, callback) => {
   let coordinates_filename = graph_directory + '/' + sub_directory + '/coordinates.txt';
 
   d3.text(project_directory + '/' + sub_directory + '/mutability.txt').then(text => {
-    let mutable = text;
-    if (mutable == null) {
+    if (text === null) {
       mutable = true;
     } else {
       mutable = false;
@@ -170,7 +175,7 @@ export const forceLayout = (project_directory, callback) => {
 
   // Read coordinates file if it exists
   d3.text(coordinates_filename).then(text => {
-    text.split('\n').forEach(function(entry, index, array) {
+    text.split('\n').forEach((entry, index, array) => {
       let items = entry.split(',');
       if (items.length > 1) {
         let xx = parseFloat($.trim(items[1]));
@@ -180,24 +185,16 @@ export const forceLayout = (project_directory, callback) => {
       }
     });
 
-    app = new PIXI.Application(width, height, { backgroundColor: 0xdcdcdc });
-    //app = new PIXI.Application(width,height, {backgroundColor: '0xb0b0b0'});
+    
     document.getElementById('pixi_canvas_holder').appendChild(app.view);
 
-    sprites = new PIXI.particles.ParticleContainer(coordinates.length, {
-      alpha: true,
-      position: true,
-      rotation: true,
-      scale: true,
-      uvs: true,
-    });
+    sprites = new PIXI.Container();
 
     sprites.interactive = true;
     sprites.interactiveChildren = true;
 
     // create an array to store all the sprites
     let totalSprites = app.renderer instanceof PIXI.WebGLRenderer ? coordinates.length : 100;
-    let base_colors = [];
     let sprite_chooser = Math.random();
     for (let i = 0; i < totalSprites; i++) {
       let dude = PIXI.Sprite.fromImage('stuff/disc.png');
@@ -221,7 +218,7 @@ export const forceLayout = (project_directory, callback) => {
       dude.scale.set((0.5 * 32) / SPRITE_IMG_WIDTH);
       dude.x = coordinates[i][0];
       dude.y = coordinates[i][1];
-      dude.tint = rgbToHex(0, 0, 0);
+      dude.tint = parseInt(rgbToHex(0, 0, 0), 16);
       dude.alpha = 1;
       dude.interactive = true;
       dude.index = i;
@@ -236,7 +233,7 @@ export const forceLayout = (project_directory, callback) => {
       outline.scale.set(0.5);
       outline.x = coordinates[i][0];
       outline.y = coordinates[i][1];
-      outline.tint = '0xffff00';
+      outline.tint = 0xffff00;
       outline.index = i;
       outline.bump = 0.0001;
       outline.alpha = 0;
@@ -261,23 +258,15 @@ export const forceLayout = (project_directory, callback) => {
 
     loadColors(graph_directory, sub_directory);
     load_edges(all_nodes, sprites, app);
+    console.log('base colors setup done?');
   });
 
   function load_edges(all_nodes, sprites, app) {
-    edge_container = new PIXI.particles.ParticleContainer(all_nodes.length * 20, {
-      alpha: true,
-      position: true,
-      rotation: true,
-      scale: true,
-      uvs: true,
-    });
-    edge_container.interactive = true;
-    edge_container.interactiveChildren = true;
-    console.log(edge_container);
+    edge_container = new PIXI.Container();
+
     edge_container.position = sprites.position;
     edge_container.scale = sprites.scale;
     edge_container.alpha = 0.5;
-    console.log(edge_container);
     let neighbors = {};
     for (let i = 0; i < all_nodes.length; i++) {
       neighbors[i] = [];
@@ -343,13 +332,13 @@ export const forceLayout = (project_directory, callback) => {
       if (clicked_pos_sel || clicked_neg_sel) {
         let stash_i = stashed_coordinates.length;
         stashed_coordinates.push({});
-        for (leti in all_nodes) {
+        for (let i in all_nodes) {
           stashed_coordinates[stash_i][i] = [all_nodes[i].x, all_nodes[i].y];
         }
       }
       if (clicked_pos_sel) {
         being_dragged = true;
-        for (leti = 0; i < all_nodes.length; i++) {
+        for (let i = 0; i < all_nodes.length; i++) {
           if (all_outlines[i].selected) {
             all_nodes[i].beingDragged = true;
           }
@@ -507,9 +496,7 @@ export const adjust_edges = () => {
 }
 
 export const animation = () => {
-  console.log('ANIM');
   // check if animation exists. if so, hide sprites and load it
-
   $.get(graph_directory + '/' + sub_directory + '/animation.txt')
     .done(function(data) {
       let animation_frames = [];
@@ -747,7 +734,7 @@ export const initiateButtons = () => {
             text = text + d.number + ',' + d.x.toString() + ',' + d.y.toString() + '\n';
           });
         let name = window.location.search;
-        path = 'coordinates/' + name.slice(9, name.length).split('/')[1] + '_coordinates.' + sub_directory + '.txt';
+        let path = 'coordinates/' + name.slice(9, name.length).split('/')[1] + '_coordinates.' + sub_directory + '.txt';
         $.ajax({
           data: { path: path, content: text },
           type: 'POST',
@@ -795,8 +782,8 @@ export const initiateButtons = () => {
 }
 
 export const download_png = () => {
-  let path = window.location.search.split('/');
-  path = path[path.length - 2] + '_' + path[path.length - 1] + '.png';
+  let searchPaths = window.location.search.split('/');
+  const path = searchPaths[searchPaths.length - 2] + '_' + searchPaths[searchPaths.length - 1] + '.png';
   download_sprite_as_png(app.renderer, app.stage, path);
 }
 

@@ -1,23 +1,28 @@
-export const cluster_setup = project_directory => {
-  spectrum_dropdown = false;
-  explain_dropdown = false;
+import * as d3 from 'd3';
 
+let spectrum_dropdown = false;
+let explain_dropdown = false;
+
+let clustering_data = {};
+let current_clus_name = '';
+let last_clus_name = '';
+
+export const cluster_setup = project_directory => {
   d3.select('#cluster_dropdown_button').on('click', showClusterDropdown);
   let name = window.location.search.split('/')[2];
-  d3.json('data/clustering_data/' + name + '_clustering_data.json', function(data) {
+  d3.json('data/clustering_data/' + name + '_clustering_data.json').then(data => {
     console.log(data);
     clustering_data = data;
     current_clus_name = clustering_data.Current_clustering;
     last_clus_name = current_clus_name;
   });
 
-  svg_width = parseInt(d3.select('svg').attr('width'), 10);
+  const svg_width = parseInt(d3.select('svg').attr('width'), 10);
   d3.select('#create_cluster_box').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', cluster_box_dragstarted)
+    d3.drag()
+      .on('start', cluster_box_dragstarted)
       .on('drag', cluster_box_dragged)
-      .on('dragend', cluster_box_dragended),
+      .on('end', cluster_box_dragended),
   );
 
   d3.select('#cluster_view_button').on('click', function() {
@@ -99,11 +104,10 @@ export const cluster_setup = project_directory => {
   }
 
   d3.select('#update_cluster_labels_box').call(
-    d3.behavior
-      .drag()
-      .on('dragstart', update_cluster_labels_box_dragstarted)
+    d3.drag()
+      .on('start', update_cluster_labels_box_dragstarted)
       .on('drag', update_cluster_labels_box_dragged)
-      .on('dragend', update_cluster_labels_box_dragended),
+      .on('end', update_cluster_labels_box_dragended),
   );
 
   const update_cluster_labels_box_dragstarted = () => {
@@ -230,8 +234,8 @@ export const show_spectrum = () => {
   const height = 280 - margin.top - margin.bottom;
 
   // Set the ranges
-  let x = d3.scale.linear().range([0, width]);
-  let y = d3.scale.linear().range([height, 0]);
+  let x = d3.scaleLinear().range([0, width]);
+  let y = d3.scaleLinear().range([height, 0]);
 
   // Define the axes
   let xAxis = d3.svg

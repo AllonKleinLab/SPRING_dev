@@ -5,21 +5,15 @@ export const clone_nodes = {};
 export const clone_edges = {};
 export const node_status = {};
 
-export let clone_sprites = new PIXI.particles.ParticleContainer();
+export let clone_sprites = new PIXI.Container();
 
 export const clone_viewer_setup = () => {
-  let clone_edge_container = new PIXI.particles.ParticleContainer();
+  let clone_edge_container = new PIXI.Container();
   clone_edge_container.position = sprites.position;
   clone_edge_container.scale = sprites.scale;
 
-  let clone_sprites = new PIXI.particles.ParticleContainer(all_nodes.length, {
-    alpha: true,
-    position: true,
-    rotation: true,
-    scale: true,
-    uvs: true,
-  });
-  
+  let clone_sprites = new PIXI.Container();
+
   clone_sprites.position = sprites.position;
   clone_sprites.scale = sprites.scale;
 

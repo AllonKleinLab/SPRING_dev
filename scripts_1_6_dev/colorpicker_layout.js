@@ -21,11 +21,10 @@ function colorpicker_setup() {
   popup.on('mouseup', colorpicker_update);
   popup.on('mousemove', colorpicker_update);
   popup.call(
-    d3.behavior
-      .drag()
-      .on('dragstart', colorpicker_popup_dragstarted)
+    d3.drag()
+      .on('start', colorpicker_popup_dragstarted)
       .on('drag', colorpicker_popup_dragged)
-      .on('dragend', colorpicker_popup_dragended),
+      .on('end', colorpicker_popup_dragended),
   );
 
   button_bar = d3.select('#colorpicker_button_bar');

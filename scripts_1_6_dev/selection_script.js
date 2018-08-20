@@ -2,13 +2,23 @@ import * as d3 from 'd3';
 import { all_outlines, zoomer, all_nodes, xScale, yScale, sprites } from './forceLayout_script';
 import { count_clusters } from './colorBar';
 
-let selection_mode = '';
+export let selection_mode = '';
+
+let neg_count_extended = null;
+let neg_select_count_rect = null;
+let neg_select_count_text = null;
+
+let pos_count_extended = null;
+let pos_select_count_rect = null;
+let pos_select_count_text = null;
+
 let brush = {};
 let brusher = () => {}
+let svg_width = 0;
 
 export const selection_setup = () => {
   selection_mode = 'drag_pan_zoom';
-  let svg_width = parseInt(d3.select('svg').attr('width'), 10);
+  svg_width = parseInt(d3.select('svg').attr('width'), 10);
 
   let drag_pan_zoom_rect = d3
     .select('svg')
@@ -66,7 +76,7 @@ export const selection_setup = () => {
       switch_mode();
     });
 
-  let pos_select_count_rect = d3
+  pos_select_count_rect = d3
     .select('svg')
     .append('rect')
     .attr('class', 'selection_option')
@@ -76,7 +86,7 @@ export const selection_setup = () => {
     .attr('width', 200)
     .attr('height', 24);
 
-  let neg_select_count_rect = d3
+  neg_select_count_rect = d3
     .select('svg')
     .append('rect')
     .attr('class', 'selection_option')
@@ -112,6 +122,7 @@ export const selection_setup = () => {
     .attr('font-size', '12px')
     .attr('fill', 'white')
     .text('Drag/pan/zoom');
+    
   d3.select('svg')
     .append('text')
     .attr('pointer-events', 'none')
@@ -122,6 +133,7 @@ export const selection_setup = () => {
     .attr('font-size', '12px')
     .attr('fill', 'yellow')
     .text('Positive select (shift)');
+
   d3.select('svg')
     .append('text')
     .attr('pointer-events', 'none')
@@ -132,6 +144,7 @@ export const selection_setup = () => {
     .attr('font-size', '12px')
     .attr('fill', 'blue')
     .text('Negative select (Shift+Esc)');
+
   d3.select('svg')
     .append('text')
     .attr('pointer-events', 'none')
@@ -142,7 +155,7 @@ export const selection_setup = () => {
     .attr('font-size', '12px')
     .attr('fill', 'white')
     .text('Deselect (command)');
-  let pos_select_count_text = d3
+  pos_select_count_text = d3
     .select('svg')
     .append('text')
     .attr('pointer-events', 'none')
@@ -153,7 +166,8 @@ export const selection_setup = () => {
     .attr('font-size', '12px')
     .attr('fill', 'yellow')
     .text('0 cells selected');
-  let neg_select_count_text = d3
+
+  neg_select_count_text = d3
     .select('svg')
     .append('text')
     .attr('pointer-events', 'none')
@@ -189,10 +203,10 @@ export const selection_setup = () => {
   }
 
   function switch_mode() {
-    drag_pan_zoom_rect.transition(5).attr('fill-opacity', selection_mode === 'drag_pan_zoom' ? 0.5 : 0.15);
-    positive_select_rect.transition(5).attr('fill-opacity', selection_mode === 'positive_select' ? 0.5 : 0.15);
-    negative_select_rect.transition(5).attr('fill-opacity', selection_mode === 'negative_select' ? 0.5 : 0.15);
-    deselect_rect.transition(5).attr('fill-opacity', selection_mode === 'deselect' ? 0.5 : 0.15);
+    drag_pan_zoom_rect.transition('5').attr('fill-opacity', selection_mode === 'drag_pan_zoom' ? 0.5 : 0.15);
+    positive_select_rect.transition('5').attr('fill-opacity', selection_mode === 'positive_select' ? 0.5 : 0.15);
+    negative_select_rect.transition('5').attr('fill-opacity', selection_mode === 'negative_select' ? 0.5 : 0.15);
+    deselect_rect.transition('5').attr('fill-opacity', selection_mode === 'deselect' ? 0.5 : 0.15);
     if (selection_mode !== 'drag_pan_zoom') {
       d3.select('#svg_graph')
         .call(zoomer)
@@ -329,110 +343,108 @@ export const selection_setup = () => {
   d3.select('#deselect')
     .select('button')
     .on('click', deselect_all);
-  let pos_count_extended = false;
-  let neg_count_extended = false;
+}
 
-  const update_selected_count = () => {
-    let num_selected = 0;
-    let num_compared = 0;
-    for (let i = 0; i < all_nodes.length; i++) {
-      if (all_outlines[i].selected) {
-        num_selected += 1;
-      }
-      if (all_outlines[i].compared) {
-        num_compared += 1;
-      }
+export const retract_edge_toggle = (callback) => {
+  d3.select('#edge_toggle_image')
+    .transition('400')
+    .attr('x', svg_width);
+  d3.select('#show_edges_rect')
+    .transition('400')
+    .attr('x', svg_width);
+  d3.select('#edge_text')
+    .selectAll('tspan')
+    .transition('400')
+    .attr('x', svg_width)
+    .each('end', callback);
+}
+
+export const update_selected_count = () => {
+  let num_selected = 0;
+  let num_compared = 0;
+  for (let i = 0; i < all_nodes.length; i++) {
+    if (all_outlines[i].selected) {
+      num_selected += 1;
     }
-    if (num_selected === 0 && pos_count_extended) {
-      pos_count_extended = false;
+    if (all_outlines[i].compared) {
+      num_compared += 1;
+    }
+  }
+  if (num_selected === 0 && pos_count_extended) {
+    pos_count_extended = false;
+    if (!neg_count_extended) {
+      pos_select_count_rect.transition(500).attr('x', svg_width);
+      pos_select_count_text
+        .transition(500)
+        .attr('x', svg_width)
+        .each('end', extend_edge_toggle);
+    } else {
+      pos_select_count_rect.transition(500).attr('x', svg_width);
+      pos_select_count_text.transition(500).attr('x', svg_width);
+    }
+  }
+  if (num_selected !== 0) {
+    if (!pos_count_extended) {
+      pos_count_extended = true;
       if (!neg_count_extended) {
-        pos_select_count_rect.transition(500).attr('x', svg_width);
-        pos_select_count_text
-          .transition(500)
-          .attr('x', svg_width)
-          .each('end', extend_edge_toggle);
-      } else {
-        pos_select_count_rect.transition(500).attr('x', svg_width);
-        pos_select_count_text.transition(500).attr('x', svg_width);
-      }
-    }
-    if (num_selected !== 0) {
-      if (!pos_count_extended) {
-        pos_count_extended = true;
-        if (!neg_count_extended) {
-          retract_edge_toggle(function() {
-            pos_select_count_rect.transition(500).attr('x', svg_width - 177);
-            pos_select_count_text.transition(500).attr('x', svg_width - 167);
-          });
-        } else {
+        retract_edge_toggle(function() {
           pos_select_count_rect.transition(500).attr('x', svg_width - 177);
           pos_select_count_text.transition(500).attr('x', svg_width - 167);
-        }
-      }
-      let pct = Math.floor((num_selected / all_nodes.length) * 100);
-      pos_select_count_text.text(num_selected.toString() + ' cells selected   (' + pct.toString() + '%)');
-    }
-    if (num_compared === 0 && neg_count_extended) {
-      neg_count_extended = false;
-      if (!pos_count_extended) {
-        neg_select_count_rect.transition(500).attr('x', svg_width);
-        neg_select_count_text
-          .transition(500)
-          .attr('x', svg_width)
-          .each('end', extend_edge_toggle);
+        });
       } else {
-        neg_select_count_rect.transition(500).attr('x', svg_width);
-        neg_select_count_text.transition(500).attr('x', svg_width);
+        pos_select_count_rect.transition(500).attr('x', svg_width - 177);
+        pos_select_count_text.transition(500).attr('x', svg_width - 167);
       }
     }
-    if (num_compared !== 0) {
-      if (!neg_count_extended) {
-        neg_count_extended = true;
-        if (!pos_count_extended) {
-          retract_edge_toggle(function() {
-            neg_select_count_rect.transition(500).attr('x', svg_width - 177);
-            neg_select_count_text.transition(500).attr('x', svg_width - 167);
-          });
-        } else {
+    let pct = Math.floor((num_selected / all_nodes.length) * 100);
+    pos_select_count_text.text(num_selected.toString() + ' cells selected   (' + pct.toString() + '%)');
+  }
+  if (num_compared === 0 && neg_count_extended) {
+    neg_count_extended = false;
+    if (!pos_count_extended) {
+      neg_select_count_rect.transition(500).attr('x', svg_width);
+      neg_select_count_text
+        .transition(500)
+        .attr('x', svg_width)
+        .each('end', extend_edge_toggle);
+    } else {
+      neg_select_count_rect.transition(500).attr('x', svg_width);
+      neg_select_count_text.transition(500).attr('x', svg_width);
+    }
+  }
+  if (num_compared !== 0) {
+    if (!neg_count_extended) {
+      neg_count_extended = true;
+      if (!pos_count_extended) {
+        retract_edge_toggle(function() {
           neg_select_count_rect.transition(500).attr('x', svg_width - 177);
           neg_select_count_text.transition(500).attr('x', svg_width - 167);
-        }
+        });
+      } else {
+        neg_select_count_rect.transition(500).attr('x', svg_width - 177);
+        neg_select_count_text.transition(500).attr('x', svg_width - 167);
       }
-      let newPct = Math.floor((num_compared / all_nodes.length) * 100);
-      neg_select_count_text.text(num_compared.toString() + ' cells selected   (' + newPct.toString() + '%)');
     }
-  };
-
-  function extend_edge_toggle() {
-    d3.select('#edge_toggle_image')
-      .transition(400)
-      .attr('x', svg_width - 77);
-    d3.select('#show_edges_rect')
-      .transition(400)
-      .attr('x', svg_width - 177);
-    d3.select('#edge_text')
-      .selectAll('tspan')
-      .transition(400)
-      .attr('x', svg_width - 167);
+    let newPct = Math.floor((num_compared / all_nodes.length) * 100);
+    neg_select_count_text.text(num_compared.toString() + ' cells selected   (' + newPct.toString() + '%)');
   }
+};
 
-  function retract_edge_toggle(callback) {
-    d3.select('#edge_toggle_image')
-      .transition(400)
-      .attr('x', svg_width);
-    d3.select('#show_edges_rect')
-      .transition(400)
-      .attr('x', svg_width);
-    d3.select('#edge_text')
-      .selectAll('tspan')
-      .transition(400)
-      .attr('x', svg_width)
-      .each('end', callback);
-  }
+function extend_edge_toggle() {
+  d3.select('#edge_toggle_image')
+    .transition('400')
+    .attr('x', svg_width - 77);
+  d3.select('#show_edges_rect')
+    .transition('400')
+    .attr('x', svg_width - 177);
+  d3.select('#edge_text')
+    .selectAll('tspan')
+    .transition('400')
+    .attr('x', svg_width - 167);
 }
 
 export const deselect_all = () => {
-  any_selected = false;
+  let any_selected = false;
   for (let i = 0; i < all_nodes.length; i++) {
     if (all_outlines[i].selected) {
       any_selected = true;
@@ -467,8 +479,8 @@ export const deselect_all = () => {
 
 export const loadSelectedCells = (project_directory) => {
   // load selected cells if it exists
-  selection_filename = project_directory + '/selected_cells.txt';
-  new_selection = [];
+  let selection_filename = project_directory + '/selected_cells.txt';
+  let new_selection = new Array();
   d3.text(selection_filename).then(text => {
     text.split('\n').forEach(function(entry, index, array) {
       if (entry !== '') {

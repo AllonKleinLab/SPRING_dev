@@ -9,6 +9,9 @@ import { settings_setup, collapse_settings } from './settings_script.js';
 import { make_new_SPRINGplot_setup } from './make_new_SPRINGplot_script.js';
 import { downloadSelectedExpr_setup } from './downloadSelectedExpr_script.js';
 import { stickyNote_setup } from './stickyNote.js';
+import { imputation_setup } from './smoothing_imputation.js';
+import { selection_logic_setup } from './selection_logic.js';
+import { PAGA_setup } from './PAGA_viewer.js';
 
 let rotator_radius = null;
 
@@ -83,7 +86,6 @@ let my_origin = window.location.origin;
 let my_pathname = window.location.pathname;
 let path_split = my_pathname.split('/');
 let path_start = path_split.slice(0, path_split.length - 1).join('/');
-path_split[path_split.length - 1] = 'springViewer_1_5_dev.html';
 let dynamic_path = path_split.join('/');
 
 d3.select('#changeViewer_link').attr('href', my_origin + dynamic_path + name);
