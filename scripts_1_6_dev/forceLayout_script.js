@@ -226,7 +226,8 @@ export default class ForceLayout {
         .on('end', this.dragended),
     );
 
-    this.load_edges(this.all_nodes, this.sprites);
+    console.log('loading edges?');
+    await this.load_edges(this.all_nodes, this.sprites);
   };
 
   create_sprites(totalSprites) {
@@ -294,11 +295,11 @@ export default class ForceLayout {
           this.all_edge_ends.push({ source: source, target: target });
         }
       });
+    } catch(e) {
+      console.log(`Error setting up edges: ${e}`);
+    } finally {
       this.app.stage.addChild(this.edge_container);
       this.app.stage.addChild(sprites);
-    } catch {
-      this.app.stage.addChild(this.edge_container);
-      this.app.stage.addChild(this.sprites);
     }
   };
 

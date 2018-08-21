@@ -1,21 +1,12 @@
-export class LineSprite extends PIXI.DisplayObject {
-  static canvas;
-  static baseTexture;
+export class LineSprite extends PIXI.Sprite {
   static textureCache = {};
   static maxWidth = 100;
   static maxColors = 100;
   static colors = 0;
-
-  static initCanvas() {
-    LineSprite.canvas = document.createElement('canvas');
-    LineSprite.canvas.width = LineSprite.maxWidth + 2;
-    LineSprite.canvas.height = LineSprite.maxColors;
-    LineSprite.baseTexture = new PIXI.BaseTexture(LineSprite.canvas);
-  };
+  static canvas = null;
 
   constructor(thickness, color, x1, y1, x2, y2) {
-    super();
-    PIXI.Sprite.call(this, this.getTexture(thickness, color));
+    super(LineSprite.getTexture(thickness, color));
     this._thickness = thickness;
     this._color = color;
     this.x1 = x1;
@@ -23,15 +14,20 @@ export class LineSprite extends PIXI.DisplayObject {
     this.x2 = x2;
     this.y2 = y2;
     this.updatePosition();
-    this.anchor = {
-      x: 0.5,
-    };
-  }
+    this.anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5);
+  };
 
-  getTexture(thickness, color) {
+  static initCanvas () {
+    LineSprite.canvas = document.createElement("canvas");
+    LineSprite.canvas.width = LineSprite.maxWidth + 2;
+    LineSprite.canvas.height = LineSprite.maxColors;
+    LineSprite.baseTexture = new PIXI.BaseTexture(LineSprite.canvas);
+  };
+
+  static getTexture(thickness, color) {
     let key = thickness + '-' + color;
     if (!LineSprite.textureCache[key]) {
-      if (LineSprite.canvas === null) {
+      if (!LineSprite.canvas) {
         LineSprite.initCanvas();
       }
       let canvas = LineSprite.canvas;
@@ -39,6 +35,7 @@ export class LineSprite extends PIXI.DisplayObject {
       context.fillStyle = PIXI.utils.hex2string(color);
       context.fillRect(1, LineSprite.colors, thickness, 1);
       let texture = new PIXI.Texture(LineSprite.baseTexture, PIXI.SCALE_MODES.LINEAR);
+      console.log(texture);
       texture.frame = new PIXI.Rectangle(0, LineSprite.colors, thickness + 2, 1);
       LineSprite.textureCache[key] = texture;
       LineSprite.colors++;
@@ -51,28 +48,34 @@ export class LineSprite extends PIXI.DisplayObject {
     this.position.x = this.x1;
     this.position.y = this.y1;
     this.height = Math.sqrt((this.x2 - this.x1) * (this.x2 - this.x1) + (this.y2 - this.y1) * (this.y2 - this.y1));
-    let dir = Math.atan2(this.y1 - this.y2, this.x1 - this.x2);
+    var dir = Math.atan2(this.y1 - this.y2, this.x1 - this.x2);
     this.rotation = Math.PI * 0.5 + dir;
   };
 }
 
+
+
 Object.defineProperties(LineSprite.prototype, {
-  color: {
-    get: function() {
-      return this._color;
-    },
-    set: function(value) {
-      this._color = value;
-      this.texture = this.getTexture(this._thickness, this._color);
-    },
-  },
   thickness: {
-    get: function() {
-      return this._thickness;
-    },
-    set: function(value) {
-      this._thickness = value;
-      this.texture = this.getTexture(this._thickness, this._color);
-    },
+      get: function ()
+      {
+          return this._thickness;
+      },
+      set: function (value)
+      {
+          this._thickness = value;
+          this.texture = LineSprite.getTexture(this._thickness, this._color);
+      }
   },
+  color: {
+      get: function ()
+      {
+          return this._color;
+      },
+      set: function (value)
+      {
+          this._color = value;
+          this.texture = LineSprite.getTexture(this._thickness, this._color);
+      }
+  }
 });

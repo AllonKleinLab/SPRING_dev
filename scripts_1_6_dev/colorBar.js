@@ -23,23 +23,27 @@ export default class ColorBar {
     return this._instance;
   }
 
-  static create(project_directory, color_menu_genes) {
+  static async create(project_directory, color_menu_genes) {
     if (!this._instance) {
       this._instance = new ColorBar(project_directory, color_menu_genes);
+      await this._instance.loadData();
     } else {
       throw new Error('ColorBar.create() has already been called, get the existing instance with ColorBar.instance!');
     }
   }
 
   constructor(project_directory, color_menu_genes) {
-    /* -----------------------------------------------------------------------------------
-                        Top menu bar
-    */
+    this.project_directory = project_directory;
+    this.color_menu_genes = color_menu_genes;
     this.color_profiles = {};
     this.color_option = 'gradient';
     this.noCache = new Date().getTime();
     this.color_max = 1;
     this.color_stats = null;
+
+    /* -----------------------------------------------------------------------------------
+                                        Top menu bar
+    */
     this.menuBar = d3.select('#color_chooser');
     // const enrich_script = 'get_gene_zscores.from_npz.dev.py';
     this.enrich_script = 'get_gene_zscores.from_hdf5.dev.py';
@@ -48,7 +52,6 @@ export default class ColorBar {
     this.svg_height = parseInt(d3.select('svg').attr('height'), 10);
 
     /* -------------------------------    Gene menu    ---------------------------- */
-
     this.channelsButton = this.menuBar
       .append('input')
       .attr('id', 'channels_button')
@@ -154,8 +157,7 @@ export default class ColorBar {
 
     /* -----------------------------------------------------------------------------------
 										   Graph coloring
-	*/
-
+	  */
     this.gradient_color = d3
       .scaleLinear()
       .domain([0, 0.5, 1])
@@ -406,41 +408,6 @@ export default class ColorBar {
     this.all_gene_color_array = {};
     this.all_gene_cellix_array = {};
 
-    // open json file containing gene sets and populate drop down menu
-    d3.text(project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache).then(text => {
-      let gene_set_color_array = this.read_csv(text);
-
-      // gradientMenu.selectAll("option").remove();
-      this.dispatch.call('load', gene_set_color_array, 'gene_sets');
-      // update_slider();
-    });
-
-    // open json file containing gene sets and populate drop down menu
-    d3.json(project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache).then(data => {
-      categorical_coloring_data = data;
-      Object.keys(categorical_coloring_data).forEach(k => {
-        const label_counts = {};
-        Object.keys(categorical_coloring_data[k].label_colors).forEach(n => {
-          label_counts[n] = 0;
-        });
-        categorical_coloring_data[k].label_list.forEach(n => {
-          label_counts[n] += 1;
-        });
-        categorical_coloring_data[k].label_counts = label_counts;
-      });
-
-      this.dispatch.call('load', categorical_coloring_data, 'cell_labels');
-      this.update_slider();
-
-      d3.json(project_directory + '/color_stats.json' + '?_=' + this.noCache).then(data => {
-        this.color_stats = data;
-      });
-      this.addStreamExp(color_menu_genes);
-
-      let last_gene = '';
-      let gene_entered = false;
-    });
-
     $('#autocomplete').blur(() => {
       if (this.gene_entered) {
         document.getElementById('autocomplete').value = this.last_gene;
@@ -527,6 +494,38 @@ export default class ColorBar {
       });
 
       return this;
+  }
+
+  async loadData() {
+    // open json file containing gene sets and populate drop down menu
+    const categorical_coloring_data = await d3.json(this.project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache);
+    Object.keys(categorical_coloring_data).forEach(k => {
+      const label_counts = {};
+      Object.keys(categorical_coloring_data[k].label_colors).forEach(n => {
+        label_counts[n] = 0;
+      });
+      categorical_coloring_data[k].label_list.forEach(n => {
+        label_counts[n] += 1;
+      });
+      categorical_coloring_data[k].label_counts = label_counts;
+    });
+
+    this.dispatch.call('load', categorical_coloring_data, 'cell_labels');
+    this.update_slider();
+
+    this.color_stats = await d3.json(this.project_directory + '/color_stats.json' + '?_=' + this.noCache);
+    this.addStreamExp(this.color_menu_genes);
+
+    this.last_gene = '';
+    this.gene_entered = false;
+    
+    // open json file containing gene sets and populate drop down menu
+    const text = await d3.text(this.project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
+    let gene_set_color_array = this.read_csv(text);
+
+    // gradientMenu.selectAll("option").remove();
+    this.dispatch.call('load', gene_set_color_array, 'gene_sets');
+    // update_slider();
   }
 
   normalize(x) {

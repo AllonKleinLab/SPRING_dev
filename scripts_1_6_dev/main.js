@@ -36,15 +36,14 @@ d3.select('#sound_toggle')
   });
 
 const callback = async () => {
-  console.log('callback')
   d3.select('#load_colors').remove();
   let base_dir = graph_directory;
   let sub_dir = graph_directory + '/' + sub_directory;
 
   await $.ajax({
     data: { base_dir: base_dir },
-    success: python_data => {
-      ColorBar.create(sub_dir, python_data);
+    success: async (python_data) => {
+      await ColorBar.create(sub_dir, python_data);
     },
     type: 'POST',
     url: 'cgi-bin/load_counts.py',
