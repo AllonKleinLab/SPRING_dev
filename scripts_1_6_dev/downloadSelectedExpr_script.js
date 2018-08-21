@@ -100,13 +100,13 @@ export const downloadSelectedExpr_setup = () => {
   );
 }
 
-function hide_downloadSelectedExpr_popup() {
+export const hide_downloadSelectedExpr_popup = () => {
   d3.select('#downloadSelectedExpr_popup')
     .style('visibility', 'hidden')
     .style('height', '200px');
 }
 
-function show_downloadSelectedExpr_popup() {
+export const show_downloadSelectedExpr_popup = () => {
   let mywidth = parseInt(
     d3
       .select('#downloadSelectedExpr_popup')

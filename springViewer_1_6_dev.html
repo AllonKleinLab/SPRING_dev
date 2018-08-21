@@ -23,9 +23,9 @@
 			<div id="layout_tools">
 				<button id="layout_dropdown_button">Layout</button>
 				<div id="layout_dropdown" class="dropdown-content">
-					<a href="javascript:save_coords()">Save coordinates</a>
+					<a id="save_coords">Save coordinates</a>
 					<a id="center_view">Center view</a>
-					<a href="javascript:rotation_update()">Rotate / scale</a>
+					<a id="rotation_update">Rotate / scale</a>
 					<a id="revert_positions">Undo</a>
 					<a id="move_left">Move left</a>
 					<a id="move_right">Move right</a>
@@ -36,11 +36,11 @@
 			<div class="dropdown">
 				<button id="download_dropdown_button">Download</button>
 				<div id="download_dropdown" class="dropdown-content">
-					<a href="javascript:downloadCoordinates()">Coordinates</a>
-					<a href="javascript:downloadSelection()">Selected cells</a>
-					<a href="javascript:show_downloadSelectedExpr_popup()">SPRING data <br> for selection</a>
+					<a id="download_coordinates">Coordinates</a>
+					<a id="download_selection">Selected cells</a>
+					<a id="show_download__selected_expr_popup">SPRING data <br> for selection</a>
 					<!-- <a href="javascript:downloadEdges()">Edge list</a> -->
-					<a href="javascript:downloadRankedTerms()">Enriched terms</a>
+					<a id="download_ranked_terms">Enriched terms</a>
 
 					<a id="download_png">Screenshot</a>
 					<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> -->
@@ -50,17 +50,17 @@
 			<div class="dropdown">
 				<button id="tools_dropdown_button">Tools</button>
 				<div id="tools_dropdown" class="dropdown-content">
-					<a href="javascript:show_make_new_SPRINGplot_popup()">Make new subplot</a>
+					<a id="show_make_new_SPRINGplot_popup">Make new subplot</a>
 					<a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
 					<a target="_blank" id="changeViewer_link">Dynamic mode</a>
-					<a href="javascript:start_clone_viewer()">Linkage broswer</a>
+					<a id="start_clone_viewer">Linkage broswer</a>
 					<!-- <a href="javascript:show_stickyNote_popup()">Sticky notes</a> -->
-					<a href="javascript:show_imputation_popup()">Smooth / Impute</a>
-					<a href="javascript:show_selection_logic_popup()">Selection logic</a>
-					<a href="javascript:show_doublet_popup()">Doublet detector</a>
-					<a href="javascript:run_clustering()">Louvain clustering</a>
-					<a href="javascript:show_PAGA_popup()">Graph abstraction</a>
-					<a href="javascript:toggle_legend_hover_tooltip()" id="toggle_legend_hover_tooltip_button">Show label tooltip</a>
+					<a id="show_imputation_popup">Smooth / Impute</a>
+					<a id="show_selection_logic_popup">Selection logic</a>
+					<a id="show_doublet_popup">Doublet detector</a>
+					<a id="run_clustering">Louvain clustering</a>
+					<a id="show_PAGA_popup">Graph abstraction</a>
+					<a id="toggle_legend_hover_tooltip_button">Show label tooltip</a>
 				</div>
 			</div>
 			<div id="settings">

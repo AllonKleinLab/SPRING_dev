@@ -218,7 +218,7 @@ export const imputation_setup =  () => {
   }
 }
 
-function show_imputation_popup() {
+export const show_imputation_popup = () => {
   let mywidth = parseInt(
     d3
       .select('#imputation_popup')
@@ -239,6 +239,6 @@ function show_imputation_popup() {
     .style('visibility', 'visible');
 }
 
-function hide_imputation_popup() {
+export const hide_imputation_popup = () => {
   d3.select('#imputation_popup').style('visibility', 'hidden');
 }

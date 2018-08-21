@@ -286,7 +286,7 @@ export const hide_make_new_SPRINGplot_popup = () => {
     .text('Choose file');
 }
 
-function show_make_new_SPRINGplot_popup() {
+export const show_make_new_SPRINGplot_popup = () => {
   let mywidth = parseInt(
     d3
       .select('#make_new_SPRINGplot_popup')

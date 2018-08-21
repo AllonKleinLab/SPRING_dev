@@ -1,978 +1,948 @@
 import * as d3 from 'd3';
 
-import { colorBar } from "./colorBar";
-import { LineSprite } from "./LineSprite";
+import ColorBar, { toggle_legend_hover_tooltip } from './colorBar';
+import { LineSprite } from './LineSprite';
 import { graph_directory, sub_directory } from './main';
-import { SPRITE_IMG_WIDTH } from './util';
-import { clone_sprites } from './clone_viewer';
+import { SPRITE_IMG_WIDTH, downloadFile, rgbToHex } from './util';
+import CloneViewer from './clone_viewer';
 import { selection_mode } from './selection_script';
 import { collapse_settings } from './settings_script';
+import { rotation_update } from './rotation_script';
+import { show_downloadSelectedExpr_popup } from './downloadSelectedExpr_script';
+import { show_make_new_SPRINGplot_popup } from './make_new_SPRINGplot_script';
+import { run_clustering } from './cluster2_script';
+import { show_PAGA_popup } from './PAGA_viewer';
+import { show_selection_logic_popup } from './selection_logic';
+import { show_imputation_popup } from './smoothing_imputation';
 
-export let all_nodes = [];
-export let all_outlines = [];
-export let being_dragged = false;
+export default class ForceLayout {
 
-export let width = window.innerWidth - 15;
-export let height = window.innerHeight - 70;
+  static _instance;
 
-export let app = new PIXI.Application(width, height, { backgroundColor: 0xdcdcdc });
-export let mutable = null;
-
-export let clone_edge_container = new PIXI.Container();
-export let edge_container = new PIXI.Container();
-export let sprites = new PIXI.Container();
-
-export let base_colors = new Array();
-
-export let coordinates = new Array();
-export let stashed_coordinates = new Array();
-
-export let force_on = 1;
-export let all_edges = new Array();
-export let all_edge_ends = new Array();
-
-export let xScale = d3.scaleLinear();
-export let yScale = d3.scaleLinear();
-export let zoomer = d3.zoom();
-
-export let svg_graph = {};
-
-export const forceLayout = (project_directory, sub_directory, callback) => {
-  d3.select('#toggleforce')
-    .select('button')
-    .on('click', toggleForce);
-  d3.select('#sound_toggle').style('visibility', 'hidden');
-  if (
-    d3
-      .select('#sound_toggle')
-      .select('img')
-      .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
-  ) {
-    let snd = new Audio('scripts_1_6_dev/sound_effects/opennew_sound.wav');
-    snd.play();
+  static get instance() {
+    if (!this._instance) {
+      throw new Error('You must first call ForceLayout.create()!');
+    }
+    return this._instance;
   }
 
-  const graphData_filename = project_directory + '/' + sub_directory + '/graph_data.json';
-  const coordinates_filename = graph_directory + '/' + sub_directory + '/coordinates.txt';
-  const filePath = project_directory + '/' + sub_directory + '/mutability.txt'
-  d3.text(filePath).then(text => {
-    if (text === null) {
-      mutable = true;
+  static async create(project_directory, sub_directory, callback) {
+    if (!this._instance) {
+      this._instance = new ForceLayout(project_directory, sub_directory);
+      await this._instance.loadData();
+      callback();
     } else {
-      mutable = false;
+      throw new Error(
+        'ForceLayout.create() has already been called, get the existing instance with ForceLayout.instance!',
+      );
     }
-  }).catch(err => console.log(`Unable to get mutability.txt at ${filePath}\n${err}`));
+  }
 
-  let keyCode = 0;
-  let nodeGraph = null;
+  constructor(project_directory, sub_directory) {
+    console.log('force constructor');
+    this.project_directory = project_directory;
+    this.sub_directory = sub_directory;
+    this.width = window.innerWidth - 15;
+    this.height = window.innerHeight - 70;
 
-  let svg = d3
-    .select('#force_layout')
-    .attr('tabindex', 1)
-    .each(function() {
-      this.focus();
-    })
-    .append('svg')
-    .attr('id', 'force_svg')
-    .attr('width', width)
-    .attr('height', height)
-    .style('background', 'rgba(0,0,0,0)')
-    .style('position', 'absolute')
-    .style('top', '0px');
+    this.all_edge_ends = new Array();
+    this.all_edges = new Array();
+    this.all_nodes = [];
+    this.all_outlines = [];
+    this.app = new PIXI.Application(this.width, this.height, { backgroundColor: 0xdcdcdc });
+    this.base_colors = new Array();
+    this.being_dragged = false;
+    this.coordinates = new Array();
+    this.edge_container = new PIXI.Container();
+    this.force_on = 1;
+    this.mutable = null;
+    this.sprites = new PIXI.Container();
+    this.stashed_coordinates = new Array();
+    this.svg_graph = {};
+    this.xScale = d3.scaleLinear();
+    this.yScale = d3.scaleLinear();
+    this.zoomer = d3.zoom();
 
-  zoomer = d3
-    .zoom()
-    .scaleExtent([0.02, 10])
-    .on('zoom', () => {
-      redraw();
-    });
-  /////////////////////////////////////////////////////////////////////
+    d3.select('#toggleforce')
+      .select('button')
+      .on('click', this.toggleForce);
+    d3.select('#sound_toggle').style('visibility', 'hidden');
+    if (
+      d3
+        .select('#sound_toggle')
+        .select('img')
+        .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+    ) {
+      let snd = new Audio('scripts_1_6_dev/sound_effects/opennew_sound.wav');
+      snd.play();
+    }
 
-  svg_graph = svg
-    .append('svg:g')
-    .call(zoomer)
-    .attr('id', 'svg_graph');
+    this.keyCode = 0;
+    this.nodeGraph = null;
 
-  d3.select('#force_svg')
-    .append('g')
-    .attr('id', 'vis');
+    this.svg = d3
+      .select('#force_layout')
+      .attr('tabindex', 1)
+      .each((d, i, nodes) => {
+        nodes[i].focus();
+      })
+      .append('svg')
+      .attr('id', 'force_svg')
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .style('background', 'rgba(0,0,0,0)')
+      .style('position', 'absolute')
+      .style('top', '0px');
 
-  let rect = svg_graph
-    .append('svg:rect')
-    .attr('width', width) //*1000)
-    .attr('height', height) //*1000)
-    //.attr('x',-width*500)
-    //.attr('y',-height*500)
-    .attr('fill', 'transparent')
-    .attr('stroke', 'transparent')
-    .attr('stroke-width', 1)
-    .attr('id', 'zrect');
+    this.zoomer = d3
+      .zoom()
+      .scaleExtent([0.02, 10])
+      .on('zoom', () => {
+        this.redraw();
+      });
+    /////////////////////////////////////////////////////////////////////
 
-  ///////////////////////
-  let svg_width = parseInt(d3.select('svg').attr('width'), 10);
+    this.svg_graph = this.svg
+      .append('svg:g')
+      .call(this.zoomer)
+      .attr('id', 'svg_graph');
 
-  let more_settings_rect = d3
-    .select('svg')
-    .append('rect')
-    .attr('class', 'other_frills')
-    .attr('id', 'show_edges_rect')
-    .attr('x', svg_width - 177)
-    .attr('y', 104)
-    .attr('fill', 'black')
-    .attr('fill-opacity', 0.25)
-    .attr('width', 200)
-    .attr('height', 46);
+    d3.select('#force_svg')
+      .append('g')
+      .attr('id', 'vis');
 
-  d3.select('svg')
-    .append('text')
-    .attr('pointer-events', 'none')
-    .attr('class', 'other_frills')
-    .attr('id', 'edge_text')
-    .attr('y', 122)
-    .attr('font-family', 'sans-serif')
-    .attr('font-size', '12px')
-    .attr('fill', 'white')
-    .append('tspan')
-    .attr('id', 'hide_edges_tspan')
-    .attr('x', svg_width - 167)
-    .attr('dy', 0)
-    .text('Hide edges')
-    .append('tspan')
-    .attr('id', 'hide_edges_sub_tspan')
-    .attr('x', svg_width - 167)
-    .attr('dy', 17)
-    .text('(runs faster)');
+    this.rect = this.svg_graph
+      .append('svg:rect')
+      .attr('width', this.width) //*1000)
+      .attr('height', this.height) //*1000)
+      //.attr('x',-width*500)
+      //.attr('y',-height*500)
+      .attr('fill', 'transparent')
+      .attr('stroke', 'transparent')
+      .attr('stroke-width', 1)
+      .attr('id', 'zrect');
 
-  let imgs = d3
-    .select('svg')
-    .selectAll('img')
-    .data([0]);
-  let edge_toggle_image = imgs
-    .enter()
-    .append('svg:image')
-    .attr('id', 'edge_toggle_image')
-    .attr('xlink:href', 'stuff/check-mark.svg')
-    .attr('x', svg_width - 70)
-    .attr('y', 115)
-    .attr('width', 25)
-    .attr('height', 25)
-    .attr('class', 'other_frills')
-    .on('click', toggle_edges);
+    ///////////////////////
+    this.svg_width = parseInt(d3.select('svg').attr('width'), 10);
 
-  d3.select('#toggle_edges_layout').on('click', toggle_edges);
+    this.more_settings_rect = d3
+      .select('svg')
+      .append('rect')
+      .attr('class', 'other_frills')
+      .attr('id', 'show_edges_rect')
+      .attr('x', this.svg_width - 177)
+      .attr('y', 104)
+      .attr('fill', 'black')
+      .attr('fill-opacity', 0.25)
+      .attr('width', 200)
+      .attr('height', 46);
 
-  // Read coordinates file if it exists
-  d3.text(coordinates_filename).then(text => {
+    d3.select('svg')
+      .append('text')
+      .attr('pointer-events', 'none')
+      .attr('class', 'other_frills')
+      .attr('id', 'edge_text')
+      .attr('y', 122)
+      .attr('font-family', 'sans-serif')
+      .attr('font-size', '12px')
+      .attr('fill', 'white')
+      .append('tspan')
+      .attr('id', 'hide_edges_tspan')
+      .attr('x', this.svg_width - 167)
+      .attr('dy', 0)
+      .text('Hide edges')
+      .append('tspan')
+      .attr('id', 'hide_edges_sub_tspan')
+      .attr('x', this.svg_width - 167)
+      .attr('dy', 17)
+      .text('(runs faster)');
+
+    this.imgs = d3
+      .select('svg')
+      .selectAll('img')
+      .data([0]);
+    this.edge_toggle_image = this.imgs
+      .enter()
+      .append('svg:image')
+      .attr('id', 'edge_toggle_image')
+      .attr('xlink:href', 'stuff/check-mark.svg')
+      .attr('x', this.svg_width - 70)
+      .attr('y', 115)
+      .attr('width', 25)
+      .attr('height', 25)
+      .attr('class', 'other_frills')
+      .on('click', this.toggle_edges);
+
+    d3.select('#toggle_edges_layout').on('click', this.toggle_edges);
+    return this;
+  }
+
+  loadData = async () => {
+    const filePath = this.project_directory + '/' + this.sub_directory + '/mutability.txt';
+    try {
+      const mutableText = await d3.text(filePath);
+      if (mutableText === null) {
+        this.mutable = true;
+      } else {
+        this.mutable = false;
+      }
+    } catch (err) {
+      console.log(`Unable to get mutability.txt at ${filePath}\n${err}`);
+    }
+
+    // Read coordinates file if it exists
+    const coordinates_filename = graph_directory + '/' + this.sub_directory + '/coordinates.txt';
+    const text = await d3.text(coordinates_filename);
     text.split('\n').forEach((entry, index, array) => {
       let items = entry.split(',');
       if (items.length > 1) {
         let xx = parseFloat($.trim(items[1]));
         let yy = parseFloat($.trim(items[2]));
         let nn = parseInt($.trim(items[0]), 10);
-        coordinates.push([xx, yy]);
+        this.coordinates.push([xx, yy]);
       }
     });
 
-    
-    document.getElementById('pixi_canvas_holder').appendChild(app.view);
+    document.getElementById('pixi_canvas_holder').appendChild(this.app.view);
 
-    sprites = new PIXI.Container();
-
-    sprites.interactive = true;
-    sprites.interactiveChildren = true;
+    this.sprites.interactive = true;
+    this.sprites.interactiveChildren = true;
 
     // create an array to store all the sprites
-    let totalSprites = app.renderer instanceof PIXI.WebGLRenderer ? coordinates.length : 100;
-    let sprite_chooser = Math.random();
+    let totalSprites = this.app.renderer instanceof PIXI.WebGLRenderer ? this.coordinates.length : 100;
+
+    this.create_sprites(totalSprites);
+
+    let stashed_coordinates = [{}];
+    for (let i in this.all_nodes) {
+      stashed_coordinates[0][i] = [this.all_nodes[i].x, this.all_nodes[i].y];
+    }
+
+    this.svg_graph.call(
+      d3
+        .drag()
+        .on('start', this.dragstarted)
+        .on('drag', this.dragged)
+        .on('end', this.dragended),
+    );
+
+    this.load_edges(this.all_nodes, this.sprites);
+  };
+
+  create_sprites(totalSprites) {
     for (let i = 0; i < totalSprites; i++) {
       let dude = PIXI.Sprite.fromImage('stuff/disc.png');
-      /*
-			if (sprite_chooser < 1/10) {
-				let dude = PIXI.Sprite.fromImage('stuff/mark.png')
-				SPRITE_IMG_WIDTH = 144;
-			} else if (sprite_chooser < 2/10) {
-				let dude = PIXI.Sprite.fromImage('stuff/leon.png')
-				SPRITE_IMG_WIDTH = 144;
-			} else if (sprite_chooser < 3/10) {
-				let dude = PIXI.Sprite.fromImage('stuff/james.png')
-				SPRITE_IMG_WIDTH = 144;
-			} else {
-				let dude = PIXI.Sprite.fromImage('stuff/disc.png');
-				SPRITE_IMG_WIDTH = 32;
-			}
-			*/
-
       dude.anchor.set(0.5);
       dude.scale.set((0.5 * 32) / SPRITE_IMG_WIDTH);
-      dude.x = coordinates[i][0];
-      dude.y = coordinates[i][1];
+      dude.x = this.coordinates[i][0];
+      dude.y = this.coordinates[i][1];
       dude.tint = parseInt(rgbToHex(0, 0, 0), 16);
       dude.alpha = 1;
       dude.interactive = true;
       dude.index = i;
       dude.bump = 0;
       dude.beingDragged = false;
-      sprites.addChild(dude);
-      all_nodes.push(dude);
-      base_colors.push({ r: 0, g: 0, b: 0 });
+      this.sprites.addChild(dude);
+      this.all_nodes.push(dude);
+      this.base_colors.push({ r: 0, g: 0, b: 0 });
 
       let outline = PIXI.Sprite.fromImage('stuff/annulus.png');
       outline.anchor.set(0.5);
       outline.scale.set(0.5);
-      outline.x = coordinates[i][0];
-      outline.y = coordinates[i][1];
+      outline.x = this.coordinates[i][0];
+      outline.y = this.coordinates[i][1];
       outline.tint = 0xffff00;
       outline.index = i;
       outline.bump = 0.0001;
       outline.alpha = 0;
       outline.selected = false;
       outline.compared = false;
-      sprites.addChild(outline);
-      all_outlines.push(outline);
+      this.sprites.addChild(outline);
+      this.all_outlines.push(outline);
     }
+  }
 
-    let stashed_coordinates = [{}];
-    for (let i in all_nodes) {
-      stashed_coordinates[0][i] = [all_nodes[i].x, all_nodes[i].y];
-    }
-
-    svg_graph.call(
-      d3
-        .drag()
-        .on('start', dragstarted)
-        .on('drag', dragged)
-        .on('end', dragended),
-    );
-
-    loadColors(graph_directory, sub_directory, all_nodes, base_colors);
-    load_edges(all_nodes, sprites, app);
-  });
-
-  function load_edges(all_nodes, sprites, app) {
-    edge_container = new PIXI.Container();
-
-    edge_container.position = sprites.position;
-    edge_container.scale = sprites.scale;
-    edge_container.alpha = 0.5;
+  load_edges = async (all_nodes, sprites) => {
+    this.edge_container.position = sprites.position;
+    this.edge_container.scale = sprites.scale;
+    this.edge_container.alpha = 0.5;
     let neighbors = {};
     for (let i = 0; i < all_nodes.length; i++) {
       neighbors[i] = [];
     }
-    $.get(project_directory + '/' + sub_directory + '/edges.csv')
-      .done(function(text) {
-        text.split('\n').forEach(function(entry, index) {
-          if (entry.length > 0) {
-            let items = entry.split(';');
-            let source = parseInt(items[0], 10);
-            let target = parseInt(items[1], 10);
+    try {
+      const edgesText = await d3.text(this.project_directory + '/' + this.sub_directory + '/edges.csv');
+      edgesText.split('\n').forEach((entry, index) => {
+        if (entry.length > 0) {
+          let items = entry.split(';');
+          let source = parseInt(items[0], 10);
+          let target = parseInt(items[1], 10);
 
-            neighbors[source].push(target);
-            neighbors[target].push(source);
+          neighbors[source].push(target);
+          neighbors[target].push(source);
 
-            let x1 = all_nodes[source].x;
-            let y1 = all_nodes[source].y;
-            let x2 = all_nodes[target].x;
-            let y2 = all_nodes[target].y;
+          let x1 = all_nodes[source].x;
+          let y1 = all_nodes[source].y;
+          let x2 = all_nodes[target].x;
+          let y2 = all_nodes[target].y;
 
-            let color = 6579301;
-            let s = new LineSprite(4, color, x1, y1, x2, y2);
-            s.color = color;
-            edge_container.addChild(s);
-            all_edges.push(s);
-            all_edge_ends.push({ source: source, target: target });
-          }
-        });
-        app.stage.addChild(edge_container);
-        app.stage.addChild(sprites);
-        callback();
-      })
-      .fail(function() {
-        app.stage.addChild(edge_container);
-        app.stage.addChild(sprites);
-        callback();
+          let color = 6579301;
+          let s = new LineSprite(4, color, x1, y1, x2, y2);
+          s.color = color;
+          this.edge_container.addChild(s);
+          this.all_edges.push(s);
+          this.all_edge_ends.push({ source: source, target: target });
+        }
       });
-  }
+      this.app.stage.addChild(this.edge_container);
+      this.app.stage.addChild(sprites);
+    } catch {
+      this.app.stage.addChild(this.edge_container);
+      this.app.stage.addChild(this.sprites);
+    }
+  };
 
-  function dragstarted() {
+  dragstarted() {
     if (selection_mode === 'drag_pan_zoom') {
       let dim = document.getElementById('svg_graph').getBoundingClientRect();
       let x = d3.event.sourceEvent.clientX - dim.left;
       let y = d3.event.sourceEvent.clientY - dim.top;
-      x = (x - sprites.position.x) / sprites.scale.x;
-      y = (y - sprites.position.y) / sprites.scale.y;
+      x = (x - this.sprites.position.x) / this.sprites.scale.x;
+      y = (y - this.sprites.position.y) / this.sprites.scale.y;
       let clicked_pos_sel = false;
       let clicked_neg_sel = false;
-      for (let i = 0; i < all_nodes.length; i++) {
-        if (all_outlines[i].selected) {
-          let rad = Math.sqrt((all_nodes[i].x - x) ** 2 + (all_nodes[i].y - y) ** 2);
-          if (rad < all_nodes[i].scale.x * 20) {
+      for (let i = 0; i < this.all_nodes.length; i++) {
+        if (this.all_outlines[i].selected) {
+          let rad = Math.sqrt((this.all_nodes[i].x - x) ** 2 + (this.all_nodes[i].y - y) ** 2);
+          if (rad < this.all_nodes[i].scale.x * 20) {
             clicked_pos_sel = true;
           }
         }
-        if (all_outlines[i].compared) {
-          const newRad = Math.sqrt((all_nodes[i].x - x) ** 2 + (all_nodes[i].y - y) ** 2);
-          if (newRad < all_nodes[i].scale.x * 20) {
+        if (this.all_outlines[i].compared) {
+          const newRad = Math.sqrt((this.all_nodes[i].x - x) ** 2 + (this.all_nodes[i].y - y) ** 2);
+          if (newRad < this.all_nodes[i].scale.x * 20) {
             clicked_neg_sel = true;
           }
         }
       }
       if (clicked_pos_sel || clicked_neg_sel) {
-        let stash_i = stashed_coordinates.length;
-        stashed_coordinates.push({});
-        for (let i in all_nodes) {
-          stashed_coordinates[stash_i][i] = [all_nodes[i].x, all_nodes[i].y];
+        let stash_i = this.stashed_coordinates.length;
+        this.stashed_coordinates.push({});
+        for (let i in this.all_nodes) {
+          this.stashed_coordinates[stash_i][i] = [this.all_nodes[i].x, this.all_nodes[i].y];
         }
       }
       if (clicked_pos_sel) {
-        being_dragged = true;
-        for (let i = 0; i < all_nodes.length; i++) {
-          if (all_outlines[i].selected) {
-            all_nodes[i].beingDragged = true;
+        this.being_dragged = true;
+        for (let i = 0; i < this.all_nodes.length; i++) {
+          if (this.all_outlines[i].selected) {
+            this.all_nodes[i].beingDragged = true;
           }
         }
       }
       if (clicked_neg_sel) {
-        being_dragged = true;
-        for (let i = 0; i < all_nodes.length; i++) {
-          if (all_outlines[i].compared) {
-            all_nodes[i].beingDragged = true;
+        this.being_dragged = true;
+        for (let i = 0; i < this.all_nodes.length; i++) {
+          if (this.all_outlines[i].compared) {
+            this.all_nodes[i].beingDragged = true;
           }
         }
       }
     }
   }
 
-  function dragged() {
-    for (let i = 0; i < all_nodes.length; i++) {
-      if (all_nodes[i].beingDragged) {
-        all_nodes[i].x += d3.event.dx / sprites.scale.x;
-        all_nodes[i].y += d3.event.dy / sprites.scale.y;
-        all_outlines[i].x += d3.event.dx / sprites.scale.x;
-        all_outlines[i].y += d3.event.dy / sprites.scale.y;
+  dragged() {
+    for (let i = 0; i < this.all_nodes.length; i++) {
+      if (this.all_nodes[i].beingDragged) {
+        this.all_nodes[i].x += d3.event.dx / this.sprites.scale.x;
+        this.all_nodes[i].y += d3.event.dy / this.sprites.scale.y;
+        this.all_outlines[i].x += d3.event.dx / this.sprites.scale.x;
+        this.all_outlines[i].y += d3.event.dy / this.sprites.scale.y;
       }
     }
-    for (let i = 0; i < all_edges.length; i++) {
-      if (all_nodes[all_edge_ends[i].source].beingDragged || all_nodes[all_edge_ends[i].target].beingDragged) {
-        //console.log([all_nodes[all_edge_ends[i].source].beingDragged, all_nodes[all_edge_ends[i].target].beingDragged]);
-        //console.log([all_nodes[all_edge_ends[i].source].x - all_edges[i].x1, all_nodes[all_edge_ends[i].target].x - all_edges[i].x2]);
-        //console.log([all_edges[i].x1,all_edges[i].x2]);
-        all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
-        all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
-        all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
-        all_edges[i].y2 = all_nodes[all_edge_ends[i].target].y;
-        all_edges[i].updatePosition();
+    for (let i = 0; i < this.all_edges.length; i++) {
+      if (
+        this.all_nodes[this.all_edge_ends[i].source].beingDragged ||
+        this.all_nodes[this.all_edge_ends[i].target].beingDragged
+      ) {
+        this.all_edges[i].x1 = this.all_nodes[this.all_edge_ends[i].source].x;
+        this.all_edges[i].y1 = this.all_nodes[this.all_edge_ends[i].source].y;
+        this.all_edges[i].x2 = this.all_nodes[this.all_edge_ends[i].target].x;
+        this.all_edges[i].y2 = this.all_nodes[this.all_edge_ends[i].target].y;
+        this.all_edges[i].updatePosition();
       }
     }
   }
 
-  function dragended() {
-    being_dragged = false;
-    for (let i = 0; i < all_nodes.length; i++) {
-      all_nodes[i].beingDragged = false;
+  dragended() {
+    this.being_dragged = false;
+    for (let i = 0; i < this.all_nodes.length; i++) {
+      this.all_nodes[i].beingDragged = false;
     }
   }
 
-  function toggle_edges() {
-    if (edge_container.visible === true) {
-      edge_toggle_image.attr('xlink:href', 'stuff/ex-mark.svg');
-      edge_container.visible = false;
+  toggle_edges() {
+    if (this.edge_container.visible === true) {
+      this.edge_toggle_image.attr('xlink:href', 'stuff/ex-mark.svg');
+      this.edge_container.visible = false;
       d3.select('#edge_text')
         .selectAll('tspan')
         .remove();
       d3.select('#edge_text')
         .append('tspan')
         .attr('id', 'hide_edges_tspan')
-        .attr('x', svg_width - 167)
+        .attr('x', this.svg_width - 167)
         .attr('dy', 0)
         .text('Show edges')
         .append('tspan')
         .attr('id', 'hide_edges_sub_tspan')
-        .attr('x', svg_width - 167)
+        .attr('x', this.svg_width - 167)
         .attr('dy', 17)
         .text('(runs slower)');
       d3.select('#toggle_edges_layout').text('Show edges');
     } else {
-      edge_toggle_image.attr('xlink:href', 'stuff/check-mark.svg');
-      edge_container.visible = true;
+      this.edge_toggle_image.attr('xlink:href', 'stuff/check-mark.svg');
+      this.edge_container.visible = true;
       d3.select('#edge_text')
         .selectAll('tspan')
         .remove();
       d3.select('#edge_text')
         .append('tspan')
         .attr('id', 'hide_edges_tspan')
-        .attr('x', svg_width - 167)
+        .attr('x', this.svg_width - 167)
         .attr('dy', 0)
         .text('Hide edges')
         .append('tspan')
         .attr('id', 'hide_edges_sub_tspan')
-        .attr('x', svg_width - 167)
+        .attr('x', this.svg_width - 167)
         .attr('dy', 17)
         .text('(runs faster)');
       d3.select('#toggle_edges_layout').text('Hide edges');
     }
   }
-};
 
-export const move_selection_aside = (side) => {
-  // find left and right most edge of selected and non selected cells
-  let sel_x = [];
-  let non_x = [];
-  for (let i = 0; i < all_nodes.length; i++) {
-    if (all_outlines[i].selected) {
-      sel_x.push(all_nodes[i].x);
-    } else {
-      non_x.push(all_nodes[i].x);
-    }
-  }
-  let new_coordinates = {};
-  let offset = 0;
-  if (side === 'left') {
-    offset = d3.min(non_x) - d3.max(sel_x) - 5;
-  } else {
-    offset = d3.max(non_x) - d3.min(sel_x) + 5;
-  }
-  function next_frame(steps, current_frame) {
-    current_frame += 1;
-    for (let i = 0; i < all_nodes.length; i++) {
-      if (all_outlines[i].selected) {
-        let y = all_nodes[i].y;
-        let x = all_nodes[i].x + offset / steps;
-        move_node(i, x, y);
+  move_selection_aside(side) {
+    // find left and right most edge of selected and non selected cells
+    let sel_x = [];
+    let non_x = [];
+    for (let i = 0; i < this.all_nodes.length; i++) {
+      if (this.all_outlines[i].selected) {
+        sel_x.push(this.all_nodes[i].x);
+      } else {
+        non_x.push(this.all_nodes[i].x);
       }
     }
-    if (current_frame < steps) {
-      setTimeout(function() {
-        next_frame(steps, current_frame);
-      }, 2);
+    let new_coordinates = {};
+    let offset = 0;
+    if (side === 'left') {
+      offset = d3.min(non_x) - d3.max(sel_x) - 5;
     } else {
-      center_view(false);
-      adjust_edges();
-      if (d3.select('#edge_toggle_image').attr('xlink:href') === 'stuff/check-mark.svg') {
-        blend_edges();
+      offset = d3.max(non_x) - d3.min(sel_x) + 5;
+    }
+
+    function next_frame(steps, current_frame) {
+      current_frame += 1;
+      for (let i = 0; i < this.all_nodes.length; i++) {
+        if (this.all_outlines[i].selected) {
+          let y = this.all_nodes[i].y;
+          let x = this.all_nodes[i].x + offset / steps;
+          this.move_node(i, x, y);
+        }
+      }
+      if (current_frame < steps) {
+        setTimeout(() => {
+          next_frame(steps, current_frame);
+        }, 2);
+      } else {
+        this.center_view(false);
+        this.adjust_edges();
+        if (d3.select('#edge_toggle_image').attr('xlink:href') === 'stuff/check-mark.svg') {
+          this.blend_edges();
+        }
       }
     }
-  }
-  edge_container.visible = false;
-  next_frame(6, -1);
-}
 
-export const revert_positions = () => {
-  let stash_i = stashed_coordinates.length - 1;
-  for (let i in stashed_coordinates[stash_i]) {
-    move_node(i, stashed_coordinates[stash_i][i][0], stashed_coordinates[stash_i][i][1]);
-  }
-  adjust_edges();
-  stashed_coordinates = stashed_coordinates.slice(0, stashed_coordinates.length - 1);
-}
+    this.edge_container.visible = false;
+    next_frame(6, -1);
+  };
 
-export const move_node = (i, x, y) => {
-  all_nodes[i].x = x;
-  all_nodes[i].y = y;
-  all_outlines[i].x = x;
-  all_outlines[i].y = y;
-}
+  revert_positions = () => {
+    let stash_i = this.stashed_coordinates.length - 1;
+    for (let i in this.stashed_coordinates[stash_i]) {
+      this.move_node(i, this.stashed_coordinates[stash_i][i][0], this.stashed_coordinates[stash_i][i][1]);
+    }
+    this.adjust_edges();
+    this.stashed_coordinates = this.stashed_coordinates.slice(0, this.stashed_coordinates.length - 1);
+  };
 
-export const adjust_edges = () => {
-  for (let i in all_edges) {
-    all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
-    all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
-    all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
-    all_edges[i].y2 = all_nodes[all_edge_ends[i].target].y;
-    all_edges[i].updatePosition();
-  }
-}
+  move_node = (i, x, y) => {
+    this.all_nodes[i].x = x;
+    this.all_nodes[i].y = y;
+    this.all_outlines[i].x = x;
+    this.all_outlines[i].y = y;
+  };
 
-export const animation = () => {
-  // check if animation exists. if so, hide sprites and load it
-  const filePath = graph_directory + '/' + sub_directory + '/animation.txt';
-  d3.text(filePath).then(data => {
-      let animation_frames = [];
-      data.split('\n').forEach(function(line) {
-        if (line.length > 0) {
-          let aframe = [];
-          let xx = line.split(';')[0].split(',');
-          let yy = line.split(';')[1].split(',');
-          for (let i in xx) {
-            aframe.push([parseFloat(xx[i]), parseFloat(yy[i])]);
+  adjust_edges = () => {
+    for (let i in this.all_edges) {
+      this.all_edges[i].x1 = this.all_nodes[this.all_edge_ends[i].source].x;
+      this.all_edges[i].y1 = this.all_nodes[this.all_edge_ends[i].source].y;
+      this.all_edges[i].x2 = this.all_nodes[this.all_edge_ends[i].target].x;
+      this.all_edges[i].y2 = this.all_nodes[this.all_edge_ends[i].target].y;
+      this.all_edges[i].updatePosition();
+    }
+  };
+
+  animation = () => {
+    // check if animation exists. if so, hide sprites and load it
+    const filePath = graph_directory + '/' + this.sub_directory + '/animation.txt';
+    d3.text(filePath)
+      .then(data => {
+        let animation_frames = [];
+        data.split('\n').forEach(line => {
+          if (line.length > 0) {
+            let aframe = [];
+            let xx = line.split(';')[0].split(',');
+            let yy = line.split(';')[1].split(',');
+            for (let i in xx) {
+              aframe.push([parseFloat(xx[i]), parseFloat(yy[i])]);
+            }
+            animation_frames.push(aframe);
           }
-          animation_frames.push(aframe);
+        });
+        let any_diff = false;
+        for (let i = 0; i < this.coordinates.length; i++) {
+          if (Math.abs(this.coordinates[i][0] - animation_frames[animation_frames.length - 1][i][0]) > 5) {
+            any_diff = true;
+          }
+          if (Math.abs(this.coordinates[i][1] - animation_frames[animation_frames.length - 1][i][1]) > 5) {
+            any_diff = true;
+          }
+        }
+
+        this.sprites.visible = true;
+
+        function next_frame_anim(current_frame) {
+          current_frame += 1;
+          let tmp_coordinates = animation_frames[current_frame];
+
+          for (let i = 0; i < this.all_nodes.length; i++) {
+            this.all_nodes[i].x = tmp_coordinates[i][0];
+            this.all_nodes[i].y = tmp_coordinates[i][1];
+            this.all_outlines[i].x = tmp_coordinates[i][0];
+            this.all_outlines[i].y = tmp_coordinates[i][1];
+          }
+
+          if (current_frame + 1 < animation_frames.length) {
+            setTimeout(function() {
+              next_frame_anim(current_frame);
+            }, 1);
+          } else {
+            next_frame_interp(-1, 10);
+          }
+        }
+
+        function next_frame_interp(current_frame, steps) {
+          current_frame += 1;
+          if (current_frame + 1 > steps || !any_diff) {
+            this.blend_edges();
+          } else {
+            let last_frame = animation_frames[animation_frames.length - 1];
+            for (let i = 0; i < this.all_nodes.length; i++) {
+              this.all_nodes[i].x += (this.coordinates[i][0] - last_frame[i][0]) / steps;
+              this.all_nodes[i].y += (this.coordinates[i][1] - last_frame[i][1]) / steps;
+              this.all_outlines[i].x += (this.coordinates[i][0] - last_frame[i][0]) / steps;
+              this.all_outlines[i].y += (this.coordinates[i][1] - last_frame[i][1]) / steps;
+            }
+            setTimeout(function() {
+              next_frame_interp(current_frame, steps);
+            }, 1);
+          }
+        }
+
+        next_frame_anim(-1);
+      })
+      .catch(err => {
+        this.sprites.visible = true;
+        this.edge_container.visible = true;
+      });
+  };
+
+  blend_edges = () => {
+    this.edge_container.alpha = 0;
+    this.edge_container.visible = true;
+
+    function next_frame(current_frame, min, max, steps) {
+      current_frame += 1;
+      let alpha = (current_frame * (max - min)) / steps + min;
+      this.edge_container.alpha = alpha;
+      if (alpha < max) {
+        setTimeout(function() {
+          next_frame(current_frame, min, max, steps);
+        }, 5);
+      }
+    }
+
+    next_frame(-1, 0, 0.5, 10);
+  };
+
+  toggleForce = () => {
+    if (this.force_on === 1) {
+      console.log('turning force off');
+      d3.select('#toggleforce')
+        .select('button')
+        .text('Resume');
+      this.force_on = 0;
+      this.force.stop();
+    } else {
+      console.log('turning force on');
+      d3.select('#toggleforce')
+        .select('button')
+        .text('Pause');
+      this.force_on = 1;
+      this.force.resume();
+    }
+  };
+
+  hideAccessories = () => {
+    d3.selectAll('.other_frills').style('visibility', 'hidden');
+    d3.selectAll('.selection_option').style('visibility', 'hidden');
+    d3.selectAll('.colorbar_item').style('visibility', 'hidden');
+    d3.select('svg').style('background-color', 'white');
+  };
+
+  showAccessories = () => {
+    d3.selectAll('.other_frills').style('visibility', 'visible');
+    d3.selectAll('.selection_option').style('visibility', 'visible');
+    d3.selectAll('.colorbar_item').style('visibility', 'visible');
+    d3.select('svg').style('background-color', '#D6D6D6');
+  };
+
+  downloadSelection = () => {
+    let cell_filter_filename = window.location.search.slice(1, name.length) + '/cell_filter.txt';
+    d3.text(cell_filter_filename).then(cellText => {
+      let cell_nums = cellText.split('\n');
+      let text = '';
+      for (let i = 0; i < this.all_nodes.length; i++) {
+        if (this.all_outlines[i].selected) {
+          text = text + i.toString() + ',' + cell_nums[i] + '\n';
+        }
+      }
+      downloadFile(text, 'selected_cells.txt');
+    });
+  };
+
+  downloadCoordinates = () => {
+    let text = '';
+    for (let i = 0; i < this.all_nodes.length; i++) {
+      text += i.toString() + ',' + this.all_nodes[i].x.toString() + ',' + this.all_nodes[i].y.toString() + '\n';
+    }
+    downloadFile(text, 'coordinates.txt');
+  };
+
+  initiateButtons = () => {
+    d3.select('#help').on('click', () => {
+      let win = window.open('helppage.html', '_blank');
+      win.focus();
+    });
+
+    d3.select('#center_view').on('click', () => {
+      this.center_view(true);
+    });
+
+    d3.select('#revert_positions').on('click', this.revert_positions);
+
+    d3.select('#move_left').on('click', () => {
+      this.move_selection_aside('left');
+    });
+    d3.select('#move_right').on('click', () => {
+      this.move_selection_aside('right');
+    });
+
+    d3.select('#save_coords')
+      .select('button')
+      .on('click', () => {
+        if (this.mutable) {
+          let text = '';
+          d3.select('.node')
+            .selectAll('circle')
+            .each(d => {
+              text = text + d.number + ',' + d.x.toString() + ',' + d.y.toString() + '\n';
+            });
+          let name = window.location.search;
+          let path =
+            'coordinates/' + name.slice(9, name.length).split('/')[1] + '_coordinates.' + this.sub_directory + '.txt';
+          $.ajax({
+            data: { path: path, content: text },
+            type: 'POST',
+            url: 'cgi-bin/save_data.py',
+          });
         }
       });
-      let any_diff = false;
-      for (let i = 0; i < coordinates.length; i++) {
-        if (Math.abs(coordinates[i][0] - animation_frames[animation_frames.length - 1][i][0]) > 5) {
-          any_diff = true;
-        }
-        if (Math.abs(coordinates[i][1] - animation_frames[animation_frames.length - 1][i][1]) > 5) {
-          any_diff = true;
-        }
-      }
 
-      sprites.visible = true;
+    d3.select('#download_png')
+      .on('click', this.download_png)
+      .on('mouseenter', () => {
+        d3.select('#container')
+          .append('div')
+          .attr('id', 'screenshot_tooltip')
+          .style('position', 'absolute')
+          .style('padding-top', '8px')
+          .style('padding-bottom', '8px')
+          .style('padding-left', '10px')
+          .style('padding-right', '10px')
+          .style('width', '150px')
+          .style(
+            'left',
+            (
+              parseInt(
+                d3
+                  .select('#download_dropdown')
+                  .style('left')
+                  .split('px')[0],
+                10,
+              ) - 8
+            ).toString() + 'px',
+          )
+          .style('top', d3.select('#download_dropdown').style('height'))
+          .style('background-color', 'rgba(0,0,0,.4)')
+          .append('p')
+          .text('Zoom in on plot for higher resolution download')
+          .style('margin', '0px')
+          .style('color', 'white')
+          .style('font-family', 'sans-serif')
+          .style('font-size', '13px');
+      })
+      .on('mouseleave', () => {
+        d3.select('#screenshot_tooltip').remove();
+      });
 
-      function next_frame_anim(current_frame) {
-        current_frame += 1;
-        let tmp_coordinates = animation_frames[current_frame];
+    d3.select('#rotation_update').on('click', () => rotation_update());
 
-        for (let i = 0; i < all_nodes.length; i++) {
-          all_nodes[i].x = tmp_coordinates[i][0];
-          all_nodes[i].y = tmp_coordinates[i][1];
-          all_outlines[i].x = tmp_coordinates[i][0];
-          all_outlines[i].y = tmp_coordinates[i][1];
-        }
+    d3.select('#download_coordinates').on('click', () => this.downloadCoordinates());
 
-        // 				for (let i=0; i<all_edges.length; i++) {
-        // 					all_edges[i].x1 = all_nodes[all_edge_ends[i].source].x;
-        // 					all_edges[i].y1 = all_nodes[all_edge_ends[i].source].y;
-        // 					all_edges[i].x2 = all_nodes[all_edge_ends[i].target].x;
-        // 					all_edges[i].y2 = all_nodes[all_edge_ends[i].target].y;
-        // 					all_edges[i].updatePosition();
-        // 				}
+    d3.select('#download_selection').on('click', () => this.downloadSelection());
 
-        if (current_frame + 1 < animation_frames.length) {
-          setTimeout(function() {
-            next_frame_anim(current_frame);
-          }, 1);
-        } else {
-          next_frame_interp(-1, 10);
-        }
-      }
+    d3.select('#show_download__selected_expr_popup').on('click', () => show_downloadSelectedExpr_popup());
 
-      function next_frame_interp(current_frame, steps) {
-        current_frame += 1;
-        if (current_frame + 1 > steps || !any_diff) {
-          blend_edges();
-        } else {
-          let last_frame = animation_frames[animation_frames.length - 1];
-          for (let i = 0; i < all_nodes.length; i++) {
-            all_nodes[i].x += (coordinates[i][0] - last_frame[i][0]) / steps;
-            all_nodes[i].y += (coordinates[i][1] - last_frame[i][1]) / steps;
-            all_outlines[i].x += (coordinates[i][0] - last_frame[i][0]) / steps;
-            all_outlines[i].y += (coordinates[i][1] - last_frame[i][1]) / steps;
-          }
-          setTimeout(function() {
-            next_frame_interp(current_frame, steps);
-          }, 1);
-        }
-      }
+    d3.select('#show_make_new_SPRINGplot_popup').on('click', () => show_make_new_SPRINGplot_popup());
 
-      next_frame_anim(-1);
-    })
-    .catch(err => {
-      sprites.visible = true;
-      edge_container.visible = true;
-  });
-}
-
-export const blend_edges = () => {
-  edge_container.alpha = 0;
-  edge_container.visible = true;
-
-  function next_frame(current_frame, min, max, steps) {
-    current_frame += 1;
-    let alpha = (current_frame * (max - min)) / steps + min;
-    edge_container.alpha = alpha;
-    if (alpha < max) {
-      setTimeout(function() {
-        next_frame(current_frame, min, max, steps);
-      }, 5);
-    }
-  }
-
-  next_frame(-1, 0, 0.5, 10);
-}
-
-export const UrlExists = (url) => {
-  $.get(url)
-    .done(function() {
-      console.log('yes');
-    })
-    .fail(function() {
-      console.log('no');
+    d3.select('#start_clone_viewer').on('click', () => {
+      CloneViewer.instance.start_clone_viewer();
     });
-}
+    d3.select('#show_imputation_popup').on('click', () => show_imputation_popup());
+    d3.select('#show_selection_logic_popup').on('click', () => show_selection_logic_popup());
+    d3.select('#show_doublet_popup').on('click', () => show_make_new_SPRINGplot_popup());
+    d3.select('#run_clustering').on('click', () => run_clustering());
+    d3.select('#show_PAGA_popup').on('click', () => show_PAGA_popup());
+    d3.select('#toggle_legend_hover_tooltip_button').on('click', () => toggle_legend_hover_tooltip());
+  };
+  download_png = () => {
+    let searchPaths = window.location.search.split('/');
+    const path = searchPaths[searchPaths.length - 2] + '_' + searchPaths[searchPaths.length - 1] + '.png';
+    this.download_sprite_as_png(this.app.renderer, this.app.stage, path);
+  };
 
-export const toggleForce = () => {
-  if (force_on === 1) {
-    console.log('turning force off');
-    d3.select('#toggleforce')
-      .select('button')
-      .text('Resume');
-    force_on = 0;
-    force.stop();
-  } else {
-    console.log('turning force on');
-    d3.select('#toggleforce')
-      .select('button')
-      .text('Pause');
-    force_on = 1;
-    force.resume();
-  }
-}
+  download_sprite_as_png = (renderer, sprite, fileName) => {
+    renderer.extract.canvas(sprite).toBlob(b => {
+      let a = document.createElement('a');
+      document.body.append(a);
+      a.download = fileName;
+      a.href = URL.createObjectURL(b);
+      a.click();
+      a.remove();
+    }, 'image/png');
+  };
+  showToolsDropdown = () => {
+    if (d3.select('#tools_dropdown').style('height') === 'auto') {
+      this.closeDropdown();
+      collapse_settings();
+      setTimeout(() => {
+        document.getElementById('tools_dropdown').classList.toggle('show');
+      }, 10);
+    }
+  };
 
-export const loadColors = (graph_directory, sub_directory, all_nodes, base_colors) => {
-  d3.select('#load_colors').remove();
-  let base_dir = graph_directory;
-  let sub_dir = graph_directory + '/' + sub_directory;
+  showDownloadDropdown = () => {
+    if (d3.select('#download_dropdown').style('height') === 'auto') {
+      this.closeDropdown();
+      collapse_settings();
+      setTimeout(() => {
+        document.getElementById('download_dropdown').classList.toggle('show');
+      }, 10);
+    }
+  };
 
-  $.ajax({
-    data: { base_dir: base_dir},
-    success: function(python_data) {
-      colorBar(sub_dir, python_data, all_nodes, base_colors);
-    },
-    type: 'POST',
-    url: 'cgi-bin/load_counts.py',
-  });
-}
+  showLayoutDropdown = () => {
+    if (d3.select('#layout_dropdown').style('height') === 'auto') {
+      this.closeDropdown();
+      collapse_settings();
+      setTimeout(() => {
+        document.getElementById('layout_dropdown').classList.toggle('show');
+      }, 10);
+    }
+  };
 
-export const makeTextFile = (text) => {
-  let textFile = '';
-  let data = new Blob([text], { type: 'text/plain' });
-
-  // If we are replacing a previously generated file we need to
-  // manually revoke the object URL to avoid memory leaks.
-  window.URL.revokeObjectURL(textFile);
-
-  textFile = window.URL.createObjectURL(data);
-  return textFile;
-}
-
-export const downloadFile = (text, name) => {
-  if (
-    d3
-      .select('#sound_toggle')
-      .select('img')
-      .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
-  ) {
-    let snd = new Audio('scripts_1_6_dev/sound_effects/download_sound.wav');
-    snd.play();
-  }
-  let hiddenElement = document.createElement('a');
-  hiddenElement.href = 'data:attachment/text,' + encodeURI(text);
-  hiddenElement.target = '_blank';
-  hiddenElement.download = name;
-  hiddenElement.click();
-}
-
-export const hideAccessories = () => {
-  d3.selectAll('.other_frills').style('visibility', 'hidden');
-  d3.selectAll('.selection_option').style('visibility', 'hidden');
-  d3.selectAll('.colorbar_item').style('visibility', 'hidden');
-  d3.select('svg').style('background-color', 'white');
-}
-
-export const showAccessories = () => {
-  d3.selectAll('.other_frills').style('visibility', 'visible');
-  d3.selectAll('.selection_option').style('visibility', 'visible');
-  d3.selectAll('.colorbar_item').style('visibility', 'visible');
-  d3.select('svg').style('background-color', '#D6D6D6');
-}
-
-export const downloadSelection = () => {
-  let cell_filter_filename = window.location.search.slice(1, name.length) + '/cell_filter.txt';
-  d3.text(cell_filter_filename).then(cellText => {
-    let cell_nums = cellText.split('\n');
-    let text = '';
-    for (let i = 0; i < all_nodes.length; i++) {
-      if (all_outlines[i].selected) {
-        text = text + i.toString() + ',' + cell_nums[i] + '\n';
+  closeDropdown = () => {
+    let dropdowns = document.getElementsByClassName('dropdown-content');
+    let i;
+    for (let i = 0; i < dropdowns.length; i++) {
+      let openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
       }
     }
-    downloadFile(text, 'selected_cells.txt');
-  });
-}
+  };
 
-export const downloadCoordinates = () => {
-  let text = '';
-  for (let i = 0; i < all_nodes.length; i++) {
-    text += i.toString() + ',' + all_nodes[i].x.toString() + ',' + all_nodes[i].y.toString() + '\n';
-  }
-  downloadFile(text, 'coordinates.txt');
-}
+  setup_download_dropdown = () => {
+    //d3.select("#download_dropdown_button").on("mouseenter",showDownloadDropdown);
+    d3.select('#download_dropdown_button').on('click', this.showDownloadDropdown);
+  };
 
-export const initiateButtons = () => {
-  d3.select('#help').on('click', function() {
-    let win = window.open('helppage.html', '_blank');
-    win.focus();
-  });
+  setup_tools_dropdown = () => {
+    d3.select('#tools_dropdown_button').on('click', this.showToolsDropdown);
+  };
 
-  d3.select('#center_view').on('click', function() {
-    center_view(true);
-  });
+  setup_layout_dropdown = () => {
+    //d3.select("#layout_dropdown_button").on("mouseover",showLayoutDropdown);
+    d3.select('#layout_dropdown_button').on('click', this.showLayoutDropdown);
+  };
 
-  d3.select('#revert_positions').on('click', revert_positions);
-
-  d3.select('#move_left').on('click', function() {
-    move_selection_aside('left');
-  });
-  d3.select('#move_right').on('click', function() {
-    move_selection_aside('right');
-  });
-
-  d3.select('#save_coords')
-    .select('button')
-    .on('click', function() {
-      if (mutable) {
-        let text = '';
-        d3.select('.node')
-          .selectAll('circle')
-          .each(function(d) {
-            text = text + d.number + ',' + d.x.toString() + ',' + d.y.toString() + '\n';
-          });
-        let name = window.location.search;
-        let path = 'coordinates/' + name.slice(9, name.length).split('/')[1] + '_coordinates.' + sub_directory + '.txt';
-        $.ajax({
-          data: { path: path, content: text },
-          type: 'POST',
-          url: 'cgi-bin/save_data.py',
-        });
-      }
-    });
-
-  d3.select('#download_png')
-    .on('click', download_png)
-    .on('mouseenter', function() {
-      d3.select('#container')
-        .append('div')
-        .attr('id', 'screenshot_tooltip')
-        .style('position', 'absolute')
-        .style('padding-top', '8px')
-        .style('padding-bottom', '8px')
-        .style('padding-left', '10px')
-        .style('padding-right', '10px')
-        .style('width', '150px')
-        .style(
-          'left',
-          (
-            parseInt(
-              d3
-                .select('#download_dropdown')
-                .style('left')
-                .split('px')[0],
-              10,
-            ) - 8
-          ).toString() + 'px',
-        )
-        .style('top', d3.select('#download_dropdown').style('height'))
-        .style('background-color', 'rgba(0,0,0,.4)')
-        .append('p')
-        .text('Zoom in on plot for higher resolution download')
-        .style('margin', '0px')
-        .style('color', 'white')
-        .style('font-family', 'sans-serif')
-        .style('font-size', '13px');
-    })
-    .on('mouseleave', function() {
-      d3.select('#screenshot_tooltip').remove();
-    });
-}
-
-export const download_png = () => {
-  let searchPaths = window.location.search.split('/');
-  const path = searchPaths[searchPaths.length - 2] + '_' + searchPaths[searchPaths.length - 1] + '.png';
-  download_sprite_as_png(app.renderer, app.stage, path);
-}
-
-export const download_sprite_as_png = (renderer, sprite, fileName) => {
-  renderer.extract.canvas(sprite).toBlob(function(b) {
-    let a = document.createElement('a');
-    document.body.append(a);
-    a.download = fileName;
-    a.href = URL.createObjectURL(b);
-    a.click();
-    a.remove();
-  }, 'image/png');
-}
-
-export const showToolsDropdown = () => {
-  if (d3.select('#tools_dropdown').style('height') === 'auto') {
-    closeDropdown();
-    collapse_settings();
-    setTimeout(function() {
-      document.getElementById('tools_dropdown').classList.toggle('show');
-    }, 10);
-  }
-}
-
-export const showDownloadDropdown = () => {
-  if (d3.select('#download_dropdown').style('height') === 'auto') {
-    closeDropdown();
-    collapse_settings();
-    setTimeout(function() {
-      document.getElementById('download_dropdown').classList.toggle('show');
-    }, 10);
-  }
-}
-
-export const showLayoutDropdown = () => {
-  if (d3.select('#layout_dropdown').style('height') === 'auto') {
-    closeDropdown();
-    collapse_settings();
-    setTimeout(function() {
-      document.getElementById('layout_dropdown').classList.toggle('show');
-    }, 10);
-  }
-}
-
-export const closeDropdown = () => {
-  let dropdowns = document.getElementsByClassName('dropdown-content');
-  let i;
-  for (let i = 0; i < dropdowns.length; i++) {
-    let openDropdown = dropdowns[i];
-    if (openDropdown.classList.contains('show')) {
-      openDropdown.classList.remove('show');
+  fix = () => {
+    if (d3.selectAll('.selected')[0].length === 0) {
+      d3.selectAll('.node circle').each(function(d) {
+        d.fixed = true;
+      });
     }
-  }
-}
-
-export const setup_download_dropdown = () => {
-  //d3.select("#download_dropdown_button").on("mouseenter",showDownloadDropdown);
-  d3.select('#download_dropdown_button').on('click', showDownloadDropdown);
-};
-
-export const setup_tools_dropdown = () => {
-  d3.select('#tools_dropdown_button').on('click', showToolsDropdown);
-};
-
-export const setup_layout_dropdown = () => {
-  //d3.select("#layout_dropdown_button").on("mouseover",showLayoutDropdown);
-  d3.select('#layout_dropdown_button').on('click', showLayoutDropdown);
-}
-
-export const fix = () => {
-  if (d3.selectAll('.selected')[0].length === 0) {
-    d3.selectAll('.node circle').each(function(d) {
+    d3.selectAll('.selected').each(function(d) {
       d.fixed = true;
     });
-  }
-  d3.selectAll('.selected').each(function(d) {
-    d.fixed = true;
-  });
-}
+  };
 
-export const unfix = () => {
-  d3.selectAll('.selected').each(function(d) {
-    d.fixed = false;
-  });
-  if (d3.selectAll('.selected')[0].length === 0) {
-    d3.selectAll('.node circle').each(function(d) {
+  unfix = () => {
+    d3.selectAll('.selected').each(function(d) {
       d.fixed = false;
     });
-  }
-}
-
-export const componentToHex = (c) => {
-  let hex = c.toString(16);
-  return hex.length === 1 ? '0' + hex : hex;
-}
-
-export const rgbToHex = (r, g, b) => {
-  return '0x' + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
-
-export const redraw = () => {
-  if (!being_dragged && d3.event.sourceEvent) {
-    let dim = document.getElementById('svg_graph').getBoundingClientRect();
-    let x = d3.event.sourceEvent.clientX;
-    let y = d3.event.sourceEvent.clientY;
-    x = (x - sprites.position.x) / sprites.scale.x;
-    y = (y - sprites.position.y) / sprites.scale.y;
-
-    let extraX = x * (d3.event.transform.k - sprites.scale.x);
-    let extraY = y * (d3.event.transform.k - sprites.scale.y);
-    sprites.position.x += d3.event.sourceEvent.movementX - extraX;
-    sprites.position.y += d3.event.sourceEvent.movementY - extraY;
-
-    sprites.scale.x = d3.event.transform.k;
-    sprites.scale.y = d3.event.transform.k;
-    edge_container.position = sprites.position;
-    edge_container.scale = sprites.scale;
-    clone_edge_container.position = sprites.position;
-    clone_edge_container.scale = sprites.scale;
-    clone_sprites.position = sprites.position;
-    clone_sprites.scale = sprites.scale;
-
-    //text_container.position = sprites.position;
-    //text_container.scale = sprites.scale;
-
-    d3.select('#vis').attr(
-      'transform',
-      'translate(' + [sprites.position.x, sprites.position.y] + ')' + ' scale(' + sprites.scale.x + ')',
-    );
-  }
-}
-
-export const center_view = (on_selected) => {
-  let all_xs = [];
-  let all_ys = [];
-  let num_selected = 0;
-  for (let i = 0; i < all_nodes.length; i++) {
-    if (all_outlines[i].selected) {
-      num_selected += 1;
+    if (d3.selectAll('.selected')[0].length === 0) {
+      d3.selectAll('.node circle').each(function(d) {
+        d.fixed = false;
+      });
     }
-  }
-  for (let i = 0; i < all_nodes.length; i++) {
-    if (!on_selected || all_outlines[i].selected || num_selected === 0) {
-      all_xs.push(all_nodes[i].x);
-      all_ys.push(all_nodes[i].y);
-    }
-  }
+  };
 
-  let minx = d3.min(all_xs);
-  let maxx = d3.max(all_xs);
-  let miny = d3.min(all_ys);
-  let maxy = d3.max(all_ys);
+  redraw = () => {
+    if (!this.being_dragged && d3.event.sourceEvent) {
+      let dim = document.getElementById('svg_graph').getBoundingClientRect();
+      let x = d3.event.sourceEvent.clientX;
+      let y = d3.event.sourceEvent.clientY;
+      x = (x - this.sprites.position.x) / this.sprites.scale.x;
+      y = (y - this.sprites.position.y) / this.sprites.scale.y;
 
-  const dx = maxx - minx + 50;
-  const dy = maxy - miny + 50;
-  const x = (maxx + minx) / 2;
-  const y = (maxy + miny) / 2;
-  let scale = 0.85 / Math.max(dx / width, dy / height);
+      let extraX = x * (d3.event.transform.k - this.sprites.scale.x);
+      let extraY = y * (d3.event.transform.k - this.sprites.scale.y);
+      this.sprites.position.x += d3.event.sourceEvent.movementX - extraX;
+      this.sprites.position.y += d3.event.sourceEvent.movementY - extraY;
 
-  // perform transition in 750 ms with 25ms steps
-  let N_STEPS = 5;
-  let delta_x = (width / 2 - ((maxx + minx) / 2) * scale - sprites.position.x) / N_STEPS;
-  let delta_y = (height / 2 + 30 - ((maxy + miny) / 2) * scale - sprites.position.y) / N_STEPS;
-  let delta_scale = (scale - sprites.scale.x) / N_STEPS;
+      this.sprites.scale.x = d3.event.transform.k;
+      this.sprites.scale.y = d3.event.transform.k;
+      this.edge_container.position = this.sprites.position;
+      this.edge_container.scale = this.sprites.scale;
+      CloneViewer.instance.clone_edge_container.position = this.sprites.position;
+      CloneViewer.instance.clone_edge_container.scale = this.sprites.scale;
+      CloneViewer.instance.clone_sprites.position = this.sprites.position;
+      CloneViewer.instance.clone_sprites.scale = this.sprites.scale;
 
-  let step = 0;
-  (function move() {
-    if (step < N_STEPS) {
-      sprites.position.x += delta_x;
-      sprites.position.y += delta_y;
-      sprites.scale.x += delta_scale;
-      sprites.scale.y += delta_scale;
-      edge_container.position = sprites.position;
-      edge_container.scale = sprites.scale;
-      clone_edge_container.position = sprites.position;
-      clone_edge_container.scale = sprites.scale;
-      clone_sprites.position = sprites.position;
-      clone_sprites.scale = sprites.scale;
+      //text_container.position = sprites.position;
+      //text_container.scale = sprites.scale;
 
       d3.select('#vis').attr(
         'transform',
-        'translate(' + [sprites.position.x, sprites.position.y] + ')' + ' scale(' + sprites.scale.x + ')',
+        'translate(' +
+          [this.sprites.position.x, this.sprites.position.y] +
+          ')' +
+          ' scale(' +
+          this.sprites.scale.x +
+          ')',
       );
-
-      // zoomer.scale(sprites.scale.x);
-      step += 1;
-      setTimeout(move, 10);
     }
-  })();
-}
+  };
 
-export const save_coords = () => {
-  if (mutable) {
-    let text = '';
-    for (let i in coordinates) {
-      text = text + [i.toString(), all_nodes[i].x.toString(), all_nodes[i].y.toString()].join(',') + '\n';
+  center_view = on_selected => {
+    let all_xs = [];
+    let all_ys = [];
+    let num_selected = 0;
+    for (let i = 0; i < this.all_nodes.length; i++) {
+      if (this.all_outlines[i].selected) {
+        num_selected += 1;
+      }
     }
-    let name = window.location.search;
-    let path = name.slice(1, name.length) + '/coordinates.txt';
-    $.ajax({
-      data: { path: path, content: text },
-      type: 'POST',
-      url: 'cgi-bin/save_data.py',
-    });
-  }
+    for (let i = 0; i < this.all_nodes.length; i++) {
+      if (!on_selected || this.all_outlines[i].selected || num_selected === 0) {
+        all_xs.push(this.all_nodes[i].x);
+        all_ys.push(this.all_nodes[i].y);
+      }
+    }
+
+    let minx = d3.min(all_xs);
+    let maxx = d3.max(all_xs);
+    let miny = d3.min(all_ys);
+    let maxy = d3.max(all_ys);
+
+    const dx = maxx - minx + 50;
+    const dy = maxy - miny + 50;
+    const x = (maxx + minx) / 2;
+    const y = (maxy + miny) / 2;
+    let scale = 0.85 / Math.max(dx / this.width, dy / this.height);
+
+    // perform transition in 750 ms with 25ms steps
+    let N_STEPS = 5;
+    let delta_x = (this.width / 2 - ((maxx + minx) / 2) * scale - this.sprites.position.x) / N_STEPS;
+    let delta_y = (this.height / 2 + 30 - ((maxy + miny) / 2) * scale - this.sprites.position.y) / N_STEPS;
+    let delta_scale = (scale - this.sprites.scale.x) / N_STEPS;
+
+    let step = 0;
+    const move = () => {
+      if (step < N_STEPS) {
+        this.sprites.position.x += delta_x;
+        this.sprites.position.y += delta_y;
+        this.sprites.scale.x += delta_scale;
+        this.sprites.scale.y += delta_scale;
+        this.edge_container.position = this.sprites.position;
+        this.edge_container.scale = this.sprites.scale;
+        CloneViewer.instance.clone_edge_container.position = this.sprites.position;
+        CloneViewer.instance.clone_edge_container.scale = this.sprites.scale;
+        CloneViewer.instance.clone_sprites.position = this.sprites.position;
+        CloneViewer.instance.clone_sprites.scale = this.sprites.scale;
+
+        d3.select('#vis').attr(
+          'transform',
+          'translate(' +
+            [this.sprites.position.x, this.sprites.position.y] +
+            ')' +
+            ' scale(' +
+            this.sprites.scale.x +
+            ')',
+        );
+
+        // zoomer.scale(sprites.scale.x);
+        step += 1;
+        setTimeout(move, 10);
+      }
+    };
+  };
+
+  save_coords = () => {
+    if (this.mutable) {
+      let text = '';
+      for (let i in this.coordinates) {
+        text = text + [i.toString(), this.all_nodes[i].x.toString(), this.all_nodes[i].y.toString()].join(',') + '\n';
+      }
+      let name = window.location.search;
+      let path = name.slice(1, name.length) + '/coordinates.txt';
+      $.ajax({
+        data: { path: path, content: text },
+        type: 'POST',
+        url: 'cgi-bin/save_data.py',
+      });
+    }
+  };
 }

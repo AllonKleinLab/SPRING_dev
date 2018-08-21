@@ -179,7 +179,7 @@ export const selection_logic_setup = () => {
   );
 }
 
-function show_selection_logic_popup() {
+export const show_selection_logic_popup = () => {
   let mywidth = parseInt(
     d3
       .select('#selection_logic_popup')
@@ -200,6 +200,6 @@ function show_selection_logic_popup() {
     .style('visibility', 'visible');
 }
 
-function hide_selection_logic_popup() {
+export const hide_selection_logic_popup = () => {
   d3.select('#selection_logic_popup').style('visibility', 'hidden');
 }

@@ -293,12 +293,12 @@ function PAGA_redraw() {
     });
 }
 
-function adjust_PAGA_mask_opacity() {
+export const adjust_PAGA_mask_opacity = () => {
   let opacity = parseFloat(d3.select('#PAGA_mask_opacity_slider')[0][0].value) / 100;
   d3.select('svg').style('background', 'rgba(255,255,255,' + opacity.toString() + ')');
 }
 
-function toggle_PAGA_visibility() {
+export const toggle_PAGA_visibility = () => {
   if (document.getElementById('PAGA_visibility_checkbox').checked) {
     d3.selectAll('.PAGA_node').style('visibility', 'visible');
     d3.selectAll('.PAGA_link').style('visibility', 'visible');
@@ -311,11 +311,11 @@ function toggle_PAGA_visibility() {
   }
 }
 
-function show_PAGA_popup() {
+export const show_PAGA_popup = () => {
   d3.select('#PAGA_popup').style('visibility', 'visible');
   toggle_PAGA_visibility();
 }
 
-function hide_PAGA_popup() {
+export const hide_PAGA_popup = () => {
   d3.select('#PAGA_popup').style('visibility', 'hidden');
 }

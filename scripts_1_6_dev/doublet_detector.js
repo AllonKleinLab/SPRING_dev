@@ -1,3 +1,5 @@
+import * as d3 from 'd3';
+
 export const doublet_setup = () => {
   let popup = d3
     .select('#force_layout')

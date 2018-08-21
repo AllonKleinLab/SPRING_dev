@@ -1,59 +1,60 @@
-export class LineSprite {
+export class LineSprite extends PIXI.DisplayObject {
+  static canvas;
+  static baseTexture;
+  static textureCache = {};
+  static maxWidth = 100;
+  static maxColors = 100;
+  static colors = 0;
+
+  static initCanvas() {
+    LineSprite.canvas = document.createElement('canvas');
+    LineSprite.canvas.width = LineSprite.maxWidth + 2;
+    LineSprite.canvas.height = LineSprite.maxColors;
+    LineSprite.baseTexture = new PIXI.BaseTexture(LineSprite.canvas);
+  };
+
   constructor(thickness, color, x1, y1, x2, y2) {
+    super();
     PIXI.Sprite.call(this, this.getTexture(thickness, color));
-  this._thickness = thickness;
-  this._color = color;
-  this.x1 = x1;
-  this.y1 = y1;
-  this.x2 = x2;
-  this.y2 = y2;
-  this.updatePosition();
-  this.anchor.x = 0.5;
+    this._thickness = thickness;
+    this._color = color;
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.updatePosition();
+    this.anchor = {
+      x: 0.5,
+    };
   }
-}
 
-
-LineSprite.textureCache = {};
-LineSprite.maxWidth = 100;
-LineSprite.maxColors = 100;
-LineSprite.colors = 0;
-LineSprite.canvas = null;
-
-LineSprite.prototype = Object.create(PIXI.Sprite.prototype);
-LineSprite.prototype.constructor = LineSprite;
-
-LineSprite.prototype.initCanvas = function() {
-  LineSprite.canvas = document.createElement('canvas');
-  LineSprite.canvas.width = LineSprite.maxWidth + 2;
-  LineSprite.canvas.height = LineSprite.maxColors;
-  LineSprite.baseTexture = new PIXI.BaseTexture(LineSprite.canvas);
-};
-LineSprite.prototype.getTexture = function(thickness, color) {
-  let key = thickness + '-' + color;
-  if (!LineSprite.textureCache[key]) {
-    if (LineSprite.canvas === null) {
-      this.initCanvas();
+  getTexture(thickness, color) {
+    let key = thickness + '-' + color;
+    if (!LineSprite.textureCache[key]) {
+      if (LineSprite.canvas === null) {
+        LineSprite.initCanvas();
+      }
+      let canvas = LineSprite.canvas;
+      let context = canvas.getContext('2d');
+      context.fillStyle = PIXI.utils.hex2string(color);
+      context.fillRect(1, LineSprite.colors, thickness, 1);
+      let texture = new PIXI.Texture(LineSprite.baseTexture, PIXI.SCALE_MODES.LINEAR);
+      texture.frame = new PIXI.Rectangle(0, LineSprite.colors, thickness + 2, 1);
+      LineSprite.textureCache[key] = texture;
+      LineSprite.colors++;
     }
-    let canvas = LineSprite.canvas;
-    let context = canvas.getContext('2d');
-    context.fillStyle = PIXI.utils.hex2string(color);
-    context.fillRect(1, LineSprite.colors, thickness, 1);
-    let texture = new PIXI.Texture(LineSprite.baseTexture, PIXI.SCALE_MODES.LINEAR);
-    texture.frame = new PIXI.Rectangle(0, LineSprite.colors, thickness + 2, 1);
-    LineSprite.textureCache[key] = texture;
-    LineSprite.colors++;
-  }
+  
+    return LineSprite.textureCache[key];
+  };
 
-  return LineSprite.textureCache[key];
-};
-
-LineSprite.prototype.updatePosition = function() {
-  this.position.x = this.x1;
-  this.position.y = this.y1;
-  this.height = Math.sqrt((this.x2 - this.x1) * (this.x2 - this.x1) + (this.y2 - this.y1) * (this.y2 - this.y1));
-  let dir = Math.atan2(this.y1 - this.y2, this.x1 - this.x2);
-  this.rotation = Math.PI * 0.5 + dir;
-};
+  updatePosition() {
+    this.position.x = this.x1;
+    this.position.y = this.y1;
+    this.height = Math.sqrt((this.x2 - this.x1) * (this.x2 - this.x1) + (this.y2 - this.y1) * (this.y2 - this.y1));
+    let dir = Math.atan2(this.y1 - this.y2, this.x1 - this.x2);
+    this.rotation = Math.PI * 0.5 + dir;
+  };
+}
 
 Object.defineProperties(LineSprite.prototype, {
   color: {

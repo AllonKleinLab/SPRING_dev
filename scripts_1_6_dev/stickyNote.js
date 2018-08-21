@@ -1,114 +1,147 @@
 import * as d3 from 'd3';
-import { count_clusters, shrinkNodes } from './colorBar';
-import { update_selected_count } from './selection_script';
-import { all_outlines, all_nodes } from './forceLayout_script';
 
-export const stickyNote_setup = () => {
-  let popup = d3
-    .select('#force_layout')
-    .append('div')
-    .attr('id', 'stickyNote_popup')
-    .on('mousedown', deactivate_all);
+import ColorBar, { shrinkNodes } from './colorBar';
+import SelectionScript from './selection_script';
+import ForceLayout from './forceLayout_script';
 
-  let button_bar = popup
-    .append('div')
-    .attr('id', 'stickyNote_button_bar')
-    .style('width', '100%');
+export default class StickyNote {
+  static _instance;
 
-  let selected_note = null;
+  static get instance() {
+    if (!this._instance) {
+      throw new Error('You must first call StickyNote.create()!');
+    }
+    return this._instance;
+  }
 
-  button_bar
-    .append('button')
-    .text('Close')
-    .style('margin-right', '11px')
-    .on('click', function() {
-      if (!is_synched()) {
-        hide_stickyNote_popup();
-      } else {
-        hide_stickyNote_popup();
-      }
-    });
+  static async create() {
+    if (!this._instance) {
+      this._instance = new StickyNote();
+      await this._instance.loadData();
+    } else {
+      throw new Error(
+        'StickyNote.create() has already been called, get the existing instance with StickyNote.instance!',
+      );
+    }
+  }
 
-  button_bar
-    .append('button')
-    .text('Save')
-    .on('click', save_note)
-    .attr('id', 'sticky_save_button');
+  constructor() {
+    this.popup = d3
+      .select('#force_layout')
+      .append('div')
+      .attr('id', 'stickyNote_popup')
+      .on('mousedown', this.deactivate_all);
 
-  button_bar
-    .append('button')
-    .text('New')
-    .on('click', new_note);
+    this.button_bar = this.popup
+      .append('div')
+      .attr('id', 'stickyNote_button_bar')
+      .style('width', '100%');
 
-  button_bar
-    .append('button')
-    .text('Delete')
-    .on('click', delete_note);
+    this.selected_note = null;
 
-  button_bar
-    .append('button')
-    .text('Bind cells')
-    .on('click', bind_cells);
-
-  button_bar
-    .append('button')
-    .text('Show selected')
-    .on('click', show_selected);
-
-  let sticky_div = popup.append('div').attr('id', 'sticky_div');
-
-  button_bar.selectAll('button').on('mousedown', function() {
-    d3.event.stopPropagation();
-  });
-
-  popup
-    .append('div')
-    .attr('id', 'sticky_email')
-    .append('label')
-    .text('Email address')
-    .append('input')
-    .attr('type', 'text')
-    .on('mousedown', function() {
-      d3.event.stopPropagation();
-    })
-    .attr('id', 'sticky_email_input')
-    .style('width', '252px');
-
-  let sticky_path = window.location.search;
-  sticky_path = sticky_path.slice(1, sticky_path.length) + '/sticky_notes_data.json';
-  $.get(sticky_path)
-    .done(function() {
-      d3.json(sticky_path).then(data => {
-        data.forEach(function(d) {
-          new_note(d);
-        });
+    this.button_bar
+      .append('button')
+      .text('Close')
+      .style('margin-right', '11px')
+      .on('click', () => {
+        if (!this.is_synched()) {
+          this.hide_stickyNote_popup();
+        } else {
+          this.hide_stickyNote_popup();
+        }
       });
-    })
-    .fail(function() {
-      const note = new_note();
-      activate_note(note);
+
+    this.button_bar
+      .append('button')
+      .text('Save')
+      .on('click', this.save_note)
+      .attr('id', 'sticky_save_button');
+
+    this.button_bar
+      .append('button')
+      .text('New')
+      .on('click', this.new_note);
+
+    this.button_bar
+      .append('button')
+      .text('Delete')
+      .on('click', this.delete_note);
+
+    this.button_bar
+      .append('button')
+      .text('Bind cells')
+      .on('click', this.bind_cells);
+
+    this.button_bar
+      .append('button')
+      .text('Show selected')
+      .on('click', this.show_selected);
+
+    this.sticky_div = this.popup.append('div').attr('id', 'sticky_div');
+
+    this.button_bar.selectAll('button').on('mousedown', () => {
+      d3.event.stopPropagation();
     });
 
-  function delete_note() {
-    d3.selectAll('.sticky_note').each(function(d, i) {
-      if (d3.select(this).attr('active') === 'true') {
-        d3.select(this).remove();
+    this.popup
+      .append('div')
+      .attr('id', 'sticky_email')
+      .append('label')
+      .text('Email address')
+      .append('input')
+      .attr('type', 'text')
+      .on('mousedown', () => {
+        d3.event.stopPropagation();
+      })
+      .attr('id', 'sticky_email_input')
+      .style('width', '252px');
+
+    d3.select('#stickyNote_popup').call(
+      d3
+        .drag()
+        .on('start', this.stickyNote_popup_dragstarted)
+        .on('drag', this.stickyNote_popup_dragged)
+        .on('end', this.stickyNote_popup_dragended),
+    );
+
+    return this;
+  }
+
+  async loadData() {
+    let paths = window.location.search;
+    this.sticky_path = paths.slice(1, paths.length) + '/sticky_notes_data.json';
+    try {
+      await $.get(this.sticky_path);
+      const data = await d3.json(this.sticky_path);
+      data.forEach(d => {
+        this.new_note(d);
+      });
+    } catch (e) {
+      console.log(e);
+      const note = this.new_note();
+      this.activate_note(note);
+    }
+  }
+  delete_note() {
+    d3.selectAll('.sticky_note').each((d, i) => {
+      if (d3.select(d).attr('active') === 'true') {
+        d3.select(d).remove();
       }
     });
   }
 
-  function new_note(d) {
+  new_note(d) {
     if (!d) {
-      d = { text: '', emails: '', bound_cells: get_selected_cells().join(',') };
+      d = { text: '', emails: '', bound_cells: this.get_selected_cells().join(',') };
     }
 
-    let note = sticky_div.insert('div', ':first-child').attr('class', 'sticky_note');
+    let note = this.sticky_div.insert('div', ':first-child').attr('class', 'sticky_note');
     note.append('textarea').style('height', '90px');
-    note.on('mousedown', function() {
+    note.on('mousedown', () => {
       d3.event.stopPropagation();
       if (note.attr('active') !== 'true') {
-        deactivate_all();
-        activate_note(note);
+        this.deactivate_all();
+        this.activate_note(note);
       }
     });
     note.attr('bound_cells', d.bound_cells);
@@ -120,10 +153,9 @@ export const stickyNote_setup = () => {
     return note;
   }
 
-  function activate_note(note = d3.selection()) {
+  activate_note(note) {
     if (note.attr('active') !== 'true') {
       note.select('p').style('visibility', 'hidden');
-      console.log(note.select('textarea'));
       $(note.select('textarea')).focus();
 
       // 			let emails = note.attr('emails');
@@ -138,20 +170,20 @@ export const stickyNote_setup = () => {
     note
       .attr('bound_cells')
       .split(',')
-      .forEach(function(d) {
+      .forEach(d => {
         if (d !== '') {
           my_nodes.push(parseInt(d, 10));
-          all_outlines[d].selected = true;
-          all_outlines[d].tint = '0xffff00';
-          all_outlines[d].alpha = 1;
+          ForceLayout.instance.all_outlines[d].selected = true;
+          ForceLayout.instance.all_outlines[d].tint = '0xffff00';
+          ForceLayout.instance.all_outlines[d].alpha = 1;
         }
       });
-    count_clusters(all_nodes);
-    update_selected_count();
-    shrinkNodes(10, 10, my_nodes, all_nodes);
+    ColorBar.instance.count_clusters();
+    SelectionScript.instance.update_selected_count();
+    shrinkNodes(10, 10, my_nodes, ForceLayout.instance.all_nodes);
   }
 
-  function deactivate_all() {
+  deactivate_all() {
     d3.selectAll('.sticky_note')
       .attr('active', 'false')
       .style('border', '0px');
@@ -162,7 +194,7 @@ export const stickyNote_setup = () => {
       .style('border', 'none');
   }
 
-  function sync_note(note) {
+  sync_note(note) {
     if (note.attr('saved_text') !== $(note.select('textarea')[0][0]).val()) {
       note.attr('saved_text', $(note.select('textarea')[0][0]).val());
       let my_emails = note.attr('emails').split(',');
@@ -174,42 +206,42 @@ export const stickyNote_setup = () => {
     }
   }
 
-  function bind_cells(note) {
-    let sel = get_selected_cells().join(',');
-    d3.selectAll('.sticky_note').each(function() {
-      if (d3.select(this).attr('active') === 'true') {
-        d3.select(this).attr('bound_cells', sel);
+  bind_cells(note) {
+    let sel = this.get_selected_cells().join(',');
+    d3.selectAll('.sticky_note').each(d => {
+      if (d3.select(d).attr('active') === 'true') {
+        d3.select(d).attr('bound_cells', sel);
       }
     });
   }
 
-  function get_selected_cells() {
+  get_selected_cells() {
     let sel = [];
-    for (let i = 0; i < all_outlines.length; i++) {
-      if (all_outlines[i].selected) {
+    for (let i = 0; i < ForceLayout.instance.all_outlines.length; i++) {
+      if (ForceLayout.instance.all_outlines[i].selected) {
         sel.push(i);
       }
     }
     return sel;
   }
 
-  function save_note() {
-    if (!check_email()) {
-      flash_email();
+  save_note() {
+    if (!this.check_email()) {
+      this.flash_email();
       return false;
     } else {
-      d3.selectAll('.sticky_note').each(function() {
-        sync_note(d3.select(this));
+      d3.selectAll('.sticky_note').each(d => {
+        this.sync_note(d3.select(d));
       });
-      write_data();
+      this.write_data();
       return true;
     }
   }
 
-  function write_data() {
+  write_data() {
     let all_data = [];
-    d3.selectAll('.sticky_note').each(function(d) {
-      let note = d3.select(this);
+    d3.selectAll('.sticky_note').each(d => {
+      let note = d3.select(d);
       let text = note.attr('saved_text');
       let emails = note.attr('emails');
       let bound_cells = note.attr('bound_cells');
@@ -222,7 +254,7 @@ export const stickyNote_setup = () => {
     path = path.slice(1, path.length) + '/sticky_notes_data.json';
     $.ajax({
       data: { path: path, content: JSON.stringify(all_data, null, ' ') },
-      success: function() {
+      success: () => {
         sweetAlert({ title: 'All stickies have been saved' });
       },
       type: 'POST',
@@ -230,7 +262,7 @@ export const stickyNote_setup = () => {
     });
   }
 
-  function check_email() {
+  check_email() {
     if (
       $('#sticky_email_input')
         .val()
@@ -242,21 +274,21 @@ export const stickyNote_setup = () => {
     }
   }
 
-  function flash_email() {
+  flash_email() {
     $('#sticky_email_input').addClass('flash');
-    setTimeout(function() {
+    setTimeout(() => {
       $('#sticky_email_input').removeClass('flash');
     }, 500);
   }
 
-  function is_synched() {
+  is_synched() {
     return true;
   }
 
-  function stickyNote_popup_dragstarted() {
+  stickyNote_popup_dragstarted() {
     d3.event.sourceEvent.stopPropagation();
   }
-  function stickyNote_popup_dragged() {
+  stickyNote_popup_dragged() {
     let cx = parseFloat(
       d3
         .select('#stickyNote_popup')
@@ -272,57 +304,51 @@ export const stickyNote_setup = () => {
     d3.select('#stickyNote_popup').style('left', (cx + d3.event.dx).toString() + 'px');
     d3.select('#stickyNote_popup').style('top', (cy + d3.event.dy).toString() + 'px');
   }
-  function stickyNote_popup_dragended() {
+
+  stickyNote_popup_dragended() {
     return;
   }
 
-  function show_selected() {
+  show_selected() {
     let selected_cells = [];
-    for (let i = 0; i < all_outlines.length; i++) {
-      if (all_outlines[i].selected) {
+    for (let i = 0; i < ForceLayout.instance.all_outlines.length; i++) {
+      if (ForceLayout.instance.all_outlines[i].selected) {
         selected_cells.push(i.toString());
       }
     }
     d3.selectAll('.sticky_note').style('background-color', 'rgba(0,0,0,.5)');
-    d3.selectAll('.sticky_note').each(function() {
-      let note = d3.select(this);
+    d3.selectAll('.sticky_note').each(d => {
+      let note = d3.select(d);
       const bound_cells = note.attr('bound_cells').split(',');
       if (bound_cells.filter(n => selected_cells.includes(n)).length > 0) {
         note.style('background-color', 'rgba(255,255,0,.4)');
-        $(sticky_div[0][0]).prepend(note[0][0]);
+        $(this.sticky_div[0][0]).prepend(note[0][0]);
       }
     });
   }
 
-  d3.select('#stickyNote_popup').call(
-    d3.drag()
-      .on('start', stickyNote_popup_dragstarted)
-      .on('drag', stickyNote_popup_dragged)
-      .on('end', stickyNote_popup_dragended),
-  );
-}
+  hide_stickyNote_popup() {
+    d3.select('#stickyNote_popup').style('visibility', 'hidden');
+  }
 
-function hide_stickyNote_popup() {
-  d3.select('#stickyNote_popup').style('visibility', 'hidden');
-}
-
-function show_stickyNote_popup() {
-  let mywidth = parseInt(
-    d3
-      .select('#stickyNote_popup')
-      .style('width')
-      .split('px')[0],
-    10,
-  );
-  let svg_width = parseInt(
-    d3
-      .select('svg')
-      .style('width')
-      .split('px')[0],
-    10,
-  );
-  d3.select('#stickyNote_popup')
-    .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
-    .style('top', '10px')
-    .style('visibility', 'visible');
+  show_stickyNote_popup() {
+    let mywidth = parseInt(
+      d3
+        .select('#stickyNote_popup')
+        .style('width')
+        .split('px')[0],
+      10,
+    );
+    let svg_width = parseInt(
+      d3
+        .select('svg')
+        .style('width')
+        .split('px')[0],
+      10,
+    );
+    d3.select('#stickyNote_popup')
+      .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
+      .style('top', '10px')
+      .style('visibility', 'visible');
+  }
 }
