@@ -1,4 +1,6 @@
 import * as d3 from 'd3';
+import { colorBar, forceLayout, graph_directory, sub_directory, cloneViewer } from './main';
+import { read_csv } from './util';
 
 export const doublet_setup = () => {
   let popup = d3
@@ -169,7 +171,7 @@ export const doublet_setup = () => {
   // }
 
   function run_doublet_detector() {
-    if (mutable) {
+    if (forceLayout.mutable) {
       let t0 = new Date();
       let k = $('#doublet_k_input').val();
       let r = $('#doublet_r_input').val();
@@ -195,35 +197,35 @@ export const doublet_setup = () => {
           show_doublet_notification();
           if (d3.select('#clone_viewer_popup').style('visibility') === 'visible') {
             $('#clone_viewer_popup').remove();
-            for (let i = 0; i < all_outlines.length; i++) {
-              node_status[i].source = false;
-              node_status[i].target = false;
+            for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+              forceLayout.node_status[i].source = false;
+              forceLayout.node_status[i].target = false;
             }
-            for (let i in clone_nodes) {
-              deactivate_nodes(i);
+            for (let i in cloneViewer.clone_nodes) {
+              cloneViewer.deactivate_nodes(i);
             }
-            for (let i in clone_edges) {
-              deactivate_edges(i);
+            for (let i in cloneViewer.clone_edges) {
+              cloneViewer.deactivate_edges(i);
             }
-            targetCircle.clear();
+            cloneViewer.targetCircle.clear();
 
-            clone_viewer_setup();
-            start_clone_viewer();
+            // cloneViewer.clone_viewer_setup();
+            cloneViewer.start_clone_viewer();
           } else {
             $('#clone_viewer_popup').remove();
-            clone_viewer_setup();
+            // cloneViewer.clone_viewer_setup();
           }
 
-          hide_processing_mask();
+          // hide_processing_mask();
           // open json file containing gene sets and populate drop down menu
           let noCache = new Date().getTime();
           d3.json(graph_directory + '/' + sub_directory + '/color_stats.json' + '?_=' + noCache).then(colorData => {
-            color_stats = colorData;
+            colorBar.color_stats = colorData;
           });
           d3.text(graph_directory + '/' + sub_directory + '/color_data_gene_sets.csv' + '?_=' + noCache).then(text => {
-            gene_set_color_array = read_csv(text);
-            dispatch.load(gene_set_color_array, 'gene_sets');
-            update_slider();
+            colorBar.gene_set_color_array = read_csv(text);
+            colorBar.dispatch.load(colorBar.gene_set_color_array, 'gene_sets');
+            colorBar.update_slider();
           });
         },
         type: 'POST',
@@ -272,7 +274,7 @@ export const  hide_doublet_notification = () => {
 }
 
 export const show_doublet_popup = () => {
-  if (mutable) {
+  if (forceLayout.mutable) {
     let mywidth = parseInt(
       d3
         .select('#doublet_popup')

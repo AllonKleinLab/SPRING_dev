@@ -1,3 +1,6 @@
+import * as d3 from 'd3';
+import { colorBar } from './main';
+
 export const diffex_setup = (project_directory) => {
   let scatter_zoom = 0.2;
   let scatter_size = 4;
@@ -57,7 +60,7 @@ export const diffex_setup = (project_directory) => {
   //open_diffex();
 
   function open_diffex() {
-    gene_list = Object.keys(all_gene_color_array);
+    gene_list = Object.keys(colorBar.all_gene_color_array);
     d3.selectAll('#diffex_panel').style('z-index', '4');
     setTimeout(function() {
       d3.select('#diffex_refresh_button').style('visibility', 'visible');
@@ -150,8 +153,8 @@ export const diffex_setup = (project_directory) => {
     let xx = [];
     let yy = [];
     gene_list.forEach(function(d) {
-      xx.push(masked_average(all_gene_color_array[d], blue_selection));
-      yy.push(masked_average(all_gene_color_array[d], yellow_selection));
+      xx.push(masked_average(colorBar.all_gene_color_array[d], blue_selection));
+      yy.push(masked_average(colorBar.all_gene_color_array[d], yellow_selection));
     });
 
     scatter_data = [];
@@ -171,8 +174,7 @@ export const diffex_setup = (project_directory) => {
     const width = document.getElementById('diffex_panel').offsetWidth - margin.left - margin.right;
     const height = document.getElementById('diffex_panel').offsetHeight - margin.top - margin.bottom;
 
-    scatter_x = d3.scale
-      .linear()
+    scatter_x = d3.scaleLinear()
       .domain([
         0,
         d3.max(scatter_data, function(d) {
@@ -181,8 +183,7 @@ export const diffex_setup = (project_directory) => {
       ])
       .range([0, width]);
 
-    scatter_y = d3.scale
-      .linear()
+    scatter_y = d3.scaleLinear()
       .domain([
         0,
         d3.max(scatter_data, function(d) {
@@ -310,7 +311,7 @@ export const diffex_setup = (project_directory) => {
       })
       .on('click', function(d) {
         d3.select('#green_menu')[0][0].value = d[4];
-        update_slider();
+        colorBar.update_slider();
       });
   }
 

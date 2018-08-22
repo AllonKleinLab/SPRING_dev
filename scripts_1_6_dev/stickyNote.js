@@ -177,7 +177,6 @@ export default class StickyNote {
         }
       });
     colorBar.count_clusters();
-    console.log(selectionScript);
     selectionScript.update_selected_count();
     colorBar.shrinkNodes(10, 10, my_nodes, forceLayout.all_nodes);
   }

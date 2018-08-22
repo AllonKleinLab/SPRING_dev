@@ -1,4 +1,7 @@
+import * as d3 from 'd3';
+
 import { openInNewTab } from "./util";
+import { forceLayout } from './main';
 
 function add_list_item(project_directory, sub_directory, order) {
   d3.json(project_directory + '/' + sub_directory + '/run_info.json').then(data => {
@@ -94,10 +97,10 @@ function add_list_item(project_directory, sub_directory, order) {
       .on('click', function() {
         d3.event.stopPropagation();
         if (d3.select(this).text() === 'Show more') {
-          list_item.transition(200).style('height', show_more_height);
+          list_item.transition('200').style('height', show_more_height);
           d3.select(this).text('Show less');
         } else {
-          list_item.transition(200).style('height', show_less_height);
+          list_item.transition('200').style('height', show_less_height);
           d3.select(this).text('Show more');
         }
       });
@@ -108,9 +111,9 @@ function add_list_item(project_directory, sub_directory, order) {
       .text('Delete')
       .on('click', function() {
         d3.event.stopPropagation();
-        d3.text(project_directory + '/' + sub_directory + '/mutability.txt', function(text) {
-          mutable = text;
-          if (mutable == null) {
+        d3.text(project_directory + '/' + sub_directory + '/mutability.txt', (text) => {
+          forceLayout.mutable = text;
+          if (forceLayout.mutable == null) {
             sweetAlert(
               {
                 icon: 'warning',
@@ -126,7 +129,7 @@ function add_list_item(project_directory, sub_directory, order) {
                     .transition()
                     .duration(700)
                     .style('margin-top', '-115px')
-                    .each('end', function() {
+                    .each(() => {
                       list_item.remove();
                     });
 
@@ -176,9 +179,8 @@ function populate_dataset_subdirs_list(project_directory) {
   title = title[title.length - 1];
   d3.select('#project_directory_title').text('SPRING subplots of "' + title + '"');
 
-  let base_url = window.location.href.split('?')[0];
-  base_url = base_url.split('/');
-  base_url = base_url.slice(0, base_url.length - 1).join('/') + '/stickyPage.html';
+  let splitURL = window.location.href.split('?')[0].split('/');
+  let base_url = splitURL.slice(0, splitURL.length - 1).join('/') + '/stickyPage.html';
   d3.select('#sticky_link').attr('href', base_url + '?' + project_directory);
 
   $.ajax({

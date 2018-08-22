@@ -1,26 +1,25 @@
 import * as d3 from 'd3';
 
-import { all_nodes, all_outlines, stashed_coordinates, sprites, adjust_edges, move_node } from "./forceLayout_script";
-import { deselect_all } from './selection_script';
+import { forceLayout, selectionScript } from './main';
 
 export const rotation_update = () => {
   let selected = [];
-  let stash_i = stashed_coordinates.length;
-  stashed_coordinates.push({});
-  for (let i in all_nodes) {
-    if (all_outlines[i].selected) {
+  let stash_i = forceLayout.stashed_coordinates.length;
+  forceLayout.stashed_coordinates.push({});
+  for (let i in forceLayout.all_nodes) {
+    if (forceLayout.all_outlines[i].selected) {
       selected.push(i);
     }
-    stashed_coordinates[stash_i][i] = [all_nodes[i].x, all_nodes[i].y];
+    forceLayout.stashed_coordinates[stash_i][i] = [forceLayout.all_nodes[i].x, forceLayout.all_nodes[i].y];
   }
   if (selected.length === 0) {
-    deselect_all();
-    selected = d3.range(0, all_nodes.length);
+    selectionScript.deselect_all();
+    selected = d3.range(0, forceLayout.all_nodes.length);
   }
   let real_scale = 1;
 
   const vis = d3.select('#vis');
-  vis.attr('transform', 'translate(' + [sprites.x, sprites.y] + ')' + ' scale(' + sprites.scale.x + ')');
+  vis.attr('transform', 'translate(' + [forceLayout.sprites.x, forceLayout.sprites.y] + ')' + ' scale(' + forceLayout.sprites.scale.x + ')');
   vis.append('circle').attr('id', 'rotation_outer_circ');
   vis.append('circle').attr('id', 'rotation_inner_circ');
   vis.append('circle').attr('id', 'rotation_pivot');
@@ -30,10 +29,10 @@ export const rotation_update = () => {
 
   let all_xs = [];
   let all_ys = [];
-  for (let i in all_nodes) {
-    if (all_outlines[i].selected) {
-      all_xs.push(all_nodes[i].x);
-      all_ys.push(all_nodes[i].y);
+  for (let i in forceLayout.all_nodes) {
+    if (forceLayout.all_outlines[i].selected) {
+      all_xs.push(forceLayout.all_nodes[i].x);
+      all_ys.push(forceLayout.all_nodes[i].y);
     }
   }
   let cx = d3.sum(all_xs) / all_xs.length;
@@ -43,21 +42,24 @@ export const rotation_update = () => {
     dels.push(Math.sqrt(Math.pow(all_xs[i] - cx, 2) + Math.pow(all_ys[i] - cy, 2)));
   }
   let rotator_radius = d3.median(dels) * 1.5;
+
+  const zoomScale = d3.zoomTransform(forceLayout.zoomer).k;
+  
   d3.select('#rotation_pivot')
-    .attr('r', d3.min([13 / zoomer.scale(), (rotator_radius + 30) / 3]))
-    .style('stroke-width', d3.min([3 / zoomer.scale(), 10]))
+    .attr('r', d3.min([13 / zoomScale, (rotator_radius + 30) / 3]))
+    .style('stroke-width', d3.min([3 / zoomScale, 10]))
     .style('cx', cx)
     .style('cy', cy);
   d3.select('#rotation_outer_circ')
-    .attr('r', rotator_radius + 30 + 12 / zoomer.scale())
+    .attr('r', rotator_radius + 30 + 12 / zoomScale)
     .style('cx', cx)
     .style('cy', cy)
-    .style('stroke-width', 18 / zoomer.scale());
+    .style('stroke-width', 18 / zoomScale);
   d3.select('#rotation_inner_circ')
     .attr('r', rotator_radius + 30)
     .style('cx', cx)
     .style('cy', cy)
-    .style('stroke-width', 6 / zoomer.scale());
+    .style('stroke-width', 6 / zoomScale);
 
   d3.select('#rotation_outer_circ')
     .on('mouseover', function() {
@@ -146,19 +148,19 @@ export const rotation_update = () => {
     }
 
     if (Math.abs(rot) < 1) {
-      for (let i in all_outlines) {
-        if (all_outlines[i].selected) {
-          let d = all_nodes[i];
+      for (let i in forceLayout.all_outlines) {
+        if (forceLayout.all_outlines[i].selected) {
+          let d = forceLayout.all_nodes[i];
           let dx = d.x - cxFromD3;
           let dy = d.y - cyFromD3;
           let brad = Math.sqrt(dx * dx + dy * dy);
           let ddx = Math.cos(rot) * dx + Math.sin(rot) * dy;
           let ddy = -Math.sin(rot) * dx + Math.cos(rot) * dy;
           let arad = Math.sqrt(ddx * ddx + ddy * ddy);
-          move_node(i, cxFromD3 + ddx * scale, cyFromD3 + ddy * scale);
+          forceLayout.move_node(i, cxFromD3 + ddx * scale, cyFromD3 + ddy * scale);
         }
       }
-      adjust_edges();
+      forceLayout.adjust_edges();
     }
   }
 

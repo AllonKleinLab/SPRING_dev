@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import { openInNewTab } from "./util";
 
 function add_sticky_subdir(project_directory, sub_directory, order) {
@@ -28,10 +29,10 @@ function add_sticky_subdir(project_directory, sub_directory, order) {
       .on('click', function() {
         d3.event.stopPropagation();
         if (d3.select(this).text() === 'Expand') {
-          list_item.transition(200).style('height', $(list_item[0][0])[0].scrollHeight.toString() + 'px');
+          list_item.transition('200').style('height', $(list_item[0][0])[0].scrollHeight.toString() + 'px');
           d3.select(this).text('Collapse');
         } else {
-          list_item.transition(200).style('height', '46px');
+          list_item.transition('200').style('height', '46px');
           d3.select(this).text('Expand');
         }
       });

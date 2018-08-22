@@ -187,8 +187,8 @@ export default class SelectionScript {
       .text('0 cells selected');
 
     d3.select('body')
-      .on('keydown', this.keydown)
-      .on('keyup', this.keyup);
+      .on('keydown', () => this.keydown())
+      .on('keyup', () => this.keyup());
 
     this.base_radius = parseInt(d3.select('#settings_range_node_size').attr('value'), 10) / 100;
     this.large_radius = this.base_radius * 3;
@@ -484,7 +484,7 @@ export default class SelectionScript {
         // 				all_nodes[i].scale.set(large_radius);
       }
     }
-    ColorBar.instance.count_clusters();
+    colorBar.count_clusters();
     this.update_selected_count();
   }
 

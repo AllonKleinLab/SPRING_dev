@@ -1,11 +1,7 @@
 import * as d3 from 'd3';
-import { forceLayout, graph_directory, sub_directory } from './main';
-import SelectionScript from './selection_script';
 import { show_colorpicker_popup } from './colorpicker_layout';
+import { forceLayout, graph_directory, selectionScript, sub_directory } from './main';
 import { rgbToHex } from './util';
-
-let rankedMask = null;
-let slider_ticks = null;
 
 export default class ColorBar {
   static _instance;
@@ -78,7 +74,7 @@ export default class ColorBar {
       .attr('id', 'labels_button')
       .attr('type', 'radio')
       .style('margin-left', '12px')
-      .on('click', this.labels_click)
+      .on('click', () => this.labels_click())
       .attr('checked', true);
 
     this.labelsMenu = this.menuBar
@@ -96,7 +92,7 @@ export default class ColorBar {
       .on('change', () => {
         this.update_slider();
       })
-      .on('click', this.labels_click);
+      .on('click', () => this.labels_click());
 
     this.menuBar.selectAll('options').style('font-size', '6px');
 
@@ -107,7 +103,7 @@ export default class ColorBar {
       .style('margin-left', '7px')
       .attr('id', 'gradient_button')
       .attr('type', 'radio')
-      .on('click', this.gradient_click);
+      .on('click', () => this.gradient_click());
 
     this.gradientMenu = this.menuBar
       .append('select')
@@ -119,7 +115,7 @@ export default class ColorBar {
       .on('change', () => {
         this.update_slider();
       })
-      .on('click', this.gradient_click);
+      .on('click', () => this.gradient_click());
 
     /* -----------------------------    Populate menus    ---------------------------- */
     this.dispatch = d3.dispatch('load', 'statechange');
@@ -235,16 +231,12 @@ export default class ColorBar {
       .attr('id', 'track')
       .attr('x1', this.slider_scale.range()[0])
       .attr('x2', this.slider_scale.range()[1])
-      .select(d => {
-        if (this.parentNode) {
-          return this.parentNode.appendChild(d.cloneNode(true));
-        }
+      .select(function() {
+        return this.parentNode.appendChild(this.cloneNode(true));
       })
       .attr('id', 'track-inset')
-      .select(d => {
-        if (d.parentNode) {
-          return d.appendChild(d.cloneNode(true));
-        }
+      .select(function() {
+        return this.parentNode.appendChild(this.cloneNode(true));
       })
       .attr('id', 'track-overlay');
 
@@ -266,7 +258,8 @@ export default class ColorBar {
       .attr('r', 8);
 
     this.left_bracket = this.slider
-      .insert('rect', '#track-overlay')
+      .append('rect')
+      .attr('id', '#track-overlay')
       .attr('class', 'colorbar_item')
       .attr('id', 'left_bracket')
       .style('fill', 'yellow')
@@ -277,7 +270,8 @@ export default class ColorBar {
       .style('visibility', 'hidden');
 
     this.right_bracket = this.slider
-      .insert('rect', '#track-overlay')
+      .append('rect')
+      .attr('id', '#track-overlay')
       .attr('class', 'colorbar_item')
       .attr('id', 'right_bracket')
       .style('fill', 'yellow')
@@ -288,7 +282,8 @@ export default class ColorBar {
       .style('visibility', 'hidden');
 
     this.left_bracket_label = this.slider
-      .insert('text', '#track-overlay')
+      .append('text')
+      .attr('id', '#track-overlay')
       .attr('class', 'bracket_label')
       .attr('id', 'left_bracket_label')
       .attr('x', 110)
@@ -298,7 +293,8 @@ export default class ColorBar {
       .text('');
 
     this.right_bracket_label = this.slider
-      .insert('text', '#track-overlay')
+      .append('text')
+      .attr('id', '#track-overlay')
       .attr('class', 'bracket_label')
       .attr('id', 'right_bracket_label')
       .attr('x', 240)
@@ -307,7 +303,8 @@ export default class ColorBar {
       .text('');
 
     this.ceiling_bracket = this.slider
-      .insert('rect', '#track-overlay')
+      .append('rect')
+      .attr('id', '#track-overlay')
       .attr('class', 'colorbar_item')
       .attr('id', 'ceiling_bracket')
       .style('fill', 'yellow')
@@ -318,7 +315,8 @@ export default class ColorBar {
       .style('visibility', 'hidden');
 
     this.floor_bracket = this.slider
-      .insert('rect', '#track-overlay')
+      .append('rect')
+      .attr('id', '#track-overlay')
       .attr('class', 'colorbar_item')
       .attr('id', 'floor_bracket')
       .style('fill', 'yellow')
@@ -339,7 +337,7 @@ export default class ColorBar {
       .append('text')
       .attr('x', this.slider_scale)
       .attr('text-anchor', 'middle')
-      .text(d => {
+      .text(function(d) {
         return d;
       });
 
@@ -360,7 +358,7 @@ export default class ColorBar {
 
     d3.select('#slider_select_button')
       .select('button')
-      .on('click', this.toggle_slider_select);
+      .on('click', () => this.toggle_slider_select());
 
     this.slider.call(
       d3
@@ -388,11 +386,11 @@ export default class ColorBar {
           const cx = d3.event.x - this.svg_width / 3;
           if (this.drag_mode === 'left_bracket') {
             this.set_left_bracket(cx);
-            SelectionScript.instance.update_selected_count();
+            selectionScript.update_selected_count();
           }
           if (this.drag_mode === 'right_bracket') {
             this.set_right_bracket(cx);
-            SelectionScript.instance.update_selected_count();
+            selectionScript.update_selected_count();
           } else if (this.drag_mode === 'handle') {
             this.set_slider_position(cx);
           }
@@ -522,12 +520,14 @@ export default class ColorBar {
     const text = await d3.text(this.project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
     this.gene_set_color_array = this.read_csv(text);
 
+    console.log(`Variable 'this.gene_set_color_array':\n${this.gene_set_color_array}\n${JSON.stringify(this.gene_set_color_array, null, 2)}`);
     // gradientMenu.selectAll("option").remove();
     this.dispatch.call('load', this.gene_set_color_array, 'gene_sets');
     // update_slider();
   }
 
   normalize(x) {
+    console.log(x);
     const min = 0;
     const max = this.color_max;
     const out = [];
@@ -599,7 +599,7 @@ export default class ColorBar {
           this.update_tints();
           if (d3.select('#left_bracket').style('visibility') === 'visible') {
             this.slider_select_update();
-            SelectionScript.instance.update_selected_count();
+            selectionScript.update_selected_count();
           }
         },
         type: 'POST',
@@ -611,6 +611,8 @@ export default class ColorBar {
   updateColorMax() {
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
+
+      console.log(`update color max: ${current_selection}`);
       const color_array = this.normalize(this.gene_set_color_array[current_selection]);
       for (let i = 0; i < forceLayout.base_colors.length; i++) {
         forceLayout.base_colors[i] = d3.rgb(this.gradient_color(color_array[i]));
@@ -692,6 +694,7 @@ export default class ColorBar {
   }
 
   labels_click() {
+    console.log('label click');
     document.getElementById('gradient_button').checked = false;
     document.getElementById('labels_button').checked = true;
     document.getElementById('channels_button').checked = false;
@@ -738,7 +741,7 @@ export default class ColorBar {
     } else {
       this.hide_slider_select();
     }
-    SelectionScript.instance.update_selected_count();
+    selectionScript.update_selected_count();
   }
 
   show_slider_select() {
@@ -799,6 +802,7 @@ export default class ColorBar {
     let color_array = null;
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
+      console.log(`slider_selectUpdate: ${current_selection}`);
       color_array = this.gene_set_color_array[current_selection];
     }
     if (document.getElementById('channels_button').checked) {
@@ -835,15 +839,12 @@ export default class ColorBar {
       d3.selectAll('#gradient_bar').attr('fill', '#7e7e7e');
       d3.selectAll('#handle').style('fill', '#7e7e7e');
       const name = document.getElementById('labels_menu').value;
-      console.log(this.categorical_coloring_data);
       let cat_color_map = this.categorical_coloring_data.Sample.label_colors;
       let cat_label_list = this.categorical_coloring_data.Sample.label_list;
-      console.log('selecting legend mask?');
       d3.select('#legend_mask')
         .transition()
         .attr('x', this.svg_width - 177)
         .on('end', () => {
-          console.log('make legend call');
           this.make_legend(cat_color_map, cat_label_list);
         });
 
@@ -854,7 +855,6 @@ export default class ColorBar {
       this.color_max = max;
       this.slider_scale.domain([0, max * 1.05]);
 
-      console.log('setting slider position.');
       this.set_slider_position_only(max);
     } else {
       d3.select('#legend_mask')
@@ -881,8 +881,8 @@ export default class ColorBar {
       }
     }
 
-    if (slider_ticks) {
-      slider_ticks.remove();
+    if (this.slider_ticks) {
+      this.slider_ticks.remove();
       d3.select('.ticks').remove();
     }
 
@@ -912,7 +912,7 @@ export default class ColorBar {
       ticknum = this.color_max / 1000000;
     }
 
-    slider_ticks = this.slider
+    this.slider_ticks = this.slider
       .insert('g', '.track-overlay')
       .attr('class', 'colorbar_item')
       .attr('id', 'ticks')
@@ -1044,7 +1044,7 @@ export default class ColorBar {
       d3.select('#scorecolumn')
         .selectAll('div')
         .remove();
-      rankedMask
+      this.rankedMask
         .transition()
         .attr('x', 0)
         .each(() => {
@@ -1102,7 +1102,7 @@ export default class ColorBar {
       d3.select('#scorecolumn')
         .selectAll('div')
         .remove();
-      rankedMask
+      this.rankedMask
         .transition()
         .attr('x', 0)
         .each(() => {
@@ -1134,7 +1134,7 @@ export default class ColorBar {
     d3.select('#scorecolumn')
       .selectAll('div')
       .remove();
-    rankedMask.transition().attr('x', -200);
+    this.rankedMask.transition().attr('x', -200);
     this.rankedTermsButtonRect.transition().attr('x', -70);
     this.rankedGenesButtonRect.transition().attr('x', -70);
     this.exoutTermsButtonLabel.style('opacity', 0);
@@ -1385,10 +1385,10 @@ export default class ColorBar {
       }
     }
     let text = '';
-    if (num_selected === 0 && rankedMask.attr('x') === -200) {
+    if (num_selected === 0 && this.rankedMask.attr('x') === '-200') {
       text = 'No cells selected!';
     } else {
-      if (rankedMask.attr('x') === -200) {
+      if (this.rankedMask.attr('x') === '-200') {
         if (document.getElementById('gradient_button').checked) {
           tracks = this.gene_set_color_array;
           sparse_version = 0;
@@ -1438,19 +1438,19 @@ export default class ColorBar {
       .text('');
 
     d3.select('#count_column')
-      .on('mouseenter', () => {
-        d3.selectAll('.text_count_div').each(d => {
-          const pct = d3
-            .select(d)
+      .on('mouseenter', function() {
+        d3.selectAll('.text_count_div').each(function() {
+          var pct = d3
+            .select(this)
             .select('p')
-            .text(d3.select(d).attr('pct') + '%');
+            .text(d3.select(this).attr('pct') + '%');
         });
       })
-      .on('mouseleave', () => {
-        d3.selectAll('.text_count_div').each(d => {
-          d3.select(d)
+      .on('mouseleave', function() {
+        d3.selectAll('.text_count_div').each(function() {
+          d3.select(this)
             .select('p')
-            .text(d3.select(d).attr('count'));
+            .text(d3.select(this).attr('count'));
         });
       });
 
@@ -1468,14 +1468,26 @@ export default class ColorBar {
 
     d3.select('#label_column')
       .selectAll('div')
-      .each(d => {
-        d3.select(d)
+      .data(Object.keys(cat_color_map))
+      .enter()
+      .append('div')
+      .style('display', 'inline-block')
+      .attr('class', 'legend_row')
+      .style('height', '25px')
+      .style('margin-top', '0px')
+      .style('width', '152px');
+    //.style("overflow","hidden");
+
+    d3.select('#label_column')
+      .selectAll('div')
+      .each(function(d) {
+        d3.select(this)
           .append('div')
           .style('background-color', cat_color_map[d])
-          .on('click', () => {
+          .on('click', function() {
             show_colorpicker_popup(d);
           });
-        d3.select(d)
+        d3.select(this)
           .append('div')
           .attr('class', 'text_label_div')
           .append('p')
@@ -1484,18 +1496,18 @@ export default class ColorBar {
           .style('white-space', 'nowrap')
           .style('margin-top', '-6px')
           .style('margin-left', '3px')
-          .on('click', () => {
-            this.categorical_click(d, cat_label_list, forceLayout.all_nodes);
+          .on('click', function() {
+            this.categorical_click(d, cat_label_list);
           });
       });
     d3.selectAll('.legend_row')
       .style('width', '152px')
       .style('background-color', 'rgba(0, 0, 0, 0)')
-      .on('mouseover', d => {
-        d3.select(d).style('background-color', 'rgba(0, 0, 0, 0.3)');
+      .on('mouseover', function(d) {
+        d3.select(this).style('background-color', 'rgba(0, 0, 0, 0.3)');
       })
-      .on('mouseout', d => {
-        d3.select(d).style('background-color', 'rgba(0, 0, 0, 0)');
+      .on('mouseout', function(d) {
+        d3.select(this).style('background-color', 'rgba(0, 0, 0, 0)');
       });
 
     d3.selectAll('.legend_row')
@@ -1524,7 +1536,7 @@ export default class ColorBar {
           forceLayout.all_outlines[i].compared = false;
           forceLayout.all_outlines[i].alpha = 0;
         } else {
-          if (SelectionScript.instance.selection_mode === 'negative_select') {
+          if (selectionScript.selection_mode === 'negative_select') {
             forceLayout.all_outlines[i].compared = true;
             forceLayout.all_outlines[i].tint = '0x0000ff';
             forceLayout.all_outlines[i].alpha = all_nodes[i].alpha;
@@ -1540,7 +1552,7 @@ export default class ColorBar {
     if (all_nodes.length < 25000) {
       this.shrinkNodes(6, 10, my_nodes, all_nodes);
     }
-    SelectionScript.instance.update_selected_count();
+    selectionScript.update_selected_count();
     this.count_clusters();
   }
 

@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
-import { closeDropdown, edge_container, _app, rgbToHex, all_nodes, all_outlines } from './forceLayout_script';
-import { SPRITE_IMG_WIDTH } from './util';
+
+import { forceLayout } from './main';
+import { SPRITE_IMG_WIDTH, rgbToHex } from './util';
 
 export const settings_setup = () => {
   let dropdown = d3
@@ -131,26 +132,26 @@ export const settings_setup = () => {
     });
 
   function node_repulsion_change(val) {
-    force.charge(-val / 10);
-    force.start();
+    forceLayout.force.charge(-val / 10);
+    forceLayout.force.start();
   }
   function link_distance_change(val) {
-    force.linkDistance(val / 10);
-    force.start();
+    forceLayout.force.linkDistance(val / 10);
+    forceLayout.force.start();
   }
   function link_strength_change(val) {
-    force.linkStrength(val / 10);
-    force.start();
+    forceLayout.force.linkStrength(val / 10);
+    forceLayout.force.start();
   }
   function gravity_change(val) {
-    force.gravity(val / 100);
-    force.start();
+    forceLayout.force.gravity(val / 100);
+    forceLayout.force.start();
   }
 
   function check_any_selected() {
     let any_selected = false;
-    for (let i = 0; i < all_outlines.length; i++) {
-      if (all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         any_selected = true;
       }
     }
@@ -160,21 +161,21 @@ export const settings_setup = () => {
   function node_size_change(val) {
     val = (val / 50) ** 2.5 * 50 * (32 / SPRITE_IMG_WIDTH);
     let any_selected = check_any_selected();
-    for (let i = 0; i < all_nodes.length; i++) {
-      if (!any_selected || all_outlines[i].selected) {
-        all_nodes[i].scale.set(val / 100);
-        all_outlines[i].scale.set(val / 100);
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+      if (!any_selected || forceLayout.all_outlines[i].selected) {
+        forceLayout.all_nodes[i].scale.set(val / 100);
+        forceLayout.all_outlines[i].scale.set(val / 100);
       }
     }
   }
 
   function node_opacity_change(val) {
     let any_selected = check_any_selected();
-    for (let i = 0; i < all_nodes.length; i++) {
-      if (!any_selected || all_outlines[i].selected) {
-        all_nodes[i].alpha = val / 100;
-        if (all_outlines[i].selected || all_outlines[i].compared) {
-          all_outlines[i].alpha = val / 100;
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+      if (!any_selected || forceLayout.all_outlines[i].selected) {
+        forceLayout.all_nodes[i].alpha = val / 100;
+        if (forceLayout.all_outlines[i].selected || forceLayout.all_outlines[i].compared) {
+          forceLayout.all_outlines[i].alpha = val / 100;
         }
       }
     }
@@ -182,7 +183,7 @@ export const settings_setup = () => {
 
   function background_color_change(val) {
     const parsedVal = parseInt(val, 10);
-    _app.renderer.backgroundColor = rgbToHex(parsedVal, parsedVal, parsedVal);
+    forceLayout.app.renderer.backgroundColor = rgbToHex(parsedVal, parsedVal, parsedVal);
     /*
 		if (val < 125) {
 			text_anos.ba.style.fill = '#B8B8B8';
@@ -200,7 +201,7 @@ export const settings_setup = () => {
   }
 
   function edge_opacity_change(val) {
-    edge_container.alpha = val / 100;
+    forceLayout.edge_container.alpha = val / 100;
   }
 
   function rgb_string(val) {
@@ -259,7 +260,7 @@ export const toggle_settings = () => {
   }
 }
 export const expand_settings = () => {
-  closeDropdown();
+  forceLayout.closeDropdown();
   if (d3.select('#settings_dropdown').style('visibility') === 'hidden') {
     setTimeout(function() {
       d3.select('#settings_dropdown').style('height', '275px');
@@ -279,7 +280,7 @@ export const collapse_settings = () => {
       10,
     ) > 200
   ) {
-    closeDropdown();
+    forceLayout.closeDropdown();
     d3.select('#settings_dropdown').style('height', '0px');
     d3.select('#settings_restore_defaults_button').style('visibility', 'hidden');
     d3.select('#settings_dropdown').style('visibility', 'hidden');

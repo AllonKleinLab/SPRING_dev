@@ -1,8 +1,7 @@
 import * as d3 from 'd3';
 
-import ColorBar, { average_color } from './colorBar';
 import { SPRITE_IMG_WIDTH, rgbToHex } from './util';
-import { forceLayout } from './main';
+import { colorBar, forceLayout } from './main';
 
 export default class CloneViewer {
   static _instance;
@@ -14,9 +13,9 @@ export default class CloneViewer {
     return this._instance;
   }
 
-  static async create(forceLayout) {
+  static async create() {
     if (!this._instance) {
-      this._instance = new CloneViewer(forceLayout);
+      this._instance = new CloneViewer();
       await this._instance.loadData();
       return this._instance;
     } else {
@@ -373,16 +372,16 @@ export default class CloneViewer {
         forceLayout.base_colors[i] = { r: 0, g: 0, b: 0 };
       }
     }
-    ColorBar.instance.update_tints();
+    colorBar.update_tints();
     forceLayout.app.stage.children[1].children.sort((a, b) => {
-      return average_color(forceLayout.base_colors[a.index]) - average_color(forceLayout.base_colors[b.index]);
+      return colorBar.average_color(forceLayout.base_colors[a.index]) - colorBar.average_color(forceLayout.base_colors[b.index]);
     });
 
     this.clear_clone_overlays();
   }
 
   restore_colors() {
-    ColorBar.instance.setNodeColors();
+    colorBar.setNodeColors();
   }
 
   extend_from_selection() {

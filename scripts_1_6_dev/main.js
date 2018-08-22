@@ -5,21 +5,23 @@ import ForceLayout from './forceLayout_script.js';
 import { doublet_setup } from './doublet_detector.js';
 import SelectionScript from './selection_script.js';
 import CloneViewer from './clone_viewer.js';
-import { cluster_setup } from './cluster_script.js';
+import Cluster from './cluster_script.js';
 import { settings_setup, collapse_settings } from './settings_script.js';
 import { make_new_SPRINGplot_setup } from './make_new_SPRINGplot_script.js';
 import { downloadSelectedExpr_setup } from './downloadSelectedExpr_script.js';
 import StickyNote from './stickyNote.js';
 import { imputation_setup } from './smoothing_imputation.js';
 import { selection_logic_setup } from './selection_logic.js';
-import { PAGA_setup } from './PAGA_viewer.js';
+import PAGA from './PAGA_viewer.js';
 import { colorpicker_setup } from './colorpicker_layout.js';
 
 export let forceLayout;
 export let colorBar;
+export let cluster;
 export let stickyNote;
 export let cloneViewer;
 export let selectionScript;
+export let paga;
 
 d3.select('#sound_toggle')
   .append('img')
@@ -44,6 +46,7 @@ d3.select('#sound_toggle')
 const callback = async () => {
   d3.select('#load_colors').remove();
 
+  forceLayout.initiateButtons();
   forceLayout.setup_download_dropdown();
   forceLayout.setup_tools_dropdown();
   forceLayout.center_view(false);
@@ -52,7 +55,6 @@ const callback = async () => {
   cloneViewer.edge_container.visible = false;
 
   forceLayout.animation();
-
   forceLayout.setup_layout_dropdown();
 
   make_new_SPRINGplot_setup();
@@ -60,10 +62,9 @@ const callback = async () => {
 
   imputation_setup();
   doublet_setup();
-  cluster_setup();
   selection_logic_setup();
   colorpicker_setup();
-  PAGA_setup();
+  paga = await PAGA.create();
 
   //load_text_annotation();
   //stratify_setup();
@@ -130,8 +131,8 @@ const loadData = async () => {
   colorBar = await getColorBarFromAjax();
   cloneViewer = await CloneViewer.create();
   selectionScript = await SelectionScript.create();
-  console.log(selectionScript);
   stickyNote = await StickyNote.create();
+  cluster = await Cluster.create();
 
   await callback();
 };

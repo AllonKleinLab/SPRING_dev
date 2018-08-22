@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
-import { mutable } from "./forceLayout_script";
-import { categorical_coloring_data } from "./colorBar";
+import { colorBar, forceLayout } from './main';
+import { rgbToHex } from './util';
 
 let tmp_cat_coloring = null;
 
@@ -80,12 +80,12 @@ export const colorpicker_setup = () => {
 }
 
 export const  restore_colorpicker = () => {
-  setNodeColors();
+  colorBar.setNodeColors();
   let current_label = d3.select('#colorpicker_popup').attr('current_label');
   if (current_label !== '') {
     let current_track = d3.select('#colorpicker_popup').attr('current_track');
-    tmp_cat_coloring = Object.assign({}, categorical_coloring_data[current_track].label_colors);
-    let current_color = categorical_coloring_data[current_track].label_colors[current_label].replace('#', '0x');
+    tmp_cat_coloring = Object.assign({}, colorBar.categorical_coloring_data[current_track].label_colors);
+    let current_color = colorBar.categorical_coloring_data[current_track].label_colors[current_label].replace('#', '0x');
     $('#colorpickerHolder').ColorPickerSetColor(current_color);
 
     d3.selectAll('.legend_row').each(function(d) {
@@ -99,11 +99,11 @@ export const  restore_colorpicker = () => {
 }
 
 export const  show_colorpicker_popup = (label) => {
-  if (mutable) {
+  if (forceLayout.mutable) {
     let current_track = document.getElementById('labels_menu').value;
-    let current_color = categorical_coloring_data[current_track].label_colors[label].replace('#', '0x');
+    let current_color = colorBar.categorical_coloring_data[current_track].label_colors[label].replace('#', '0x');
     let nodes = [];
-    categorical_coloring_data[current_track].label_list.forEach(function(l, i) {
+    colorBar.categorical_coloring_data[current_track].label_list.forEach(function(l, i) {
       if (label === l) {
         nodes.push(i);
       }
@@ -115,7 +115,7 @@ export const  show_colorpicker_popup = (label) => {
     d3.select('#colorpicker_popup').attr('current_track', current_track);
 
     $('#colorpickerHolder').ColorPickerSetColor(current_color);
-    tmp_cat_coloring = Object.assign({}, categorical_coloring_data[current_track].label_colors);
+    tmp_cat_coloring = Object.assign({}, colorBar.categorical_coloring_data[current_track].label_colors);
 
     let top =
       parseFloat(
@@ -161,7 +161,7 @@ export const  colorpicker_update = () => {
       .attr('current_nodes')
       .split(',')
       .forEach(function(i) {
-        all_nodes[i].tint = current_color;
+        forceLayout.all_nodes[i].tint = current_color;
       });
   }
 
@@ -183,8 +183,8 @@ export const save_colorpicker_colors = () => {
   let current_track = document.getElementById('labels_menu').value;
   if (current_track === d3.select('#colorpicker_popup').attr('current_track')) {
     if (tmp_cat_coloring != null) {
-      categorical_coloring_data[current_track].label_colors = tmp_cat_coloring;
-      let text = JSON.stringify(categorical_coloring_data);
+      colorBar.categorical_coloring_data[current_track].label_colors = tmp_cat_coloring;
+      let text = JSON.stringify(colorBar.categorical_coloring_data);
       let name = window.location.search;
       let path = name.slice(1, name.length) + '/categorical_coloring_data.json';
       console.log('gothere');

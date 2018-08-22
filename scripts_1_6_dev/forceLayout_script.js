@@ -1,17 +1,13 @@
 import * as d3 from 'd3';
 
-import ColorBar, { toggle_legend_hover_tooltip } from './colorBar';
 import { LineSprite } from './LineSprite';
-import { graph_directory } from './main';
+import { graph_directory, colorBar, cloneViewer, paga, selectionScript } from './main';
 import { SPRITE_IMG_WIDTH, downloadFile, rgbToHex } from './util';
-import CloneViewer from './clone_viewer';
-import SelectionScript from './selection_script';
 import { collapse_settings } from './settings_script';
 import { rotation_update } from './rotation_script';
 import { show_downloadSelectedExpr_popup } from './downloadSelectedExpr_script';
 import { show_make_new_SPRINGplot_popup } from './make_new_SPRINGplot_script';
 import { run_clustering } from './cluster2_script';
-import { show_PAGA_popup } from './PAGA_viewer';
 import { show_selection_logic_popup } from './selection_logic';
 import { show_imputation_popup } from './smoothing_imputation';
 
@@ -299,7 +295,7 @@ export default class ForceLayout {
   };
 
   dragstarted() {
-    if (SelectionScript.instance === 'drag_pan_zoom') {
+    if (selectionScript === 'drag_pan_zoom') {
       let dim = document.getElementById('svg_graph').getBoundingClientRect();
       let x = d3.event.sourceEvent.clientX - dim.left;
       let y = d3.event.sourceEvent.clientY - dim.top;
@@ -645,7 +641,7 @@ export default class ForceLayout {
       this.center_view(true);
     });
 
-    d3.select('#revert_positions').on('click', this.revert_positions);
+    d3.select('#revert_positions').on('click', () => this.revert_positions());
 
     d3.select('#move_left').on('click', () => {
       this.move_selection_aside('left');
@@ -676,7 +672,7 @@ export default class ForceLayout {
       });
 
     d3.select('#download_png')
-      .on('click', this.download_png)
+      .on('click', () => this.download_png())
       .on('mouseenter', () => {
         d3.select('#container')
           .append('div')
@@ -723,15 +719,16 @@ export default class ForceLayout {
     d3.select('#show_make_new_SPRINGplot_popup').on('click', () => show_make_new_SPRINGplot_popup());
 
     d3.select('#start_clone_viewer').on('click', () => {
-      CloneViewer.instance.start_clone_viewer();
+      cloneViewer.start_clone_viewer();
     });
     d3.select('#show_imputation_popup').on('click', () => show_imputation_popup());
     d3.select('#show_selection_logic_popup').on('click', () => show_selection_logic_popup());
     d3.select('#show_doublet_popup').on('click', () => show_make_new_SPRINGplot_popup());
     d3.select('#run_clustering').on('click', () => run_clustering());
-    d3.select('#show_PAGA_popup').on('click', () => show_PAGA_popup());
-    d3.select('#toggle_legend_hover_tooltip_button').on('click', () => toggle_legend_hover_tooltip());
+    d3.select('#show_PAGA_popup').on('click', () => paga.show_PAGA_popup());
+    d3.select('#toggle_legend_hover_tooltip_button').on('click', () => colorBar.toggle_legend_hover_tooltip());
   };
+  
   download_png = () => {
     let searchPaths = window.location.search.split('/');
     const path = searchPaths[searchPaths.length - 2] + '_' + searchPaths[searchPaths.length - 1] + '.png';
@@ -748,7 +745,8 @@ export default class ForceLayout {
       a.remove();
     }, 'image/png');
   };
-  showToolsDropdown = () => {
+
+  showToolsDropdown() {
     if (d3.select('#tools_dropdown').style('height') === 'auto') {
       this.closeDropdown();
       collapse_settings();
@@ -756,9 +754,9 @@ export default class ForceLayout {
         document.getElementById('tools_dropdown').classList.toggle('show');
       }, 10);
     }
-  };
+  }
 
-  showDownloadDropdown = () => {
+  showDownloadDropdown() {
     if (d3.select('#download_dropdown').style('height') === 'auto') {
       this.closeDropdown();
       collapse_settings();
@@ -766,9 +764,9 @@ export default class ForceLayout {
         document.getElementById('download_dropdown').classList.toggle('show');
       }, 10);
     }
-  };
+  }
 
-  showLayoutDropdown = () => {
+  showLayoutDropdown() {
     if (d3.select('#layout_dropdown').style('height') === 'auto') {
       this.closeDropdown();
       collapse_settings();
@@ -776,9 +774,9 @@ export default class ForceLayout {
         document.getElementById('layout_dropdown').classList.toggle('show');
       }, 10);
     }
-  };
+  }
 
-  closeDropdown = () => {
+  closeDropdown() {
     let dropdowns = document.getElementsByClassName('dropdown-content');
     let i;
     for (let i = 0; i < dropdowns.length; i++) {
@@ -787,23 +785,23 @@ export default class ForceLayout {
         openDropdown.classList.remove('show');
       }
     }
-  };
+  }
 
-  setup_download_dropdown = () => {
+  setup_download_dropdown() {
     //d3.select("#download_dropdown_button").on("mouseenter",showDownloadDropdown);
-    d3.select('#download_dropdown_button').on('click', this.showDownloadDropdown);
-  };
+    d3.select('#download_dropdown_button').on('click', () => this.showDownloadDropdown());
+  }
 
-  setup_tools_dropdown = () => {
-    d3.select('#tools_dropdown_button').on('click', this.showToolsDropdown);
-  };
+  setup_tools_dropdown() {
+    d3.select('#tools_dropdown_button').on('click', () => this.showToolsDropdown());
+  }
 
-  setup_layout_dropdown = () => {
+  setup_layout_dropdown() {
     //d3.select("#layout_dropdown_button").on("mouseover",showLayoutDropdown);
-    d3.select('#layout_dropdown_button').on('click', this.showLayoutDropdown);
-  };
+    d3.select('#layout_dropdown_button').on('click', () => this.showLayoutDropdown());
+  }
 
-  fix = () => {
+  fix() {
     if (d3.selectAll('.selected')[0].length === 0) {
       d3.selectAll('.node circle').each(function(d) {
         d.fixed = true;
@@ -812,7 +810,7 @@ export default class ForceLayout {
     d3.selectAll('.selected').each(function(d) {
       d.fixed = true;
     });
-  };
+  }
 
   unfix() {
     d3.selectAll('.selected').each(function(d) {
@@ -826,8 +824,6 @@ export default class ForceLayout {
   }
 
   redraw() {
-    console.log(ColorBar._instance);
-    console.log(CloneViewer._instance);
     if (!this.being_dragged && d3.event.sourceEvent) {
       let dim = document.getElementById('svg_graph').getBoundingClientRect();
       let x = d3.event.sourceEvent.clientX;
@@ -845,13 +841,13 @@ export default class ForceLayout {
       this.edge_container.position = this.sprites.position;
       this.edge_container.scale = this.sprites.scale;
 
-      CloneViewer.instance.clone_edge_container.position = this.sprites.position;
-      CloneViewer.instance.clone_edge_container.scale = this.sprites.scale;
-      CloneViewer.instance.clone_sprites.position = this.sprites.position;
-      CloneViewer.instance.clone_sprites.scale = this.sprites.scale;
+      cloneViewer.clone_edge_container.position = this.sprites.position;
+      cloneViewer.clone_edge_container.scale = this.sprites.scale;
+      cloneViewer.clone_sprites.position = this.sprites.position;
+      cloneViewer.clone_sprites.scale = this.sprites.scale;
 
-      //text_container.position = sprites.position;
-      //text_container.scale = sprites.scale;
+      // text_container.position = sprites.position;
+      // text_container.scale = sprites.scale;
 
       d3.select('#vis').attr(
         'transform',
@@ -866,8 +862,6 @@ export default class ForceLayout {
   }
 
   center_view(on_selected) {
-    console.log(ColorBar._instance);
-    console.log(CloneViewer._instance);
     let all_xs = [];
     let all_ys = [];
     let num_selected = 0;
@@ -909,10 +903,10 @@ export default class ForceLayout {
         this.sprites.scale.y += delta_scale;
         this.edge_container.position = this.sprites.position;
         this.edge_container.scale = this.sprites.scale;
-        CloneViewer.instance.clone_edge_container.position = this.sprites.position;
-        CloneViewer.instance.clone_edge_container.scale = this.sprites.scale;
-        CloneViewer.instance.clone_sprites.position = this.sprites.position;
-        CloneViewer.instance.clone_sprites.scale = this.sprites.scale;
+        cloneViewer.clone_edge_container.position = this.sprites.position;
+        cloneViewer.clone_edge_container.scale = this.sprites.scale;
+        cloneViewer.clone_sprites.position = this.sprites.position;
+        cloneViewer.clone_sprites.scale = this.sprites.scale;
 
         d3.select('#vis').attr(
           'transform',
@@ -929,6 +923,7 @@ export default class ForceLayout {
         setTimeout(move, 10);
       }
     };
+    move();
   }
 
   save_coords = () => {
