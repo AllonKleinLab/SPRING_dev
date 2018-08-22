@@ -4,6 +4,7 @@ export class LineSprite extends PIXI.Sprite {
   static maxColors = 100;
   static colors = 0;
   static canvas = null;
+  static baseTexture = null;
 
   constructor(thickness, color, x1, y1, x2, y2) {
     super(LineSprite.getTexture(thickness, color));
@@ -35,7 +36,6 @@ export class LineSprite extends PIXI.Sprite {
       context.fillStyle = PIXI.utils.hex2string(color);
       context.fillRect(1, LineSprite.colors, thickness, 1);
       let texture = new PIXI.Texture(LineSprite.baseTexture, PIXI.SCALE_MODES.LINEAR);
-      console.log(texture);
       texture.frame = new PIXI.Rectangle(0, LineSprite.colors, thickness + 2, 1);
       LineSprite.textureCache[key] = texture;
       LineSprite.colors++;

@@ -1,8 +1,5 @@
 import * as d3 from 'd3';
-import { all_outlines, all_nodes, base_colors, app } from './forceLayout_script';
-import { clone_nodes } from './clone_viewer';
-import { graph_directory, sub_directory } from './main';
-import { average_color } from './colorBar';
+import { forceLayout, colorBar, cloneViewer, graph_directory, sub_directory } from './main';
 
 export const imputation_setup =  () => {
   let popup = d3
@@ -108,7 +105,7 @@ export const imputation_setup =  () => {
   }
 
   function restore_colors() {
-    setNodeColors();
+    colorBar.setNodeColors();
   }
 
   function hide_waiting_wheel() {
@@ -128,14 +125,14 @@ export const imputation_setup =  () => {
       let all_b = '';
       let sel = '';
       let sel_nodes = [];
-      for (let i = 0; i < all_outlines.length; i++) {
+      for (let i = 0; i < forceLayout.all_outlines.length; i++) {
         let col = {};
-        if (all_nodes[i].tint === '0x000000' && clone_nodes[i] === undefined) {
+        if (forceLayout.all_nodes[i].tint === '0x000000' && cloneViewer.clone_nodes[i] === undefined) {
           col = { r: 0, b: 0, g: 0 };
         } else {
-          col = base_colors[i];
+          col = forceLayout.base_colors[i];
         }
-        if (all_outlines[i].selected) {
+        if (forceLayout.all_outlines[i].selected) {
           sel = sel + ',' + i.toString();
           sel_nodes.push(i);
         }
@@ -174,10 +171,10 @@ export const imputation_setup =  () => {
           
           if (document.getElementById('channels_button').checked) {
             current_min = 0;
-            current_max = parseFloat(d3.max(green_array));
+            current_max = parseFloat(d3.max(forceLayout.green_array));
           } else {
-            current_max = parseFloat(d3.max(base_colors.map(max_color)));
-            current_min = parseFloat(d3.min(base_colors.map(min_color)));
+            current_max = parseFloat(d3.max(forceLayout.base_colors.map(forceLayout.max_color)));
+            current_min = parseFloat(d3.min(forceLayout.base_colors.map(forceLayout.min_color)));
           }
 
           function nrm(x) {
@@ -190,25 +187,25 @@ export const imputation_setup =  () => {
           let blues = spl[2].split(',').map(nrm);
 
           if (document.getElementById('channels_button').checked) {
-            green_array = greens;
-            greens = greens.map(x => normalize_one_val(x));
+            forceLayout.green_array = greens;
+            greens = greens.map(x => forceLayout.normalize_one_val(x));
           }
 
           if (sel_nodes.length === 0) {
-            for (let i = 0; i < all_nodes.length; i++) {
-              base_colors[i] = { r: Math.floor(reds[i]), g: Math.floor(greens[i]), b: Math.floor(blues[i]) };
+            for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+              forceLayout.base_colors[i] = { r: Math.floor(reds[i]), g: Math.floor(greens[i]), b: Math.floor(blues[i]) };
             }
           } else {
             for (let i = 0; i < sel_nodes.length; i++) {
-              base_colors[sel_nodes[i]] = { r: Math.floor(reds[i]), g: Math.floor(greens[i]), b: Math.floor(blues[i]) };
+              forceLayout.base_colors[sel_nodes[i]] = { r: Math.floor(reds[i]), g: Math.floor(greens[i]), b: Math.floor(blues[i]) };
             }
           }
 
-          updateColorMax();
+          colorBar.updateColorMax();
           hide_waiting_wheel();
 
-          app.stage.children[1].children.sort(function(a, b) {
-            return average_color(base_colors[a.index]) - average_color(base_colors[b.index]);
+          forceLayout.app.stage.children[1].children.sort(function(a, b) {
+            return colorBar.average_color(forceLayout.base_colors[a.index]) - colorBar.average_color(forceLayout.base_colors[b.index]);
           });
         },
         type: 'POST',

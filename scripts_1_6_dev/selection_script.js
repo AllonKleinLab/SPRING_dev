@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
-import ForceLayout from './forceLayout_script';
-import ColorBar from './colorBar';
 import { rotation_hide } from './rotation_script';
+import { colorBar, forceLayout } from './main';
 
 export default class SelectionScript {
   static _instance;
@@ -16,6 +15,7 @@ export default class SelectionScript {
   static create() {
     if (!this._instance) {
       this._instance = new SelectionScript();
+      return this._instance;
     } else {
       throw new Error(
         'SelectionScript.create() has already been called, get the existing instance with SelectionScript.instance!',
@@ -201,16 +201,16 @@ export default class SelectionScript {
       // .extent([xBrushExtent, yBrushExtent])
       .on('brush', () => {
         let extent = d3.selectAll('.brush .extent')[0][0].getBoundingClientRect();
-        for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-          let d = ForceLayout.instance.all_nodes[i];
+        for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+          let d = forceLayout.all_nodes[i];
           let dim = document.getElementById('svg_graph').getBoundingClientRect();
-          let x = d.x * ForceLayout.instance.sprites.scale.x + dim.left;
-          let y = d.y * ForceLayout.instance.sprites.scale.y + dim.top;
-          x = x + ForceLayout.instance.sprites.position.x;
-          y = y + ForceLayout.instance.sprites.position.y;
+          let x = d.x * forceLayout.sprites.scale.x + dim.left;
+          let y = d.y * forceLayout.sprites.scale.y + dim.top;
+          x = x + forceLayout.sprites.position.x;
+          y = y + forceLayout.sprites.position.y;
 
           let inrect = extent.left <= x && x < extent.right && extent.top <= y && y < extent.bottom;
-          let o = ForceLayout.instance.all_outlines[i];
+          let o = forceLayout.all_outlines[i];
           if (this.selection_mode === 'positive_select' || this.selection_mode === 'negative_select') {
             o.selected = (o.selected && !o.compared) || (this.selection_mode === 'positive_select' && inrect);
             o.compared = (o.compared && !o.selected) || (this.selection_mode === 'negative_select' && inrect);
@@ -220,11 +220,11 @@ export default class SelectionScript {
             o.compared = o.compared && !inrect;
           }
           if (o.selected) {
-            o.alpha = ForceLayout.instance.all_nodes[i].alpha;
+            o.alpha = forceLayout.all_nodes[i].alpha;
             o.tint = '0xffff00';
           }
           if (o.compared) {
-            o.alpha = ForceLayout.instance.all_nodes[i].alpha;
+            o.alpha = forceLayout.all_nodes[i].alpha;
             o.tint = '0x0000ff';
           }
           if (o.selected || o.compared) {
@@ -237,14 +237,14 @@ export default class SelectionScript {
           }
         }
         this.update_selected_count();
-        ColorBar.instance.count_clusters();
+        colorBar.count_clusters();
       })
       .on('end', (d) => {
         d3.event.target.clear();
         d3.select(d).call(d3.event.target);
         let selected = [];
-        for (let i in ForceLayout.instance.all_outlines) {
-          if (ForceLayout.instance.all_outlines.selected) {
+        for (let i in forceLayout.all_outlines) {
+          if (forceLayout.all_outlines.selected) {
             selected.push(i);
           }
         }
@@ -279,23 +279,23 @@ export default class SelectionScript {
   switch_pos_neg() {
     let pos_cells = [];
     let neg_cells = [];
-    for (let i = 0; i < ForceLayout.instance.all_outlines.length; i++) {
-      if (ForceLayout.instance.all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         pos_cells.push(i);
       }
-      if (ForceLayout.instance.all_outlines[i].compared) {
+      if (forceLayout.all_outlines[i].compared) {
         neg_cells.push(i);
       }
     }
     for (let i = 0; i < neg_cells.length; i++) {
-      ForceLayout.instance.all_outlines[neg_cells[i]].tint = '0xffff00';
-      ForceLayout.instance.all_outlines[neg_cells[i]].selected = true;
-      ForceLayout.instance.all_outlines[neg_cells[i]].compared = false;
+      forceLayout.all_outlines[neg_cells[i]].tint = '0xffff00';
+      forceLayout.all_outlines[neg_cells[i]].selected = true;
+      forceLayout.all_outlines[neg_cells[i]].compared = false;
     }
     for (let i = 0; i < pos_cells.length; i++) {
-      ForceLayout.instance.all_outlines[pos_cells[i]].tint = '0x0000ff';
-      ForceLayout.instance.all_outlines[pos_cells[i]].compared = true;
-      ForceLayout.instance.all_outlines[pos_cells[i]].selected = false;
+      forceLayout.all_outlines[pos_cells[i]].tint = '0x0000ff';
+      forceLayout.all_outlines[pos_cells[i]].compared = true;
+      forceLayout.all_outlines[pos_cells[i]].selected = false;
     }
   }
 
@@ -310,7 +310,7 @@ export default class SelectionScript {
     this.deselect_rect.transition('5').attr('fill-opacity', this.selection_mode === 'deselect' ? 0.5 : 0.15);
     if (this.selection_mode !== 'drag_pan_zoom') {
       d3.select('#svg_graph')
-        .call(ForceLayout.instance.zoomer)
+        .call(forceLayout.zoomer)
         .on('mousedown.zoom', null)
         .on('touchstart.zoom', null)
         .on('touchmove.zoom', null)
@@ -327,7 +327,7 @@ export default class SelectionScript {
         .on('touchmove.brush', null)
         .on('touchend.brush', null);
       this.brush.select('.background').style('cursor', 'auto');
-      d3.select('#svg_graph').call(ForceLayout.instance.zoomer);
+      d3.select('#svg_graph').call(forceLayout.zoomer);
     }
   }
 
@@ -373,11 +373,11 @@ export default class SelectionScript {
   update_selected_count() {
     let num_selected = 0;
     let num_compared = 0;
-    for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-      if (ForceLayout.instance.all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         num_selected += 1;
       }
-      if (ForceLayout.instance.all_outlines[i].compared) {
+      if (forceLayout.all_outlines[i].compared) {
         num_compared += 1;
       }
     }
@@ -407,7 +407,7 @@ export default class SelectionScript {
           this.pos_select_count_text.transition('500').attr('x', this.svg_width - 167);
         }
       }
-      let pct = Math.floor((num_selected / ForceLayout.instance.all_nodes.length) * 100);
+      let pct = Math.floor((num_selected / forceLayout.all_nodes.length) * 100);
       this.pos_select_count_text.text(num_selected.toString() + ' cells selected   (' + pct.toString() + '%)');
     }
     if (num_compared === 0 && this.neg_count_extended) {
@@ -436,7 +436,7 @@ export default class SelectionScript {
           this.neg_select_count_text.transition('500').attr('x', this.svg_width - 167);
         }
       }
-      let newPct = Math.floor((num_compared / ForceLayout.instance.all_nodes.length) * 100);
+      let newPct = Math.floor((num_compared / forceLayout.all_nodes.length) * 100);
       this.neg_select_count_text.text(num_compared.toString() + ' cells selected   (' + newPct.toString() + '%)');
     }
   }
@@ -456,30 +456,30 @@ export default class SelectionScript {
 
   deselect_all() {
     let any_selected = false;
-    for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-      if (ForceLayout.instance.all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         any_selected = true;
       }
-      if (ForceLayout.instance.all_outlines[i].compared) {
+      if (forceLayout.all_outlines[i].compared) {
         any_selected = true;
       }
     }
     if (any_selected) {
       rotation_hide();
-      for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-        ForceLayout.instance.all_outlines[i].alpha = 0;
-        ForceLayout.instance.all_outlines[i].selected = false;
-        ForceLayout.instance.all_outlines[i].compared = false;
+      for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+        forceLayout.all_outlines[i].alpha = 0;
+        forceLayout.all_outlines[i].selected = false;
+        forceLayout.all_outlines[i].compared = false;
 
         // 				all_nodes[i].scale.set(base_radius);
         // 				all_outlines[i].scale.set(base_radius);
       }
     }
     if (!any_selected) {
-      for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-        ForceLayout.instance.all_outlines[i].alpha = ForceLayout.instance.all_nodes[i].alpha;
-        ForceLayout.instance.all_outlines[i].tint = '0xffff00';
-        ForceLayout.instance.all_outlines[i].selected = true;
+      for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+        forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
+        forceLayout.all_outlines[i].tint = '0xffff00';
+        forceLayout.all_outlines[i].selected = true;
         // 				all_outlines[i].scale.set(large_radius);
         // 				all_nodes[i].scale.set(large_radius);
       }
@@ -508,13 +508,13 @@ export default class SelectionScript {
   }
 
   extend_selection() {
-    for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-      if (ForceLayout.instance.all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         for (let j in neighbors[i]) {
           let jj = neighbors[i][j];
-          ForceLayout.instance.all_outlines[jj].alpha = ForceLayout.instance.all_nodes[i].alpha;
-          ForceLayout.instance.all_outlines[jj].tint = '0xffff00';
-          ForceLayout.instance.all_outlines[jj].selected = true;
+          forceLayout.all_outlines[jj].alpha = forceLayout.all_nodes[i].alpha;
+          forceLayout.all_outlines[jj].tint = '0xffff00';
+          forceLayout.all_outlines[jj].selected = true;
         }
       }
     }

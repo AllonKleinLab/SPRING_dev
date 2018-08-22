@@ -2,10 +2,10 @@ import * as d3 from 'd3';
 
 import ColorBar, { toggle_legend_hover_tooltip } from './colorBar';
 import { LineSprite } from './LineSprite';
-import { graph_directory, sub_directory } from './main';
+import { graph_directory } from './main';
 import { SPRITE_IMG_WIDTH, downloadFile, rgbToHex } from './util';
 import CloneViewer from './clone_viewer';
-import { selection_mode } from './selection_script';
+import SelectionScript from './selection_script';
 import { collapse_settings } from './settings_script';
 import { rotation_update } from './rotation_script';
 import { show_downloadSelectedExpr_popup } from './downloadSelectedExpr_script';
@@ -16,7 +16,6 @@ import { show_selection_logic_popup } from './selection_logic';
 import { show_imputation_popup } from './smoothing_imputation';
 
 export default class ForceLayout {
-
   static _instance;
 
   static get instance() {
@@ -26,11 +25,11 @@ export default class ForceLayout {
     return this._instance;
   }
 
-  static async create(project_directory, sub_directory, callback) {
+  static async create(project_directory, sub_directory) {
     if (!this._instance) {
       this._instance = new ForceLayout(project_directory, sub_directory);
       await this._instance.loadData();
-      callback();
+      return this._instance;
     } else {
       throw new Error(
         'ForceLayout.create() has already been called, get the existing instance with ForceLayout.instance!',
@@ -39,7 +38,6 @@ export default class ForceLayout {
   }
 
   constructor(project_directory, sub_directory) {
-    console.log('force constructor');
     this.project_directory = project_directory;
     this.sub_directory = sub_directory;
     this.width = window.innerWidth - 15;
@@ -97,9 +95,7 @@ export default class ForceLayout {
     this.zoomer = d3
       .zoom()
       .scaleExtent([0.02, 10])
-      .on('zoom', () => {
-        this.redraw();
-      });
+      .on('zoom', () => this.redraw());
     /////////////////////////////////////////////////////////////////////
 
     this.svg_graph = this.svg
@@ -171,13 +167,13 @@ export default class ForceLayout {
       .attr('width', 25)
       .attr('height', 25)
       .attr('class', 'other_frills')
-      .on('click', this.toggle_edges);
+      .on('click', () => this.toggle_edges());
 
-    d3.select('#toggle_edges_layout').on('click', this.toggle_edges);
+    d3.select('#toggle_edges_layout').on('click', () => this.toggle_edges());
     return this;
   }
 
-  loadData = async () => {
+  async loadData() {
     const filePath = this.project_directory + '/' + this.sub_directory + '/mutability.txt';
     try {
       const mutableText = await d3.text(filePath);
@@ -226,9 +222,8 @@ export default class ForceLayout {
         .on('end', this.dragended),
     );
 
-    console.log('loading edges?');
     await this.load_edges(this.all_nodes, this.sprites);
-  };
+  }
 
   create_sprites(totalSprites) {
     for (let i = 0; i < totalSprites; i++) {
@@ -295,7 +290,7 @@ export default class ForceLayout {
           this.all_edge_ends.push({ source: source, target: target });
         }
       });
-    } catch(e) {
+    } catch (e) {
       console.log(`Error setting up edges: ${e}`);
     } finally {
       this.app.stage.addChild(this.edge_container);
@@ -304,7 +299,7 @@ export default class ForceLayout {
   };
 
   dragstarted() {
-    if (selection_mode === 'drag_pan_zoom') {
+    if (SelectionScript.instance === 'drag_pan_zoom') {
       let dim = document.getElementById('svg_graph').getBoundingClientRect();
       let x = d3.event.sourceEvent.clientX - dim.left;
       let y = d3.event.sourceEvent.clientY - dim.top;
@@ -465,7 +460,7 @@ export default class ForceLayout {
 
     this.edge_container.visible = false;
     next_frame(6, -1);
-  };
+  }
 
   revert_positions = () => {
     let stash_i = this.stashed_coordinates.length - 1;
@@ -819,7 +814,7 @@ export default class ForceLayout {
     });
   };
 
-  unfix = () => {
+  unfix() {
     d3.selectAll('.selected').each(function(d) {
       d.fixed = false;
     });
@@ -828,9 +823,11 @@ export default class ForceLayout {
         d.fixed = false;
       });
     }
-  };
+  }
 
-  redraw = () => {
+  redraw() {
+    console.log(ColorBar._instance);
+    console.log(CloneViewer._instance);
     if (!this.being_dragged && d3.event.sourceEvent) {
       let dim = document.getElementById('svg_graph').getBoundingClientRect();
       let x = d3.event.sourceEvent.clientX;
@@ -847,6 +844,7 @@ export default class ForceLayout {
       this.sprites.scale.y = d3.event.transform.k;
       this.edge_container.position = this.sprites.position;
       this.edge_container.scale = this.sprites.scale;
+
       CloneViewer.instance.clone_edge_container.position = this.sprites.position;
       CloneViewer.instance.clone_edge_container.scale = this.sprites.scale;
       CloneViewer.instance.clone_sprites.position = this.sprites.position;
@@ -865,9 +863,11 @@ export default class ForceLayout {
           ')',
       );
     }
-  };
+  }
 
-  center_view = on_selected => {
+  center_view(on_selected) {
+    console.log(ColorBar._instance);
+    console.log(CloneViewer._instance);
     let all_xs = [];
     let all_ys = [];
     let num_selected = 0;
@@ -929,7 +929,7 @@ export default class ForceLayout {
         setTimeout(move, 10);
       }
     };
-  };
+  }
 
   save_coords = () => {
     if (this.mutable) {

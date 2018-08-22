@@ -15,6 +15,12 @@ import { selection_logic_setup } from './selection_logic.js';
 import { PAGA_setup } from './PAGA_viewer.js';
 import { colorpicker_setup } from './colorpicker_layout.js';
 
+export let forceLayout;
+export let colorBar;
+export let stickyNote;
+export let cloneViewer;
+export let selectionScript;
+
 d3.select('#sound_toggle')
   .append('img')
   .attr('src', 'scripts_1_6_dev/sound_effects/icon_mute.svg')
@@ -37,36 +43,20 @@ d3.select('#sound_toggle')
 
 const callback = async () => {
   d3.select('#load_colors').remove();
-  let base_dir = graph_directory;
-  let sub_dir = graph_directory + '/' + sub_directory;
 
-  await $.ajax({
-    data: { base_dir: base_dir },
-    success: async (python_data) => {
-      await ColorBar.create(sub_dir, python_data);
-    },
-    type: 'POST',
-    url: 'cgi-bin/load_counts.py',
-  });
+  forceLayout.setup_download_dropdown();
+  forceLayout.setup_tools_dropdown();
+  forceLayout.center_view(false);
 
-  ForceLayout.instance.setup_download_dropdown();
-  ForceLayout.instance.setup_tools_dropdown();
-  ForceLayout.instance.center_view(false);
+  cloneViewer.clone_sprites.visible = false;
+  cloneViewer.edge_container.visible = false;
 
-  CloneViewer.create(ForceLayout.instance);
-  CloneViewer.instance.clone_sprites.visible = false;
-  CloneViewer.instance.edge_container.visible = false;
+  forceLayout.animation();
 
-  ForceLayout.instance.animation();
-
-  settings_setup();
-  SelectionScript.create();
-
-  ForceLayout.instance.setup_layout_dropdown();
+  forceLayout.setup_layout_dropdown();
 
   make_new_SPRINGplot_setup();
   downloadSelectedExpr_setup();
-  await StickyNote.create();
 
   imputation_setup();
   doublet_setup();
@@ -74,6 +64,7 @@ const callback = async () => {
   selection_logic_setup();
   colorpicker_setup();
   PAGA_setup();
+
   //load_text_annotation();
   //stratify_setup();
   //show_stratify_popup();
@@ -86,10 +77,10 @@ const callback = async () => {
       collapse_settings();
     }
     if (!event.target.matches('#download_dropdown_button')) {
-      ForceLayout.instance.closeDropdown();
+      forceLayout.closeDropdown();
     }
     if (!event.target.matches('#layout_dropdown_button')) {
-      ForceLayout.instance.closeDropdown();
+      forceLayout.closeDropdown();
     }
   };
 };
@@ -108,10 +99,6 @@ let base_dirs = name.slice(1, name.length).split('/');
 let base_dir_name = base_dirs.slice(0, base_dirs.length - 1).join('/');
 
 d3.select('#all_SPRINGplots_menu').attr('href', my_origin + path_start + '/currentDatasetsList.html?' + base_dir_name);
-
-var force_on = 1;
-var n_nodes = 0;
-var colors_loaded = 0;
 
 export let graph_directory = name.slice(1, name.length);
 let tmp = graph_directory.split('/');
@@ -134,4 +121,39 @@ d3.select('#color_chooser')
   .selectAll('select')
   .remove();
 
-ForceLayout.create(graph_directory, sub_directory, callback);
+const loadData = async () => {
+
+  forceLayout = await ForceLayout.create(graph_directory, sub_directory);
+
+  settings_setup();
+
+  colorBar = await getColorBarFromAjax();
+  cloneViewer = await CloneViewer.create();
+  selectionScript = await SelectionScript.create();
+  console.log(selectionScript);
+  stickyNote = await StickyNote.create();
+
+  await callback();
+};
+
+const getColorBarFromAjax = async args => {
+  let base_dir = graph_directory;
+  let sub_dir = graph_directory + '/' + sub_directory;
+
+  const python_data = await $.ajax({
+    data: { base_dir: base_dir },
+    type: 'POST',
+    url: 'cgi-bin/load_counts.py',
+  });
+
+  const colorBar = await ColorBar.create(sub_dir, python_data);
+  return colorBar;
+};
+
+loadData()
+  .then(res => {
+    console.log('Data loaded!');
+  })
+  .catch(e => {
+    console.log(e);
+  });

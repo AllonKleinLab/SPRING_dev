@@ -1,8 +1,6 @@
 import * as d3 from 'd3';
 
-import ColorBar, { shrinkNodes } from './colorBar';
-import SelectionScript from './selection_script';
-import ForceLayout from './forceLayout_script';
+import { forceLayout, colorBar, selectionScript } from './main';
 
 export default class StickyNote {
   static _instance;
@@ -18,6 +16,7 @@ export default class StickyNote {
     if (!this._instance) {
       this._instance = new StickyNote();
       await this._instance.loadData();
+      return this._instance;
     } else {
       throw new Error(
         'StickyNote.create() has already been called, get the existing instance with StickyNote.instance!',
@@ -117,7 +116,6 @@ export default class StickyNote {
         this.new_note(d);
       });
     } catch (e) {
-      console.log(e);
       const note = this.new_note();
       this.activate_note(note);
     }
@@ -173,14 +171,15 @@ export default class StickyNote {
       .forEach(d => {
         if (d !== '') {
           my_nodes.push(parseInt(d, 10));
-          ForceLayout.instance.all_outlines[d].selected = true;
-          ForceLayout.instance.all_outlines[d].tint = '0xffff00';
-          ForceLayout.instance.all_outlines[d].alpha = 1;
+          forceLayout.all_outlines[d].selected = true;
+          forceLayout.all_outlines[d].tint = '0xffff00';
+          forceLayout.all_outlines[d].alpha = 1;
         }
       });
-    ColorBar.instance.count_clusters();
-    SelectionScript.instance.update_selected_count();
-    shrinkNodes(10, 10, my_nodes, ForceLayout.instance.all_nodes);
+    colorBar.count_clusters();
+    console.log(selectionScript);
+    selectionScript.update_selected_count();
+    colorBar.shrinkNodes(10, 10, my_nodes, forceLayout.all_nodes);
   }
 
   deactivate_all() {
@@ -217,8 +216,8 @@ export default class StickyNote {
 
   get_selected_cells() {
     let sel = [];
-    for (let i = 0; i < ForceLayout.instance.all_outlines.length; i++) {
-      if (ForceLayout.instance.all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         sel.push(i);
       }
     }
@@ -311,8 +310,8 @@ export default class StickyNote {
 
   show_selected() {
     let selected_cells = [];
-    for (let i = 0; i < ForceLayout.instance.all_outlines.length; i++) {
-      if (ForceLayout.instance.all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         selected_cells.push(i.toString());
       }
     }

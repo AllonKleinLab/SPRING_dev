@@ -1,21 +1,15 @@
 import * as d3 from 'd3';
-import ForceLayout from './forceLayout_script';
-import { graph_directory, sub_directory } from './main';
-import { update_selected_count, selection_mode } from './selection_script';
+import { forceLayout, graph_directory, sub_directory } from './main';
+import SelectionScript from './selection_script';
 import { show_colorpicker_popup } from './colorpicker_layout';
 import { rgbToHex } from './util';
-
-export let gene_set_color_array = new Array();
-export let categorical_coloring_data = {};
-export let drag_mode = '';
-export let all_selected = false;
 
 let rankedMask = null;
 let slider_ticks = null;
 
 export default class ColorBar {
-
   static _instance;
+
   static get instance() {
     if (!this._instance) {
       throw new Error('You must first call ColorBar.create()!');
@@ -26,7 +20,10 @@ export default class ColorBar {
   static async create(project_directory, color_menu_genes) {
     if (!this._instance) {
       this._instance = new ColorBar(project_directory, color_menu_genes);
+
       await this._instance.loadData();
+
+      return this._instance;
     } else {
       throw new Error('ColorBar.create() has already been called, get the existing instance with ColorBar.instance!');
     }
@@ -375,28 +372,28 @@ export default class ColorBar {
             Math.abs(cx - parseFloat(this.left_bracket.attr('x')) - 12) < 5 &&
             d3.select('#left_bracket').style('visibility') === 'visible'
           ) {
-            drag_mode = 'left_bracket';
+            this.drag_mode = 'left_bracket';
             // console.log(cx, parseFloat(left_bracket.attr("x")));
           } else if (
             Math.abs(cx - parseFloat(this.right_bracket.attr('x')) - 12) < 5 &&
             d3.select('#right_bracket').style('visibility') === 'visible'
           ) {
-            drag_mode = 'right_bracket';
+            this.drag_mode = 'right_bracket';
             // console.log(cx, parseFloat(right_bracket.attr("x")));
           } else {
-            drag_mode = 'handle';
+            this.drag_mode = 'handle';
           }
         })
         .on('drag', () => {
           const cx = d3.event.x - this.svg_width / 3;
-          if (drag_mode === 'left_bracket') {
+          if (this.drag_mode === 'left_bracket') {
             this.set_left_bracket(cx);
-            update_selected_count();
+            SelectionScript.instance.update_selected_count();
           }
-          if (drag_mode === 'right_bracket') {
+          if (this.drag_mode === 'right_bracket') {
             this.set_right_bracket(cx);
-            update_selected_count();
-          } else if (drag_mode === 'handle') {
+            SelectionScript.instance.update_selected_count();
+          } else if (this.drag_mode === 'handle') {
             this.set_slider_position(cx);
           }
         })
@@ -493,24 +490,26 @@ export default class ColorBar {
         this.hideRankedGenes();
       });
 
-      return this;
+    return this;
   }
 
   async loadData() {
     // open json file containing gene sets and populate drop down menu
-    const categorical_coloring_data = await d3.json(this.project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache);
-    Object.keys(categorical_coloring_data).forEach(k => {
+    this.categorical_coloring_data = await d3.json(
+      this.project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache,
+    );
+    Object.keys(this.categorical_coloring_data).forEach(k => {
       const label_counts = {};
-      Object.keys(categorical_coloring_data[k].label_colors).forEach(n => {
+      Object.keys(this.categorical_coloring_data[k].label_colors).forEach(n => {
         label_counts[n] = 0;
       });
-      categorical_coloring_data[k].label_list.forEach(n => {
+      this.categorical_coloring_data[k].label_list.forEach(n => {
         label_counts[n] += 1;
       });
-      categorical_coloring_data[k].label_counts = label_counts;
+      this.categorical_coloring_data[k].label_counts = label_counts;
     });
 
-    this.dispatch.call('load', categorical_coloring_data, 'cell_labels');
+    this.dispatch.call('load', this.categorical_coloring_data, 'cell_labels');
     this.update_slider();
 
     this.color_stats = await d3.json(this.project_directory + '/color_stats.json' + '?_=' + this.noCache);
@@ -518,13 +517,13 @@ export default class ColorBar {
 
     this.last_gene = '';
     this.gene_entered = false;
-    
+
     // open json file containing gene sets and populate drop down menu
     const text = await d3.text(this.project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
-    let gene_set_color_array = this.read_csv(text);
+    this.gene_set_color_array = this.read_csv(text);
 
     // gradientMenu.selectAll("option").remove();
-    this.dispatch.call('load', gene_set_color_array, 'gene_sets');
+    this.dispatch.call('load', this.gene_set_color_array, 'gene_sets');
     // update_slider();
   }
 
@@ -550,29 +549,29 @@ export default class ColorBar {
   }
 
   update_tints() {
-    for (let i = 0; i < ForceLayout.instance.base_colors.length; i++) {
-      const rgb = ForceLayout.instance.base_colors[i];
-      ForceLayout.instance.all_nodes[i].tint = rgbToHex(rgb.r, rgb.g, rgb.b);
+    for (let i = 0; i < forceLayout.base_colors.length; i++) {
+      const rgb = forceLayout.base_colors[i];
+      forceLayout.all_nodes[i].tint = rgbToHex(rgb.r, rgb.g, rgb.b);
     }
   }
 
   setNodeColors() {
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
-      const color_array = this.normalize(gene_set_color_array[current_selection]);
+      const color_array = this.normalize(this.gene_set_color_array[current_selection]);
 
-      for (let i = 0; i < ForceLayout.instance.base_colors.length; i++) {
-        ForceLayout.instance.base_colors[i] = d3.rgb(this.gradient_color(color_array[i]));
+      for (let i = 0; i < forceLayout.base_colors.length; i++) {
+        forceLayout.base_colors[i] = d3.rgb(this.gradient_color(color_array[i]));
       }
       this.update_tints();
     }
     if (document.getElementById('labels_button').checked) {
       const name = document.getElementById('labels_menu').value;
-      const cat_color_map = categorical_coloring_data.Sample.label_colors;
-      const cat_label_list = categorical_coloring_data.Sample.label_list;
+      const cat_color_map = this.categorical_coloring_data.Sample.label_colors;
+      const cat_label_list = this.categorical_coloring_data.Sample.label_list;
 
-      for (let i = 0; i < ForceLayout.instance.base_colors.length; i++) {
-        ForceLayout.instance.base_colors[i] = d3.rgb(cat_color_map[cat_label_list[i]]);
+      for (let i = 0; i < forceLayout.base_colors.length; i++) {
+        forceLayout.base_colors[i] = d3.rgb(cat_color_map[cat_label_list[i]]);
       }
       this.update_tints();
     }
@@ -582,25 +581,25 @@ export default class ColorBar {
 
       $.ajax({
         data: { base_dir: graph_directory, sub_dir: graph_directory + '/' + sub_directory, gene: green_selection },
-        success: (data) => {
+        success: data => {
           const t1 = new Date();
           console.log('Read gene data: ', t1.getTime() - t0.getTime());
           this.green_array = data.split('\n').slice(0, -1);
           this.green_array_raw = data.split('\n').slice(0, -1);
-          for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
+          for (let i = 0; i < forceLayout.all_nodes.length; i++) {
             const rawval = this.green_array[i];
             const gg = this.normalize_one_val(rawval);
-            ForceLayout.instance.base_colors[i] = { r: 0, g: Math.floor(gg * 255), b: 0 };
+            forceLayout.base_colors[i] = { r: 0, g: Math.floor(gg * 255), b: 0 };
           }
 
-          ForceLayout.instance.app.stage.children[1].children.sort((a, b) => {
+          forceLayout.app.stage.children[1].children.sort((a, b) => {
             return this.green_array[a.index] - this.green_array[b.index];
           });
 
           this.update_tints();
           if (d3.select('#left_bracket').style('visibility') === 'visible') {
             this.slider_select_update();
-            update_selected_count();
+            SelectionScript.instance.update_selected_count();
           }
         },
         type: 'POST',
@@ -612,25 +611,25 @@ export default class ColorBar {
   updateColorMax() {
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
-      const color_array = this.normalize(gene_set_color_array[current_selection]);
-      for (let i = 0; i < ForceLayout.instance.base_colors.length; i++) {
-        ForceLayout.instance.base_colors[i] = d3.rgb(this.gradient_color(color_array[i]));
+      const color_array = this.normalize(this.gene_set_color_array[current_selection]);
+      for (let i = 0; i < forceLayout.base_colors.length; i++) {
+        forceLayout.base_colors[i] = d3.rgb(this.gradient_color(color_array[i]));
       }
       this.update_tints();
     }
     if (document.getElementById('channels_button').checked) {
-      for (let i = 0; i < ForceLayout.instance.base_colors.length; i++) {
+      for (let i = 0; i < forceLayout.base_colors.length; i++) {
         const gg = this.normalize_one_val(this.green_array[i]);
-        ForceLayout.instance.base_colors[i] = { r: 0, g: Math.floor(gg * 255), b: 0 };
+        forceLayout.base_colors[i] = { r: 0, g: Math.floor(gg * 255), b: 0 };
       }
       this.update_tints();
     }
     if (document.getElementById('labels_button').checked) {
-      for (let i = 0; i < ForceLayout.instance.base_colors.length; i++) {
-        const rr = Math.floor(this.normalize_one_val(ForceLayout.instance.base_colors[i].r) * 255);
-        const gg = Math.floor(this.normalize_one_val(ForceLayout.instance.base_colors[i].g) * 255);
-        const bb = Math.floor(this.normalize_one_val(ForceLayout.instance.base_colors[i].b) * 255);
-        ForceLayout.instance.all_nodes[i].tint = rgbToHex(rr, gg, bb);
+      for (let i = 0; i < forceLayout.base_colors.length; i++) {
+        const rr = Math.floor(this.normalize_one_val(forceLayout.base_colors[i].r) * 255);
+        const gg = Math.floor(this.normalize_one_val(forceLayout.base_colors[i].g) * 255);
+        const bb = Math.floor(this.normalize_one_val(forceLayout.base_colors[i].b) * 255);
+        forceLayout.all_nodes[i].tint = rgbToHex(rr, gg, bb);
       }
       // update_tints();
     }
@@ -739,7 +738,7 @@ export default class ColorBar {
     } else {
       this.hide_slider_select();
     }
-    update_selected_count();
+    SelectionScript.instance.update_selected_count();
   }
 
   show_slider_select() {
@@ -800,26 +799,26 @@ export default class ColorBar {
     let color_array = null;
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
-      color_array = gene_set_color_array[current_selection];
+      color_array = this.gene_set_color_array[current_selection];
     }
     if (document.getElementById('channels_button').checked) {
       const green_selection = d3.select('#autocomplete')[0][0].value;
       color_array = this.green_array;
     }
     if (document.getElementById('labels_button').checked) {
-      color_array = ForceLayout.instance.base_colors.map(average_color);
+      color_array = forceLayout.base_colors.map(this.average_color);
     }
     if (color_array != null) {
-      for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
+      for (let i = 0; i < forceLayout.all_nodes.length; i++) {
         const x = color_array[i];
         if (x >= lower_bound && (x <= upper_bound || upper_bound > this.slider_scale.domain()[1] * 0.98)) {
-          ForceLayout.instance.all_outlines[i].selected = true;
-          ForceLayout.instance.all_outlines[i].compared = false;
-          ForceLayout.instance.all_outlines[i].alpha = ForceLayout.instance.all_nodes[i].alpha;
-          ForceLayout.instance.all_outlines[i].tint = '0xffff00';
+          forceLayout.all_outlines[i].selected = true;
+          forceLayout.all_outlines[i].compared = false;
+          forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
+          forceLayout.all_outlines[i].tint = '0xffff00';
         } else {
-          ForceLayout.instance.all_outlines[i].selected = false;
-          ForceLayout.instance.all_outlines[i].alpha = 0;
+          forceLayout.all_outlines[i].selected = false;
+          forceLayout.all_outlines[i].alpha = 0;
         }
       }
     }
@@ -836,21 +835,26 @@ export default class ColorBar {
       d3.selectAll('#gradient_bar').attr('fill', '#7e7e7e');
       d3.selectAll('#handle').style('fill', '#7e7e7e');
       const name = document.getElementById('labels_menu').value;
-      let cat_color_map = categorical_coloring_data.Sample.label_colors;
-      let cat_label_list = categorical_coloring_data.Sample.label_list;
+      console.log(this.categorical_coloring_data);
+      let cat_color_map = this.categorical_coloring_data.Sample.label_colors;
+      let cat_label_list = this.categorical_coloring_data.Sample.label_list;
+      console.log('selecting legend mask?');
       d3.select('#legend_mask')
         .transition()
         .attr('x', this.svg_width - 177)
         .on('end', () => {
+          console.log('make legend call');
           this.make_legend(cat_color_map, cat_label_list);
         });
 
-      let max = parseInt(d3.max(ForceLayout.instance.base_colors.map(max_color)), 10);
+      let max = parseInt(d3.max(forceLayout.base_colors.map(this.max_color)), 10);
       if (max === 0) {
         max = 255;
       }
       this.color_max = max;
       this.slider_scale.domain([0, max * 1.05]);
+
+      console.log('setting slider position.');
       this.set_slider_position_only(max);
     } else {
       d3.select('#legend_mask')
@@ -1102,11 +1106,11 @@ export default class ColorBar {
         .transition()
         .attr('x', 0)
         .each(() => {
-          this.renderRankedText(gene_set_color_array, 0);
+          this.renderRankedText(this.gene_set_color_array, 0);
         });
-        this.rankedGenesButtonRect.transition().attr('x', 0);
-        this.rankedTermsButtonRect.transition().attr('x', 0);
-        this.exoutTermsButtonLabel
+      this.rankedGenesButtonRect.transition().attr('x', 0);
+      this.rankedTermsButtonRect.transition().attr('x', 0);
+      this.exoutTermsButtonLabel
         .transition()
         .delay(200)
         .style('opacity', 1);
@@ -1138,8 +1142,8 @@ export default class ColorBar {
 
   renderRankedText(tracks, version) {
     let any_selected = false;
-    for (let i = 0; i < ForceLayout.instance.all_outlines.length; i++) {
-      if (ForceLayout.instance.all_outlines[i].selected || ForceLayout.instance.all_outlines[i].compared) {
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+      if (forceLayout.all_outlines[i].selected || forceLayout.all_outlines[i].compared) {
         any_selected = true;
       }
     }
@@ -1216,7 +1220,7 @@ export default class ColorBar {
   // preload_enrichments();
   preload_enrichments() {
     let sel2text = '';
-    for (let i = 0; i < ForceLayout.instance.all_outlines.length; i++) {
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
       sel2text = sel2text + ',' + i.toString();
     }
     sel2text = sel2text.slice(1, sel2text.length);
@@ -1242,11 +1246,11 @@ export default class ColorBar {
   getRankedText(tracks, version) {
     const selected_nodes = [];
     const compared_nodes = [];
-    for (const i in ForceLayout.instance.all_outlines) {
-      if (ForceLayout.instance.all_outlines[i].selected) {
+    for (const i in forceLayout.all_outlines) {
+      if (forceLayout.all_outlines[i].selected) {
         selected_nodes.push(i);
       }
-      if (ForceLayout.instance.all_outlines[i].compared) {
+      if (forceLayout.all_outlines[i].compared) {
         compared_nodes.push(i);
       }
     }
@@ -1299,12 +1303,12 @@ export default class ColorBar {
       let sel2text = '';
       let comp2text = '';
       let n_highlight = 0;
-      for (let i = 0; i < ForceLayout.instance.all_outlines.length; i++) {
-        if (ForceLayout.instance.all_outlines[i].selected) {
+      for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+        if (forceLayout.all_outlines[i].selected) {
           sel2text = sel2text + ',' + i.toString();
           n_highlight = n_highlight + 1;
         }
-        if (ForceLayout.instance.all_outlines[i].compared) {
+        if (forceLayout.all_outlines[i].compared) {
           comp2text = comp2text + ',' + i.toString();
           n_highlight = n_highlight + 1;
         }
@@ -1375,8 +1379,8 @@ export default class ColorBar {
     let scorecol = [];
     let tracks = this.all_gene_color_array;
     let sparse_version = 1;
-    for (let i = 0; i < all_nodes.length; i++) {
-      if (ForceLayout.instance.all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         num_selected += 1;
       }
     }
@@ -1386,7 +1390,7 @@ export default class ColorBar {
     } else {
       if (rankedMask.attr('x') === -200) {
         if (document.getElementById('gradient_button').checked) {
-          tracks = gene_set_color_array;
+          tracks = this.gene_set_color_array;
           sparse_version = 0;
         } else {
           tracks = this.all_gene_color_array;
@@ -1481,7 +1485,7 @@ export default class ColorBar {
           .style('margin-top', '-6px')
           .style('margin-left', '3px')
           .on('click', () => {
-            this.categorical_click(d, cat_label_list, ForceLayout.instance.all_nodes);
+            this.categorical_click(d, cat_label_list, forceLayout.all_nodes);
           });
       });
     d3.selectAll('.legend_row')
@@ -1500,13 +1504,13 @@ export default class ColorBar {
 
     this.count_clusters();
   }
- 
+
   categorical_click(d, cat_label_list, all_nodes) {
-    all_selected = true;
+    this.all_selected = true;
     for (let i = 0; i < all_nodes.length; i++) {
       if (cat_label_list[i] === d) {
-        if (!(ForceLayout.instance.all_outlines[i].selected || ForceLayout.instance.all_outlines[i].compared)) {
-          all_selected = false;
+        if (!(forceLayout.all_outlines[i].selected || forceLayout.all_outlines[i].compared)) {
+          this.all_selected = false;
         }
       }
     }
@@ -1515,51 +1519,51 @@ export default class ColorBar {
     for (let i = 0; i < all_nodes.length; i++) {
       if (cat_label_list[i] === d) {
         my_nodes.push(i);
-        if (all_selected) {
-          ForceLayout.instance.all_outlines[i].selected = false;
-          ForceLayout.instance.all_outlines[i].compared = false;
-          ForceLayout.instance.all_outlines[i].alpha = 0;
+        if (this.all_selected) {
+          forceLayout.all_outlines[i].selected = false;
+          forceLayout.all_outlines[i].compared = false;
+          forceLayout.all_outlines[i].alpha = 0;
         } else {
-          if (selection_mode === 'negative_select') {
-            ForceLayout.instance.all_outlines[i].compared = true;
-            ForceLayout.instance.all_outlines[i].tint = '0x0000ff';
-            ForceLayout.instance.all_outlines[i].alpha = all_nodes[i].alpha;
+          if (SelectionScript.instance.selection_mode === 'negative_select') {
+            forceLayout.all_outlines[i].compared = true;
+            forceLayout.all_outlines[i].tint = '0x0000ff';
+            forceLayout.all_outlines[i].alpha = all_nodes[i].alpha;
           } else {
-            ForceLayout.instance.all_outlines[i].selected = true;
-            ForceLayout.instance.all_outlines[i].tint = '0xffff00';
-            ForceLayout.instance.all_outlines[i].alpha = all_nodes[i].alpha;
+            forceLayout.all_outlines[i].selected = true;
+            forceLayout.all_outlines[i].tint = '0xffff00';
+            forceLayout.all_outlines[i].alpha = all_nodes[i].alpha;
           }
         }
       }
     }
 
     if (all_nodes.length < 25000) {
-      shrinkNodes(6, 10, my_nodes, all_nodes);
+      this.shrinkNodes(6, 10, my_nodes, all_nodes);
     }
-    update_selected_count();
+    SelectionScript.instance.update_selected_count();
     this.count_clusters();
   }
 
   count_clusters() {
     const name = document.getElementById('labels_menu').value;
     if (name.length > 0) {
-      const cat_color_map = categorical_coloring_data.Sample.label_colors;
-      const cat_label_list = categorical_coloring_data.Sample.label_list;
-      const cat_counts = categorical_coloring_data.Sample.label_counts;
-  
+      const cat_color_map = this.categorical_coloring_data.Sample.label_colors;
+      const cat_label_list = this.categorical_coloring_data.Sample.label_list;
+      const cat_counts = this.categorical_coloring_data.Sample.label_counts;
+
       let counts = {};
       Object.keys(cat_color_map).forEach(d => {
         counts[d] = 0;
       });
-      for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-        if (ForceLayout.instance.all_outlines[i].selected || ForceLayout.instance.all_outlines[i].compared) {
+      for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+        if (forceLayout.all_outlines[i].selected || forceLayout.all_outlines[i].compared) {
           counts[cat_label_list[i]] += 1;
         }
       }
-  
+
       d3.select('#count_column')
         .selectAll('div')
-        .each((d) => {
+        .each(d => {
           d3.select(d)
             .style('visibility', 'hidden')
             .select('p')
@@ -1574,159 +1578,155 @@ export default class ColorBar {
           }
         });
     }
+  }
+
+  shrinkNodes(scale, numsteps, my_nodes, all_nodes) {
+    const current_radii = {};
+    const nodes = [];
+    for (let ii in my_nodes) {
+      // console.log(['A',my_nodes[ii], all_nodes[my_nodes[ii]].active_scaling]);
+      if (all_nodes[my_nodes[ii]].active_scaling !== true) {
+        nodes.push(my_nodes[ii]);
+      }
+    }
+    for (let ii in nodes) {
+      current_radii[ii] = all_nodes[nodes[ii]].scale.x;
+      all_nodes[nodes[ii]].active_scaling = true;
+    }
+    const refreshIntervalId = setInterval(() => {
+      if (scale < 1) {
+        for (let ii in nodes) {
+          current_radii[ii] = all_nodes[nodes[ii]].scale.x;
+          all_nodes[nodes[ii]].active_scaling = false;
+          // console.log(['B',nodes[ii], all_nodes[nodes[ii]].active_scaling]);
+        }
+        clearInterval(refreshIntervalId);
+      } else {
+        for (let ii in nodes) {
+          const i = nodes[ii];
+          forceLayout.all_outlines[i].scale.set(scale * current_radii[ii]);
+          all_nodes[i].scale.set(scale * current_radii[ii]);
+        }
+        scale = scale - scale / numsteps;
+      }
+    }, 5);
+  }
+
+  toggle_legend_hover_tooltip() {
+    const button = d3.select('#toggle_legend_hover_tooltip_button');
+    if (button.text() === 'Hide label tooltip') {
+      button.text('Show label tooltip');
+      d3.select('#legend_hover_tooltip').remove();
+    } else {
+      button.text('Hide label tooltip');
+
+      const tooltip = d3
+        .select('#force_layout')
+        .append('div')
+        .attr('id', 'legend_hover_tooltip')
+        .style('background-color', 'rgba(100,100,100,.92)')
+        .style('position', 'absolute')
+        .style('top', '100px')
+        .style('left', '100px')
+        .style('padding', '5px')
+        .style('width', '200px')
+        .style('border-radius', '5px')
+        .style('visibility', 'hidden');
+
+      d3.select('#force_layout').on('mousemove', () => {
+        const name = document.getElementById('labels_menu').value;
+        if (name.length > 0) {
+          const cat_color_map = this.categorical_coloring_data[name].label_colors;
+          const cat_label_list = this.categorical_coloring_data[name].label_list;
+
+          let hover_clusters = [];
+          const dim = document.getElementById('svg_graph').getBoundingClientRect();
+          let x = d3.event.clientX - dim.left;
+          let y = d3.event.clientY - dim.top;
+          x = (x - forceLayout.sprites.position.x) / forceLayout.sprites.scale.x;
+          y = (y - forceLayout.sprites.position.y) / forceLayout.sprites.scale.y;
+          for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+            const rad = Math.sqrt((forceLayout.all_nodes[i].x - x) ** 2 + (forceLayout.all_nodes[i].y - y) ** 2);
+            if (rad < forceLayout.all_nodes[i].scale.x * 20) {
+              hover_clusters.push(cat_label_list[i]);
+            }
+          }
+
+          hover_clusters = hover_clusters.filter((item, pos) => {
+            return hover_clusters.indexOf(item) === pos;
+          });
+
+          if (hover_clusters.length > 0) {
+            tooltip.style('visibility', 'visible');
+          } else {
+            tooltip.style('visibility', 'hidden');
+          }
+
+          tooltip.selectAll('div').remove();
+          tooltip
+            .selectAll('div')
+            .data(hover_clusters)
+            .enter()
+            .append('div')
+            .attr('class', 'legend_row')
+            .style('height', '25px')
+            .style('margin-top', '0px');
+
+          const widths = [];
+          tooltip.selectAll('div').each(function(d) {
+            d3.select(this)
+              .append('div')
+              .style('background-color', cat_color_map[d]);
+            const tt = d3
+              .select(this)
+              .append('div')
+              .attr('class', 'text_label_div')
+              .append('p')
+              .text(d)
+              .style('float', 'left')
+              .style('white-space', 'nowrap')
+              .style('margin-top', '-6px')
+              .style('margin-left', '3px');
+            widths.push(parseFloat(tt.style('width').split('px')[0]));
+          });
+
+          const height = parseFloat(tooltip.style('height').split('px')[0]);
+          tooltip
+            .style('width', (d3.max(widths) + 45).toString() + 'px')
+            .style('left', d3.event.x.toString() + 'px')
+            .style('top', (d3.event.y - height - 40).toString() + 'px');
+        }
+      });
+    }
+  }
+
+  get_hover_cells = e => {
+    const dim = document.getElementById('svg_graph').getBoundingClientRect();
+    let x = e.clientX - dim.left;
+    let y = e.clientY - dim.top;
+    x = (x - forceLayout.sprites.position.x) / forceLayout.sprites.scale.x;
+    y = (y - forceLayout.sprites.position.y) / forceLayout.sprites.scale.y;
+    const hover_cells = [];
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
+        const rad = Math.sqrt((forceLayout.all_nodes[i].x - x) ** 2 + (forceLayout.all_nodes[i].y - y) ** 2);
+        if (rad < forceLayout.all_nodes[i].scale.x * 20) {
+          hover_cells.push(i);
+        }
+      }
+    }
+    return hover_cells;
+  };
+
+  max_color = c => {
+    return d3.max([c.r, c.b, c.g]);
+  };
+
+  min_color = c => {
+    return d3.min([c.r, c.b, c.g]);
+  };
+
+  average_color = c => {
+    return d3.mean([c.r, c.b, c.g]);
   };
 }
-
-export const shrinkNodes = (scale, numsteps, my_nodes, all_nodes) => {
-  const current_radii = {};
-  const nodes = [];
-  for (let ii in my_nodes) {
-    // console.log(['A',my_nodes[ii], all_nodes[my_nodes[ii]].active_scaling]);
-    if (all_nodes[my_nodes[ii]].active_scaling !== true) {
-      nodes.push(my_nodes[ii]);
-    }
-  }
-  for (let ii in nodes) {
-    current_radii[ii] = all_nodes[nodes[ii]].scale.x;
-    all_nodes[nodes[ii]].active_scaling = true;
-  }
-  const refreshIntervalId = setInterval(() => {
-    if (scale < 1) {
-      for (let ii in nodes) {
-        current_radii[ii] = all_nodes[nodes[ii]].scale.x;
-        all_nodes[nodes[ii]].active_scaling = false;
-        // console.log(['B',nodes[ii], all_nodes[nodes[ii]].active_scaling]);
-      }
-      clearInterval(refreshIntervalId);
-    } else {
-      for (let ii in nodes) {
-        const i = nodes[ii];
-        ForceLayout.instance.all_outlines[i].scale.set(scale * current_radii[ii]);
-        all_nodes[i].scale.set(scale * current_radii[ii]);
-      }
-      scale = scale - scale / numsteps;
-    }
-  }, 5);
-};
-
-export const toggle_legend_hover_tooltip = () => {
-  const button = d3.select('#toggle_legend_hover_tooltip_button');
-  if (button.text() === 'Hide label tooltip') {
-    button.text('Show label tooltip');
-    d3.select('#legend_hover_tooltip').remove();
-  } else {
-    button.text('Hide label tooltip');
-
-    const tooltip = d3
-      .select('#force_layout')
-      .append('div')
-      .attr('id', 'legend_hover_tooltip')
-      .style('background-color', 'rgba(100,100,100,.92)')
-      .style('position', 'absolute')
-      .style('top', '100px')
-      .style('left', '100px')
-      .style('padding', '5px')
-      .style('width', '200px')
-      .style('border-radius', '5px')
-      .style('visibility', 'hidden');
-
-    d3.select('#force_layout').on('mousemove', () => {
-      const name = document.getElementById('labels_menu').value;
-      if (name.length > 0) {
-        const cat_color_map = categorical_coloring_data[name].label_colors;
-        const cat_label_list = categorical_coloring_data[name].label_list;
-
-        let hover_clusters = [];
-        const dim = document.getElementById('svg_graph').getBoundingClientRect();
-        let x = d3.event.clientX - dim.left;
-        let y = d3.event.clientY - dim.top;
-        x = (x - ForceLayout.instance.sprites.position.x) / ForceLayout.instance.sprites.scale.x;
-        y = (y - ForceLayout.instance.sprites.position.y) / ForceLayout.instance.sprites.scale.y;
-        for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-          const rad = Math.sqrt(
-            (ForceLayout.instance.all_nodes[i].x - x) ** 2 + (ForceLayout.instance.all_nodes[i].y - y) ** 2,
-          );
-          if (rad < ForceLayout.instance.all_nodes[i].scale.x * 20) {
-            hover_clusters.push(cat_label_list[i]);
-          }
-        }
-
-        hover_clusters = hover_clusters.filter((item, pos) => {
-          return hover_clusters.indexOf(item) === pos;
-        });
-
-        if (hover_clusters.length > 0) {
-          tooltip.style('visibility', 'visible');
-        } else {
-          tooltip.style('visibility', 'hidden');
-        }
-
-        tooltip.selectAll('div').remove();
-        tooltip
-          .selectAll('div')
-          .data(hover_clusters)
-          .enter()
-          .append('div')
-          .attr('class', 'legend_row')
-          .style('height', '25px')
-          .style('margin-top', '0px');
-
-        const widths = [];
-        tooltip.selectAll('div').each(function(d) {
-          d3.select(this)
-            .append('div')
-            .style('background-color', cat_color_map[d]);
-          const tt = d3
-            .select(this)
-            .append('div')
-            .attr('class', 'text_label_div')
-            .append('p')
-            .text(d)
-            .style('float', 'left')
-            .style('white-space', 'nowrap')
-            .style('margin-top', '-6px')
-            .style('margin-left', '3px');
-          widths.push(parseFloat(tt.style('width').split('px')[0]));
-        });
-
-        const height = parseFloat(tooltip.style('height').split('px')[0]);
-        tooltip
-          .style('width', (d3.max(widths) + 45).toString() + 'px')
-          .style('left', d3.event.x.toString() + 'px')
-          .style('top', (d3.event.y - height - 40).toString() + 'px');
-      }
-    });
-  }
-};
-
-export const get_hover_cells = e => {
-  const dim = document.getElementById('svg_graph').getBoundingClientRect();
-  let x = e.clientX - dim.left;
-  let y = e.clientY - dim.top;
-  x = (x - ForceLayout.instance.sprites.position.x) / ForceLayout.instance.sprites.scale.x;
-  y = (y - ForceLayout.instance.sprites.position.y) / ForceLayout.instance.sprites.scale.y;
-  const hover_cells = [];
-  for (let i = 0; i < ForceLayout.instance.all_nodes.length; i++) {
-    if (ForceLayout.instance.all_outlines[i].selected) {
-      const rad = Math.sqrt(
-        (ForceLayout.instance.all_nodes[i].x - x) ** 2 + (ForceLayout.instance.all_nodes[i].y - y) ** 2,
-      );
-      if (rad < ForceLayout.instance.all_nodes[i].scale.x * 20) {
-        hover_cells.push(i);
-      }
-    }
-  }
-  return hover_cells;
-};
-
-export const max_color = c => {
-  return d3.max([c.r, c.b, c.g]);
-};
-
-export const min_color = c => {
-  return d3.min([c.r, c.b, c.g]);
-};
-
-export const average_color = c => {
-  return d3.mean([c.r, c.b, c.g]);
-};
