@@ -135,7 +135,7 @@ export default class PAGA {
         this.PAGA_data = data;
 
         let min_weight_frac = data.edge_weight_meta.min_edge_weight / data.edge_weight_meta.max_edge_weight;
-        d3.select('#PAGA_min_edge_weight_slider')[0][0].value = Math.log(min_weight_frac * Math.exp(100 / 20)) * 20;
+        d3.select('#PAGA_min_edge_weight_slider').node().value = Math.log(min_weight_frac * Math.exp(100 / 20)) * 20;
 
         let PAGA_links = d3
           .select('#vis')
@@ -268,15 +268,15 @@ export default class PAGA {
 
   adjust_min_edge_weight() {
     let min_weight =
-      Math.exp(parseFloat(d3.select('#PAGA_min_edge_weight_slider')[0][0].value) / 20) / Math.exp(100 / 20);
+      Math.exp(parseFloat(d3.select('#PAGA_min_edge_weight_slider').node().value) / 20) / Math.exp(100 / 20);
     console.log(min_weight * this.PAGA_data.edge_weight_meta.max_edge_weight);
     this.PAGA_data.edge_weight_meta.min_edge_weight = min_weight * this.PAGA_data.edge_weight_meta.max_edge_weight;
     this.PAGA_redraw();
   }
 
   PAGA_redraw() {
-    let node_scale = (d3.select('#PAGA_node_size_slider')[0][0].value / 40) ** 1.8;
-    let edge_scale = (d3.select('#PAGA_edge_width_slider')[0][0].value / 40) ** 3;
+    let node_scale = (d3.select('#PAGA_node_size_slider').node().value / 40) ** 1.8;
+    let edge_scale = (d3.select('#PAGA_edge_width_slider').node().value / 40) ** 3;
 
     d3.selectAll('.PAGA_node')
       .attr('cx', function(d) {
@@ -327,7 +327,7 @@ export default class PAGA {
   }
 
   adjust_PAGA_mask_opacity() {
-    let opacity = parseFloat(d3.select('#PAGA_mask_opacity_slider')[0][0].value) / 100;
+    let opacity = parseFloat(d3.select('#PAGA_mask_opacity_slider').node().value) / 100;
     d3.select('svg').style('background', 'rgba(255,255,255,' + opacity.toString() + ')');
   }
 

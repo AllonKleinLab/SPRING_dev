@@ -7,7 +7,7 @@ import SelectionScript from './selection_script.js';
 import CloneViewer from './clone_viewer.js';
 import Cluster from './cluster_script.js';
 import { settings_setup, collapse_settings } from './settings_script.js';
-import { make_new_SPRINGplot_setup } from './make_new_SPRINGplot_script.js';
+import SpringPlot from './make_new_SPRINGplot_script.js';
 import { downloadSelectedExpr_setup } from './downloadSelectedExpr_script.js';
 import StickyNote from './stickyNote.js';
 import { imputation_setup } from './smoothing_imputation.js';
@@ -15,13 +15,14 @@ import { selection_logic_setup } from './selection_logic.js';
 import PAGA from './PAGA_viewer.js';
 import { colorpicker_setup } from './colorpicker_layout.js';
 
-export let forceLayout;
-export let colorBar;
-export let cluster;
-export let stickyNote;
 export let cloneViewer;
-export let selectionScript;
+export let cluster;
+export let colorBar;
+export let forceLayout;
 export let paga;
+export let selectionScript;
+export let springPlot;
+export let stickyNote;
 
 d3.select('#sound_toggle')
   .append('img')
@@ -57,7 +58,7 @@ const callback = async () => {
   forceLayout.animation();
   forceLayout.setup_layout_dropdown();
 
-  make_new_SPRINGplot_setup();
+  springPlot = SpringPlot.create();
   downloadSelectedExpr_setup();
 
   imputation_setup();

@@ -53,7 +53,7 @@ function add_list_item(project_directory, sub_directory, order) {
       .style('color', 'rgb(110,110,110)')
       .style('font-weight', '530');
 
-    let o = $(info_box[0][0]);
+    let o = $(info_box.node());
     let new_height = o.offset().top - o.parent().offset().top - o.parent().scrollTop() + o.height();
 
     let show_less_height = (new_height + 8).toString() + 'px';

@@ -120,14 +120,14 @@ export const settings_setup = () => {
   d3.select('#quick_dark')
     .select('button')
     .on('click', function() {
-      d3.select('#settings_range_background_color')[0][0].value = '20';
+      d3.select('#settings_range_background_color').node().value = '20';
       background_color_change('20');
     });
 
   d3.select('#quick_light')
     .select('button')
     .on('click', function() {
-      d3.select('#settings_range_background_color')[0][0].value = '220';
+      d3.select('#settings_range_background_color').node().value = '220';
       background_color_change('220');
     });
 

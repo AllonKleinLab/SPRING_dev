@@ -360,6 +360,62 @@ export default class ColorBar {
       .select('button')
       .on('click', () => this.toggle_slider_select());
 
+    /* -----------------------------------------------------------------------------------
+					 Create button for showing enriched gene set for a selection
+	*/
+
+    this.rankedTermsButtonRect = d3
+      .select('svg')
+      .append('rect')
+      .attr('class', 'colorbar_item')
+      .attr('x', -70)
+      .attr('y', 0)
+      .attr('fill-opacity', 0.35)
+      .attr('width', 200)
+      .attr('height', 24)
+      .on('click', () => {
+        this.showRankedTerms();
+      });
+
+    this.rankedTermsButtonLabel = d3
+      .select('svg')
+      .append('text')
+      .attr('class', 'colorbar_item')
+      .attr('x', 6)
+      .attr('y', 16)
+      .attr('font-family', 'sans-serif')
+      .attr('font-size', '12px')
+      .attr('fill', 'white')
+      .text('Show enriched terms')
+      .attr('pointer-events', 'none');
+
+    this.exoutTermsButtonLabel = d3
+      .select('svg')
+      .append('text')
+      .attr('class', 'colorbar_item')
+      .attr('x', 180)
+      .attr('y', 17)
+      .attr('font-family', 'sans-serif')
+      .attr('font-size', '14px')
+      .attr('fill', 'white')
+      .attr('width', 40)
+      .text('X')
+      .style('opacity', 0)
+      .attr('pointer-events', 'none');
+
+    this.exoutTermsButton = d3
+      .select('svg')
+      .append('rect')
+      .attr('class', 'colorbar_item')
+      .attr('x', 170)
+      .attr('y', 0)
+      .attr('width', 30)
+      .attr('height', 30)
+      .attr('fill-opacity', 0)
+      .on('click', () => {
+        this.hideRankedTerms();
+      });
+
     this.slider.call(
       d3
         .drag()
@@ -520,18 +576,15 @@ export default class ColorBar {
     const text = await d3.text(this.project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
     this.gene_set_color_array = this.read_csv(text);
 
-    console.log(`Variable 'this.gene_set_color_array':\n${this.gene_set_color_array}\n${JSON.stringify(this.gene_set_color_array, null, 2)}`);
     // gradientMenu.selectAll("option").remove();
     this.dispatch.call('load', this.gene_set_color_array, 'gene_sets');
     // update_slider();
   }
 
   normalize(x) {
-    console.log(x);
     const min = 0;
     const max = this.color_max;
     const out = [];
-    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < x.length; i++) {
       if (x[i] > max) {
         out.push(1);
@@ -635,66 +688,9 @@ export default class ColorBar {
       }
       // update_tints();
     }
-
-    /* -----------------------------------------------------------------------------------
-					 Create button for showing enriched gene set for a selection
-	*/
-
-    this.rankedTermsButtonRect = d3
-      .select('svg')
-      .append('rect')
-      .attr('class', 'colorbar_item')
-      .attr('x', -70)
-      .attr('y', 0)
-      .attr('fill-opacity', 0.35)
-      .attr('width', 200)
-      .attr('height', 24)
-      .on('click', () => {
-        this.showRankedTerms();
-      });
-
-    this.rankedTermsButtonLabel = d3
-      .select('svg')
-      .append('text')
-      .attr('class', 'colorbar_item')
-      .attr('x', 6)
-      .attr('y', 16)
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', '12px')
-      .attr('fill', 'white')
-      .text('Show enriched terms')
-      .attr('pointer-events', 'none');
-
-    this.exoutTermsButtonLabel = d3
-      .select('svg')
-      .append('text')
-      .attr('class', 'colorbar_item')
-      .attr('x', 180)
-      .attr('y', 17)
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', '14px')
-      .attr('fill', 'white')
-      .attr('width', 40)
-      .text('X')
-      .style('opacity', 0)
-      .attr('pointer-events', 'none');
-
-    this.exoutTermsButton = d3
-      .select('svg')
-      .append('rect')
-      .attr('class', 'colorbar_item')
-      .attr('x', 170)
-      .attr('y', 0)
-      .attr('width', 30)
-      .attr('height', 30)
-      .attr('fill-opacity', 0)
-      .on('click', () => {
-        this.hideRankedTerms();
-      });
   }
 
   labels_click() {
-    console.log('label click');
     document.getElementById('gradient_button').checked = false;
     document.getElementById('labels_button').checked = true;
     document.getElementById('channels_button').checked = false;
@@ -802,11 +798,10 @@ export default class ColorBar {
     let color_array = null;
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
-      console.log(`slider_selectUpdate: ${current_selection}`);
       color_array = this.gene_set_color_array[current_selection];
     }
     if (document.getElementById('channels_button').checked) {
-      const green_selection = d3.select('#autocomplete')[0][0].value;
+      const green_selection = d3.select('#autocomplete').node().value;
       color_array = this.green_array;
     }
     if (document.getElementById('labels_button').checked) {
@@ -1211,7 +1206,7 @@ export default class ColorBar {
           document.getElementById('channels_button').checked = false;
           document.getElementById('gradient_button').checked = true;
           document.getElementById('labels_button').checked = false;
-          d3.select('#gradient_menu')[0][0].value = d;
+          d3.select('#gradient_menu').node().value = d;
         }
         this.update_slider();
       });
@@ -1500,6 +1495,7 @@ export default class ColorBar {
             this.categorical_click(d, cat_label_list);
           });
       });
+
     d3.selectAll('.legend_row')
       .style('width', '152px')
       .style('background-color', 'rgba(0, 0, 0, 0)')
@@ -1581,6 +1577,7 @@ export default class ColorBar {
             .select('p')
             .text('');
           if (counts[d] > 0) {
+            console.log(counts);
             d3.select(d)
               .attr('count', counts[d])
               .attr('pct', Math.floor((counts[d] / cat_counts[d]) * 1000) / 10)

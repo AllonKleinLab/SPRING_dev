@@ -359,7 +359,7 @@ export default class CloneViewer {
   }
 
   update_highlight_size() {
-    let my_scale = parseFloat(d3.select('#clone_node_size_slider')[0][0].value) / 10;
+    let my_scale = parseFloat(d3.select('#clone_node_size_slider').node().value) / 10;
     for (let i in this.clone_nodes) {
       this.clone_nodes[i].scale.x = forceLayout.all_nodes[i].scale.x * my_scale;
       this.clone_nodes[i].scale.y = forceLayout.all_nodes[i].scale.x * my_scale;
@@ -394,7 +394,7 @@ export default class CloneViewer {
       this.deactivate_edges(i);
     }
 
-    let maxsize = parseFloat(d3.select('#clone_size_input')[0][0].value);
+    let maxsize = parseFloat(d3.select('#clone_size_input').node().value);
     if (maxsize > 0 === false) {
       maxsize = 100000000;
     }
@@ -446,7 +446,7 @@ export default class CloneViewer {
     for (let i in this.clone_edges) {
       this.deactivate_edges(i);
     }
-    let maxsize = parseFloat(d3.select('#clone_size_input')[0][0].value);
+    let maxsize = parseFloat(d3.select('#clone_size_input').node().value);
     if (maxsize > 0 === false) {
       maxsize = 100000000;
     }
@@ -502,7 +502,7 @@ export default class CloneViewer {
     if (!(i in this.clone_nodes)) {
       let circ = PIXI.Sprite.fromImage('stuff/disc.png');
       circ.anchor.set(0.5);
-      let my_scale = parseFloat(d3.select('#clone_node_size_slider')[0][0].value) / 10;
+      let my_scale = parseFloat(d3.select('#clone_node_size_slider').node().value) / 10;
       circ.scale.set(forceLayout.all_nodes[i].scale.x * my_scale);
       circ.x = forceLayout.all_nodes[i].x;
       circ.y = forceLayout.all_nodes[i].y;
@@ -605,7 +605,7 @@ export default class CloneViewer {
     }
     for (let i = 0; i < forceLayout.all_outlines.length; i++) {
       if (forceLayout.all_outlines[i].selected || none_selected) {
-        forceLayout.node_status[i].source = true;
+        this.node_status[i].source = true;
       }
     }
   }
@@ -627,7 +627,8 @@ export default class CloneViewer {
   }
 
   darken_nodes() {
-    let darkness = parseFloat(d3.select('#clone_darkness_slider')[0][0].value) / 100;
+    console.log(d3.select('#clone_darkness_slider').node().value);
+    let darkness = parseFloat(d3.select('#clone_darkness_slider').node().value) / 100;
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       let cc = forceLayout.base_colors[i];
       let r = Math.floor(cc.r * darkness);

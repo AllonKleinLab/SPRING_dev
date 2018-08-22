@@ -198,8 +198,8 @@ export const doublet_setup = () => {
           if (d3.select('#clone_viewer_popup').style('visibility') === 'visible') {
             $('#clone_viewer_popup').remove();
             for (let i = 0; i < forceLayout.all_outlines.length; i++) {
-              forceLayout.node_status[i].source = false;
-              forceLayout.node_status[i].target = false;
+              cloneViewer.node_status[i].source = false;
+              cloneViewer.node_status[i].target = false;
             }
             for (let i in cloneViewer.clone_nodes) {
               cloneViewer.deactivate_nodes(i);

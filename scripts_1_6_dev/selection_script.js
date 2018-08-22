@@ -200,7 +200,7 @@ export default class SelectionScript {
       .brush()
       // .extent([xBrushExtent, yBrushExtent])
       .on('brush', () => {
-        let extent = d3.selectAll('.brush .extent')[0][0].getBoundingClientRect();
+        let extent = d3.selectAll('.brush .extent').node().getBoundingClientRect();
         for (let i = 0; i < forceLayout.all_nodes.length; i++) {
           let d = forceLayout.all_nodes[i];
           let dim = document.getElementById('svg_graph').getBoundingClientRect();

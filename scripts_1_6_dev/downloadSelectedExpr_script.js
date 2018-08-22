@@ -125,7 +125,7 @@ export const show_downloadSelectedExpr_popup = () => {
   d3.select('#downloadSelectedExpr_message_div')
     .style('visibility', 'hidden')
     .style('height', '0px');
-  d3.select('#input_description')[0][0].value = '';
+  d3.select('#input_description').node().value = '';
   d3.select('#downloadSelectedExpr_popup')
     .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
     .style('top', '10px')

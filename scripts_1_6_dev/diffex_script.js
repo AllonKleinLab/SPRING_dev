@@ -71,7 +71,7 @@ export const diffex_setup = (project_directory) => {
       d3.select('#diffex_settings_box').style('visibility', 'visible');
     }, 200);
     setTimeout(function() {
-      if (d3.select('#diffex_panel').select('svg')[0][0] == null) {
+      if (d3.select('#diffex_panel').select('svg').node() == null) {
         refresh_selected_clusters();
       }
     }, 500);
@@ -295,11 +295,11 @@ export const diffex_setup = (project_directory) => {
           .select('text')
           .text(selectedG);
         d3.select('#tooltip').style('background-color', 'green');
-        let ww = d3.select('#tooltip_gene_name')[0][0].getBoundingClientRect().width;
+        let ww = d3.select('#tooltip_gene_name').node().getBoundingClientRect().width;
         d3.select('#tooltip').style('width', (65 + ww).toString() + 'px');
         d3.select('#tooltip').style('visibility', 'visible');
 
-        let rect = d3.select('body')[0][0].getBoundingClientRect();
+        let rect = d3.select('body').node().getBoundingClientRect();
         d3.select('#tooltip')
           .style('bottom', rect.height - 5 - event.pageY + 'px')
           .style('right', rect.width - event.pageX + 20 + 'px');
@@ -310,7 +310,7 @@ export const diffex_setup = (project_directory) => {
         d3.select(this).attr('r', scatter_size);
       })
       .on('click', function(d) {
-        d3.select('#green_menu')[0][0].value = d[4];
+        d3.select('#green_menu').node().value = d[4];
         colorBar.update_slider();
       });
   }

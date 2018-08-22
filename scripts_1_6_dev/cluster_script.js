@@ -604,7 +604,7 @@ export default class Cluster {
     this.new_name_set = new Set();
 
     d3.selectAll('.cluster_label_row').each(d => {
-      let newname = d3.select(d).selectAll('.cluster_name_input')[0][0].value;
+      let newname = d3.select(d).selectAll('.cluster_name_input').node().value;
       this.new_names.push(newname);
       this.new_name_set.add(newname);
       this.mapping[d] = newname;

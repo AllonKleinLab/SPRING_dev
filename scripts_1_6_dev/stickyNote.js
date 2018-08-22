@@ -193,8 +193,8 @@ export default class StickyNote {
   }
 
   sync_note(note) {
-    if (note.attr('saved_text') !== $(note.select('textarea')[0][0]).val()) {
-      note.attr('saved_text', $(note.select('textarea')[0][0]).val());
+    if (note.attr('saved_text') !== $(note.select('textarea').node()).val()) {
+      note.attr('saved_text', $(note.select('textarea').node()).val());
       let my_emails = note.attr('emails').split(',');
       let current_email = $('#sticky_email_input').val();
       if (my_emails.indexOf(current_email) === -1) {
@@ -320,7 +320,7 @@ export default class StickyNote {
       const bound_cells = note.attr('bound_cells').split(',');
       if (bound_cells.filter(n => selected_cells.includes(n)).length > 0) {
         note.style('background-color', 'rgba(255,255,0,.4)');
-        $(this.sticky_div[0][0]).prepend(note[0][0]);
+        $(this.sticky_div.node()).prepend(note.node());
       }
     });
   }
