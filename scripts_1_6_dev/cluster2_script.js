@@ -1,3 +1,7 @@
+import * as d3 from 'd3';
+
+import { colorBar } from "./main";
+
 function cluster_setup() {
   let cluster_popup = d3
     .select('#force_layout')
@@ -86,8 +90,8 @@ export const run_clustering = (mutable, graph_directory, sub_directory) => {
               categorical_coloring_data[k].label_counts = label_counts;
             });
 
-            dispatch.load(categorical_coloring_data, 'cell_labels');
-            update_slider();
+            colorBar.dispatch.call(categorical_coloring_data, 'cell_labels');
+            colorBar.update_slider();
           },
         );
       },

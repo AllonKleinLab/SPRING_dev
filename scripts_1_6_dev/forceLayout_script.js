@@ -59,7 +59,7 @@ export default class ForceLayout {
 
     d3.select('#toggleforce')
       .select('button')
-      .on('click', this.toggleForce);
+      .on('click', () => this.toggleForce());
     d3.select('#sound_toggle').style('visibility', 'hidden');
     if (
       d3
@@ -213,9 +213,9 @@ export default class ForceLayout {
     this.svg_graph.call(
       d3
         .drag()
-        .on('start', this.dragstarted)
-        .on('drag', this.dragged)
-        .on('end', this.dragended),
+        .on('start', () => this.dragstarted())
+        .on('drag', () => this.dragged())
+        .on('end', () => this.dragended()),
     );
 
     await this.load_edges(this.all_nodes, this.sprites);
@@ -258,9 +258,9 @@ export default class ForceLayout {
     this.edge_container.position = sprites.position;
     this.edge_container.scale = sprites.scale;
     this.edge_container.alpha = 0.5;
-    let neighbors = {};
+    this.neighbors = {};
     for (let i = 0; i < all_nodes.length; i++) {
-      neighbors[i] = [];
+      this.neighbors[i] = [];
     }
     try {
       const edgesText = await d3.text(this.project_directory + '/' + this.sub_directory + '/edges.csv');
@@ -270,8 +270,8 @@ export default class ForceLayout {
           let source = parseInt(items[0], 10);
           let target = parseInt(items[1], 10);
 
-          neighbors[source].push(target);
-          neighbors[target].push(source);
+          this.neighbors[source].push(target);
+          this.neighbors[target].push(source);
 
           let x1 = all_nodes[source].x;
           let y1 = all_nodes[source].y;

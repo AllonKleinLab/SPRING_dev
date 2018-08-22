@@ -563,7 +563,7 @@ export default class ColorBar {
       this.categorical_coloring_data[k].label_counts = label_counts;
     });
 
-    this.dispatch.call('load', this.categorical_coloring_data, 'cell_labels');
+    this.dispatch.call('load', this, this.categorical_coloring_data, 'cell_labels');
     this.update_slider();
 
     this.color_stats = await d3.json(this.project_directory + '/color_stats.json' + '?_=' + this.noCache);
@@ -577,7 +577,7 @@ export default class ColorBar {
     this.gene_set_color_array = this.read_csv(text);
 
     // gradientMenu.selectAll("option").remove();
-    this.dispatch.call('load', this.gene_set_color_array, 'gene_sets');
+    this.dispatch.call('load', this, this.gene_set_color_array, 'gene_sets');
     // update_slider();
   }
 
@@ -665,7 +665,6 @@ export default class ColorBar {
     if (document.getElementById('gradient_button').checked) {
       const current_selection = document.getElementById('gradient_menu').value;
 
-      console.log(`update color max: ${current_selection}`);
       const color_array = this.normalize(this.gene_set_color_array[current_selection]);
       for (let i = 0; i < forceLayout.base_colors.length; i++) {
         forceLayout.base_colors[i] = d3.rgb(this.gradient_color(color_array[i]));
@@ -981,7 +980,7 @@ export default class ColorBar {
         tmpdict[g] = 0;
       }
     });
-    this.dispatch.call('load', tmpdict, 'all_genes');
+    this.dispatch.call('load', this, tmpdict, 'all_genes');
   }
 
   geneAutocomplete(gene_list) {
@@ -1475,14 +1474,14 @@ export default class ColorBar {
 
     d3.select('#label_column')
       .selectAll('div')
-      .each(function(d) {
-        d3.select(this)
+      .each((d, i, nodes) => {
+        d3.select(nodes[i])
           .append('div')
           .style('background-color', cat_color_map[d])
-          .on('click', function() {
+          .on('click', () => {
             show_colorpicker_popup(d);
           });
-        d3.select(this)
+        d3.select(nodes[i])
           .append('div')
           .attr('class', 'text_label_div')
           .append('p')
@@ -1491,7 +1490,7 @@ export default class ColorBar {
           .style('white-space', 'nowrap')
           .style('margin-top', '-6px')
           .style('margin-left', '3px')
-          .on('click', function() {
+          .on('click', () => {
             this.categorical_click(d, cat_label_list);
           });
       });
@@ -1571,13 +1570,12 @@ export default class ColorBar {
 
       d3.select('#count_column')
         .selectAll('div')
-        .each(d => {
-          d3.select(d)
+        .each((d, i, nodes) => {
+          d3.select(nodes[i])
             .style('visibility', 'hidden')
             .select('p')
             .text('');
           if (counts[d] > 0) {
-            console.log(counts);
             d3.select(d)
               .attr('count', counts[d])
               .attr('pct', Math.floor((counts[d] / cat_counts[d]) * 1000) / 10)

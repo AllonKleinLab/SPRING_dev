@@ -26,7 +26,6 @@ export default class SelectionScript {
   constructor() {
     this.selection_mode = 'drag_pan_zoom';
     this.svg_width = parseInt(d3.select('svg').attr('width'), 10);
-
     this.drag_pan_zoom_rect = d3
       .select('svg')
       .append('rect')
@@ -112,7 +111,7 @@ export default class SelectionScript {
       .style('right', '0px')
       .style('width', '20px')
       .style('height', '30px')
-      .on('click', this.switch_pos_neg)
+      .on('click', () => this.switch_pos_neg())
       .append('img')
       .attr('src', 'stuff/switch_arrow.png')
       .style('height', '100%')
@@ -273,7 +272,7 @@ export default class SelectionScript {
     // "(De)select All" button
     d3.select('#deselect')
       .select('button')
-      .on('click', this.deselect_all);
+      .on('click', () => this.deselect_all());
   }
 
   switch_pos_neg() {
@@ -510,8 +509,8 @@ export default class SelectionScript {
   extend_selection() {
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       if (forceLayout.all_outlines[i].selected) {
-        for (let j in neighbors[i]) {
-          let jj = neighbors[i][j];
+        for (let j in forceLayout.neighbors[i]) {
+          let jj = forceLayout.neighbors[i][j];
           forceLayout.all_outlines[jj].alpha = forceLayout.all_nodes[i].alpha;
           forceLayout.all_outlines[jj].tint = '0xffff00';
           forceLayout.all_outlines[jj].selected = true;

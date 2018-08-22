@@ -1,19 +1,20 @@
 import * as d3 from 'd3';
 
-import ColorBar from './colorBar';
-import ForceLayout from './forceLayout_script.js';
-import { doublet_setup } from './doublet_detector.js';
-import SelectionScript from './selection_script.js';
 import CloneViewer from './clone_viewer.js';
 import Cluster from './cluster_script.js';
-import { settings_setup, collapse_settings } from './settings_script.js';
+import ColorBar from './colorBar';
+import ForceLayout from './forceLayout_script.js';
+import PAGA from './PAGA_viewer.js';
+import SelectionScript from './selection_script.js';
 import SpringPlot from './make_new_SPRINGplot_script.js';
-import { downloadSelectedExpr_setup } from './downloadSelectedExpr_script.js';
 import StickyNote from './stickyNote.js';
+
+import { colorpicker_setup } from './colorpicker_layout.js';
+import { doublet_setup } from './doublet_detector.js';
+import { downloadSelectedExpr_setup } from './downloadSelectedExpr_script.js';
 import { imputation_setup } from './smoothing_imputation.js';
 import { selection_logic_setup } from './selection_logic.js';
-import PAGA from './PAGA_viewer.js';
-import { colorpicker_setup } from './colorpicker_layout.js';
+import { settings_setup, collapse_settings } from './settings_script.js';
 
 export let cloneViewer;
 export let cluster;

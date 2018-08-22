@@ -1,4 +1,6 @@
-import { read_csv } from "./util";
+import * as d3 from 'd3';
+
+import { read_csv } from './util';
 
 export const coexpression_setup = project_directory => {
   let scatter_jitter = 5;
@@ -6,7 +8,7 @@ export const coexpression_setup = project_directory => {
   let scatter_size = 6;
 
   let svg_width = parseInt(d3.select('svg').attr('width'), 10);
-  let c10 = d3.scale.category10();
+  let c10 = d3.schemeCategory10;
 
   let scatter_data = null;
   let scatter_x = null;
@@ -178,7 +180,7 @@ export const coexpression_setup = project_directory => {
     d3.selectAll('.coexpression_legend_row').each(function(d, i) {
       d3.select(this)
         .append('div')
-        .style('background-color', c10(i));
+        .style('background-color', c10[i]);
       d3.select(this)
         .append('div')
         .attr('class', 'coexpression_text_label_div')
@@ -281,8 +283,8 @@ export const coexpression_setup = project_directory => {
     const width = document.getElementById('coexpression_panel').offsetWidth - margin.left - margin.right;
     const height = document.getElementById('coexpression_panel').offsetHeight - margin.top - margin.bottom;
 
-    scatter_x = d3.scale
-      .linear()
+    scatter_x = d3
+      .scaleLinear()
       .domain([
         0,
         d3.max(scatter_data, function(d) {
@@ -291,8 +293,8 @@ export const coexpression_setup = project_directory => {
       ])
       .range([0, width]);
 
-    scatter_y = d3.scale
-      .linear()
+    scatter_y = d3
+      .scaleLinear()
       .domain([
         0,
         d3.max(scatter_data, function(d) {
@@ -316,10 +318,7 @@ export const coexpression_setup = project_directory => {
       .attr('class', 'main');
 
     // draw the x axis
-    scatter_xAxis = d3.svg
-      .axis()
-      .scale(scatter_x)
-      .orient('bottom');
+    scatter_xAxis = d3.axisBottom(scatter_x);
 
     main
       .append('g')
@@ -338,10 +337,7 @@ export const coexpression_setup = project_directory => {
       .text(geneX + ' (UMIs)');
 
     // draw the y axis
-    scatter_yAxis = d3.svg
-      .axis()
-      .scale(scatter_y)
-      .orient('left');
+    scatter_yAxis = d3.axisLeft(scatter_y);
 
     main
       .append('g')
@@ -386,7 +382,7 @@ export const coexpression_setup = project_directory => {
         color_counter = 0;
       }
       color_counter += 1;
-      return c10(current_color_index);
+      return c10[current_color_index];
     });
 
     geneX = document.getElementById('Xmenu').value;

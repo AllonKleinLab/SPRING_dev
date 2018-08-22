@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import * as html2canvas from './html2canvas';
 
 import { colorBar, forceLayout } from './main';
 import { collapse_settings } from './settings_script';
@@ -19,9 +20,7 @@ export default class Cluster {
       await this._instance.loadData();
       return this._instance;
     } else {
-      throw new Error(
-        'StickyNote.create() has already been called, get the existing instance with Cluster.instance!',
-      );
+      throw new Error('StickyNote.create() has already been called, get the existing instance with Cluster.instance!');
     }
   }
 
@@ -74,7 +73,7 @@ export default class Cluster {
       this.save_cluster_data();
     });
 
-    d3.select('#cluster_close_button').on('click', function() {
+    d3.select('#cluster_close_button').on('click', () => {
       this.current_clus_name = this.last_clus_name;
       colorBar.categorical_coloring_data['Current clustering'] = this.clustering_data.clusters[this.current_clus_name];
       if (document.getElementById('labels_button').checked) {
@@ -91,11 +90,11 @@ export default class Cluster {
       d3.event.stopPropagation();
     });
 
-    d3.select('#cluster_help_choose_button').on('click', function() {
+    d3.select('#cluster_help_choose_button').on('click', () => {
       this.toggle_spectrum();
     });
 
-    d3.select('#cluster_explanation_button').on('click', function() {
+    d3.select('#cluster_explanation_button').on('click', () => {
       this.toggle_explain();
     });
 
@@ -114,7 +113,7 @@ export default class Cluster {
       this.clustering_data = await d3.json('data/clustering_data/' + name + '_clustering_data.json');
       this.current_clus_name = this.clustering_data.Current_clustering;
       this.last_clus_name = this.current_clus_name;
-    } catch(e) {
+    } catch (e) {
       console.log(e);
     }
   }
@@ -195,7 +194,7 @@ export default class Cluster {
     document.getElementById('enter_cluster_number').value = this.current_clus_name.split('Cluster')[1];
   };
 
-  showClusterDropdown ()  {
+  showClusterDropdown() {
     if (d3.select('#cluster_dropdown').style('height') === 'auto') {
       forceLayout.closeDropdown();
       collapse_settings();
@@ -203,9 +202,9 @@ export default class Cluster {
         document.getElementById('cluster_dropdown').classList.toggle('show');
       }, 10);
     }
-  };
+  }
 
-  view_current_clusters  ()  {
+  view_current_clusters() {
     colorBar.categorical_coloring_data['Current clustering'] = this.clustering_data.clusters[this.current_clus_name];
     if (d3.selectAll('#cluster_option')[0].length === 0) {
       d3.select('#labels_menu')
@@ -234,21 +233,21 @@ export default class Cluster {
         colorBar.make_legend(cat_color_map, cat_label_list);
         this.color_nodes(cat_color_map, cat_label_list);
       });
-  };
+  }
 
-  color_nodes (cat_color_map, cat_label_list) {
+  color_nodes(cat_color_map, cat_label_list) {
     d3.select('.node')
       .selectAll('circle')
       .style('fill', d => {
         return cat_color_map[cat_label_list[d.number]];
       });
-  };
+  }
 
   make_new_clustering() {
     this.show_create_cluster_box();
   }
 
-  toggle_spectrum ()  {
+  toggle_spectrum() {
     if (this.explain_dropdown === true) {
       this.hide_explain();
       setTimeout(this.show_spectrum, 400);
@@ -259,9 +258,9 @@ export default class Cluster {
         this.show_spectrum();
       }
     }
-  };
+  }
 
-  show_spectrum ()  {
+  show_spectrum() {
     console.log('showspec');
     // Set the dimensions of the canvas / graph
     const margin = { top: 30, right: 20, bottom: 55, left: 75 };
@@ -273,35 +272,27 @@ export default class Cluster {
     let y = d3.scaleLinear().range([height, 0]);
 
     // Define the axes
-    let xAxis = d3.svg
-      .axis()
-      .scale(x)
-      .orient('bottom')
-      .ticks(10);
+    let xAxis = d3.axisBottom(x).ticks(10);
 
-    let yAxis = d3.svg
-      .axis()
-      .scale(y)
-      .orient('left')
-      .ticks(5);
+    let yAxis = d3.axisLeft(y).ticks(5);
 
     // Define the line
-    let valueline = d3.svg
+    let valueline = d3
       .line()
       .x(function(d) {
-        return x(d.x);
+        return x(d[0]);
       })
       .y(function(d) {
-        return y(d.y);
+        return y(d[1]);
       });
 
-    let argmax_line = d3.svg
+    let argmax_line = d3
       .line()
       .x(function(d) {
-        return x(d.x);
+        return x(d[0]);
       })
       .y(function(d) {
-        return y(d.y);
+        return y(d[1]);
       });
 
     // Adds the svg canvas
@@ -331,7 +322,7 @@ export default class Cluster {
       return d.y;
     });
     x.domain(
-      d3.extent(gap_data, function(d) {
+      d3.extent(this.gap_data, function(d) {
         return d.x;
       }),
     );
@@ -340,7 +331,11 @@ export default class Cluster {
     let argmax = this.clustering_data.spectral_info.argmax;
     svg
       .append('line')
-      .attr({ x1: x(argmax), y1: y(0), x2: x(argmax), y2: y(maxval), stroke: 'rgba(100,100,100,1)' })
+      .attr('x1', x(argmax))
+      .attr('y1', y(0))
+      .attr('x2', x(argmax))
+      .attr('y2', y(maxval))
+      .attr('stroke', 'rgba(100,100,100,1)')
       .style('stroke-dasharray', 5)
       .style('stroke-width', '2px');
 
@@ -427,7 +422,7 @@ export default class Cluster {
       .style('height', '470px');
 
     this.spectrum_dropdown = true;
-  };
+  }
 
   hide_spectrum() {
     d3.select('#create_cluster_box')
@@ -604,7 +599,10 @@ export default class Cluster {
     this.new_name_set = new Set();
 
     d3.selectAll('.cluster_label_row').each(d => {
-      let newname = d3.select(d).selectAll('.cluster_name_input').node().value;
+      let newname = d3
+        .select(d)
+        .selectAll('.cluster_name_input')
+        .node().value;
       this.new_names.push(newname);
       this.new_name_set.add(newname);
       this.mapping[d] = newname;

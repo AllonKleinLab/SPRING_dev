@@ -74,7 +74,9 @@ export default class CloneViewer {
       //.style("text-align", "center")
       .attr('id', 'clone_key_menu')
       .on('change', () => {
-        this.clone_key = document.getElementById('clone_key_menu').value;
+        console.log(document.getElementById('clone_key_menu').value)
+        console.log(document.getElementById('clone_key_menu').nodeValue)
+        this.clone_key = document.getElementById('clone_key_menu').nodeValue;
       });
 
     this.cloneDispatch = d3.dispatch('load', 'statechange');
@@ -108,7 +110,7 @@ export default class CloneViewer {
       .attr('id', 'clone_selector_size_slider')
       .style('margin-left', '21px')
       .attr('value', '25')
-      .on('input', this.draw_target_circle);
+      .on('input', () => this.draw_target_circle());
 
     this.popup
       .append('div')
@@ -122,7 +124,7 @@ export default class CloneViewer {
       .attr('value', '25')
       .attr('id', 'clone_node_size_slider')
       .style('margin-left', '31px')
-      .on('input', this.update_highlight_size);
+      .on('input', () => this.update_highlight_size());
 
     this.popup
       .append('div')
@@ -136,7 +138,7 @@ export default class CloneViewer {
       .attr('value', '25')
       .attr('id', 'clone_darkness_slider')
       .style('margin-left', '23px')
-      .on('input', this.darken_nodes);
+      .on('input', () => this.darken_nodes());
 
     this.popup
       .append('div')
@@ -150,45 +152,45 @@ export default class CloneViewer {
       .attr('value', '0')
       .attr('id', 'clone_size_input')
       .style('margin-left', '23px')
-      .on('input', this.darken_nodes);
+      .on('input', () => this.darken_nodes());
 
     let source_target_options = this.popup.append('div');
     source_target_options
       .append('button')
       .text('Source')
       .style('width', '60px')
-      .on('click', this.set_source_from_selection);
+      .on('click', () => this.set_source_from_selection());
     source_target_options
       .append('button')
       .text('Target')
       .style('width', '60px')
-      .on('click', this.set_target_from_selection);
+      .on('click', () => this.set_target_from_selection());
     source_target_options
       .append('button')
       .text('Reset all')
       .style('width', '87px')
-      .on('click', this.reset_all_nodes);
+      .on('click', () => this.reset_all_nodes());
 
     let node_color_options = this.popup.append('div');
     node_color_options
       .append('button')
       .text('Darken')
-      .on('click', this.darken_nodes);
+      .on('click', () => this.darken_nodes());
 
     node_color_options
       .append('button')
       .text('Burn')
-      .on('click', this.burn);
+      .on('click',() =>  this.burn());
 
     node_color_options
       .append('button')
       .text('Restore')
-      .on('click', this.restore_colors);
+      .on('click', () => this.restore_colors());
 
     node_color_options
       .append('button')
       .text('Clear')
-      .on('click', this.clear_clone_overlays);
+      .on('click', () => this.clear_clone_overlays());
 
     let show_things_options = this.popup.append('div');
     show_things_options
@@ -225,13 +227,13 @@ export default class CloneViewer {
       .append('button')
       .text('Extend from selection')
       .style('width', '156px')
-      .on('click', this.extend_from_selection);
+      .on('click', () => this.extend_from_selection());
 
     other_options
       .append('button')
       .text('Close')
       .style('width', '56px')
-      .on('click', this.close_clone_viewer);
+      .on('click', () => this.close_clone_viewer());
 
     this.loading_screen = this.popup.append('div').attr('id', 'clone_loading_screen');
 
@@ -241,9 +243,9 @@ export default class CloneViewer {
     d3.select('#clone_viewer_popup').call(
       d3
         .drag()
-        .on('start', this.clone_viewer_popup_dragstarted)
-        .on('drag', this.clone_viewer_popup_dragged)
-        .on('end', this.clone_viewer_popup_dragended),
+        .on('start', () => this.clone_viewer_popup_dragstarted())
+        .on('drag', () => this.clone_viewer_popup_dragged())
+        .on('end', () => this.clone_viewer_popup_dragended()),
     );
 
     return this;
@@ -266,16 +268,17 @@ export default class CloneViewer {
           this.clone_map[k][i] = cloneData[k][i];
         }
       }
-
-      console.log('finished data');
-      d3.select('#clone_loading_screen').style('visibility', 'hidden');
-      this.cloneDispatch.load(this.clone_map);
-      this.clone_key = document.getElementById('clone_key_menu').value;
     } catch (e) {
-      console.log('error loading data');
       console.log(`Error getting clone data, continuing.\n${e}`);
+    } finally {
+      d3.select('#clone_loading_screen').style('visibility', 'hidden');
+      this.cloneDispatch.call('load', this, this.clone_map);
+      this.clone_key = document.getElementById('clone_key_menu').nodeValue;
     }
+  }
 
+  reset() {
+    
   }
 
   show_waiting_wheel() {
@@ -424,7 +427,7 @@ export default class CloneViewer {
   }
 
   get_clone_radius() {
-    let r = parseInt(d3.select('#clone_selector_size_slider').value, 10);
+    let r = parseInt(d3.select('#clone_selector_size_slider').node().value, 10);
     return r ** 1.5 / 8;
   }
 
@@ -481,16 +484,15 @@ export default class CloneViewer {
   }
 
   start_clone_viewer() {
-    console.log(forceLayout.all_nodes);
     this.svg_graph = d3.select('svg_graph');
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       this.node_status[i] = { active: false, active_stable: false, source: false, target: false };
     }
-    this.svg_graph.on('mousemove', this.clone_mousemove);
-    this.svg_graph.on('click', this.clone_click);
+    this.svg_graph.on('mousemove', () => this.clone_mousemove());
+    this.svg_graph.on('click', () => this.clone_click());
     d3.select('#clone_viewer_popup').style('visibility', 'visible');
 
-    d3.select('#settings_range_background_color').value = 65;
+    d3.select('#settings_range_background_color').node().value = 65;
     forceLayout.app.renderer.backgroundColor = parseInt(rgbToHex(65, 65, 65), 16);
     this.draw_target_circle();
     this.set_source_from_selection();
@@ -627,7 +629,6 @@ export default class CloneViewer {
   }
 
   darken_nodes() {
-    console.log(d3.select('#clone_darkness_slider').node().value);
     let darkness = parseFloat(d3.select('#clone_darkness_slider').node().value) / 100;
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       let cc = forceLayout.base_colors[i];

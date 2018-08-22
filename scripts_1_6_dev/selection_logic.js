@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
-import { count_clusters } from './colorBar';
-import { all_nodes, all_outlines } from './forceLayout_script';
-import { update_selected_count } from './selection_script';
+
+import { colorBar, forceLayout, selectionScript } from './main';
 
 export const selection_logic_setup = () => {
   let selection_data = {};
@@ -55,13 +54,13 @@ export const selection_logic_setup = () => {
   function get_selections() {
     let left_name = left_dropdown.property('value');
     let right_name = right_dropdown.property('value');
-    let left_sel = '';
+    let left_sel = [];
     if (left_name === 'Current selection') {
       left_sel = get_selected_cells();
     } else {
       left_sel = selection_data[left_name];
     }
-    let right_sel = '';
+    let right_sel = [];
     if (right_name === 'Current selection') {
       right_sel = get_selected_cells();
     } else {
@@ -103,17 +102,17 @@ export const selection_logic_setup = () => {
   }
 
   function set_selections(sel) {
-    for (let i = 0; i < all_outlines.length; i++) {
-      all_outlines[i].selected = false;
-      all_outlines[i].alpha = 0;
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+      forceLayout.all_outlines[i].selected = false;
+      forceLayout.all_outlines[i].alpha = 0;
     }
     for (let i = 0; i < sel.length; i++) {
-      all_outlines[sel[i]].tint = '0xffff00';
-      all_outlines[sel[i]].selected = true;
-      all_outlines[sel[i]].alpha = all_nodes[sel[i]].alpha;
+      forceLayout.all_outlines[sel[i]].tint = '0xffff00';
+      forceLayout.all_outlines[sel[i]].selected = true;
+      forceLayout.all_outlines[sel[i]].alpha = forceLayout.all_nodes[sel[i]].alpha;
     }
-    update_selected_count();
-    count_clusters(all_nodes);
+    selectionScript.update_selected_count();
+    colorBar.count_clusters(forceLayout.all_nodes);
   }
 
   function clear_options() {
@@ -129,19 +128,19 @@ export const selection_logic_setup = () => {
     $('#selection_logic_input').val('');
     left_dropdown
       .append('option')
-      .text(name)
+      .text(name.toString())
       .attr('selected', 'selected');
     right_dropdown
       .append('option')
-      .text(name)
+      .text(name.toString())
       .attr('selected', 'selected');
-    selection_data[name] = get_selected_cells();
+    selection_data[name.toString()] = get_selected_cells();
   }
 
   function get_selected_cells() {
     let sel = [];
-    for (let i = 0; i < all_outlines.length; i++) {
-      if (all_outlines[i].selected) {
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+      if (forceLayout.all_outlines[i].selected) {
         sel.push(i);
       }
     }

@@ -38,7 +38,7 @@ export default class PAGA {
       .attr('checked', true)
       .attr('id', 'PAGA_visibility_checkbox')
       .style('margin-left', '27px')
-      .on('click', this.toggle_PAGA_visibility);
+      .on('click', () => this.toggle_PAGA_visibility());
 
     this.popup
       .append('div')
@@ -52,7 +52,7 @@ export default class PAGA {
       .attr('value', '40')
       .attr('id', 'PAGA_node_size_slider')
       .style('margin-left', '29px')
-      .on('input', this.PAGA_redraw);
+      .on('input', () => this.PAGA_redraw());
 
     this.popup
       .append('div')
@@ -66,7 +66,7 @@ export default class PAGA {
       .attr('id', 'PAGA_edge_width_slider')
       .style('margin-left', '22px')
       .attr('value', '40')
-      .on('input', this.PAGA_redraw);
+      .on('input', () => this.PAGA_redraw());
 
     this.popup
       .append('div')
@@ -80,7 +80,7 @@ export default class PAGA {
       .attr('value', '25')
       .attr('id', 'PAGA_min_edge_weight_slider')
       .style('margin-left', '26px')
-      .on('input', this.adjust_min_edge_weight);
+      .on('input', () => this.adjust_min_edge_weight());
 
     this.popup
       .append('div')
@@ -94,7 +94,7 @@ export default class PAGA {
       .attr('value', '70')
       .attr('id', 'PAGA_mask_opacity_slider')
       .style('margin-left', '20px')
-      .on('input', this.adjust_PAGA_mask_opacity);
+      .on('input', () => this.adjust_PAGA_mask_opacity());
 
     this.PAGA_button_options = this.popup
       .append('div')
@@ -103,23 +103,23 @@ export default class PAGA {
 
     this.PAGA_button_options.append('button')
       .text('Reset')
-      .on('click', this.reset_positions);
+      .on('click', () => this.reset_positions());
     this.PAGA_button_options.append('button')
       .text('(De)select')
-      .on('click', this.deselect_PAGA);
+      .on('click', () => this.deselect_PAGA());
     this.PAGA_button_options.append('button')
       .text('Propagate')
-      .on('click', this.propagate);
+      .on('click', () => this.propagate());
     this.PAGA_button_options.append('button')
       .text('Close')
-      .on('click', this.hide_PAGA_popup);
+      .on('click', () => this.hide_PAGA_popup());
 
     this.popup.call(
       d3
         .drag()
-        .on('start', this.PAGA_popup_dragstarted)
-        .on('drag', this.PAGA_popup_dragged)
-        .on('end', this.PAGA_popup_dragended),
+        .on('start', () => this.PAGA_popup_dragstarted())
+        .on('drag', () => this.PAGA_popup_dragged())
+        .on('end', () => this.PAGA_popup_dragended()),
     );
 
     this.noCache = new Date().getTime();
@@ -155,20 +155,20 @@ export default class PAGA {
           .call(
             d3
               .drag()
-              .on('start', this.dragstarted)
-              .on('drag', this.dragged)
-              .on('end', this.dragended),
+              .on('start', () => this.dragstarted())
+              .on('drag', () => this.dragged())
+              .on('end', () => this.dragended()),
           )
-          .on('click', function(d) {
+          .on('click', (d) => {
             if (!d3.event.defaultPrevented) {
               d.selected = !d.selected;
               this.PAGA_redraw();
             }
           });
 
-        let PAGA_node_dict = {};
-        data.nodes.forEach(function(d) {
-          PAGA_node_dict[d.index] = d;
+        this.PAGA_node_dict = {};
+        data.nodes.forEach((d) => {
+          this.PAGA_node_dict[d.index] = d;
           d.coordinates_original = Object.assign({}, d.coordinates);
         });
 
@@ -302,22 +302,22 @@ export default class PAGA {
     d3.selectAll('.PAGA_link')
       .attr('opacity', 0.8)
       .attr('stroke', 'darkgray')
-      .attr('x1', function(d) {
+      .attr('x1', (d) => {
         return this.PAGA_node_dict[d.source].coordinates[0];
-      })
-      .attr('y1', function(d) {
+      }) 
+      .attr('y1', (d) => {
         return this.PAGA_node_dict[d.source].coordinates[1];
       })
-      .attr('x2', function(d) {
+      .attr('x2', (d) => {
         return this.PAGA_node_dict[d.target].coordinates[0];
       })
-      .attr('y2', function(d) {
+      .attr('y2', (d) => {
         return this.PAGA_node_dict[d.target].coordinates[1];
       })
-      .attr('stroke-width', function(d) {
+      .attr('stroke-width', (d) => {
         return d.weight * edge_scale;
       })
-      .style('visibility', function(d) {
+      .style('visibility', (d) => {
         if (d.weight > this.PAGA_data.edge_weight_meta.min_edge_weight) {
           return 'visible';
         } else {
@@ -332,6 +332,7 @@ export default class PAGA {
   }
 
   toggle_PAGA_visibility() {
+    console.log(document.getElementById('PAGA_visibility_checkbox'));
     if (document.getElementById('PAGA_visibility_checkbox').checked) {
       d3.selectAll('.PAGA_node').style('visibility', 'visible');
       d3.selectAll('.PAGA_link').style('visibility', 'visible');

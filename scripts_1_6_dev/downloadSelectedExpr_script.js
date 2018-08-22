@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { forceLayout, graph_directory, sub_directory } from './main';
 
 export const downloadSelectedExpr_setup = () => {
   let popup = d3
@@ -93,18 +94,19 @@ export const downloadSelectedExpr_setup = () => {
   }
 
   d3.select('#downloadSelectedExpr_popup').call(
-    d3.drag()
+    d3
+      .drag()
       .on('start', downloadSelectedExpr_popup_dragstarted)
       .on('drag', downloadSelectedExpr_popup_dragged)
       .on('end', downloadSelectedExpr_popup_dragended),
   );
-}
+};
 
 export const hide_downloadSelectedExpr_popup = () => {
   d3.select('#downloadSelectedExpr_popup')
     .style('visibility', 'hidden')
     .style('height', '200px');
-}
+};
 
 export const show_downloadSelectedExpr_popup = () => {
   let mywidth = parseInt(
@@ -131,12 +133,12 @@ export const show_downloadSelectedExpr_popup = () => {
     .style('top', '10px')
     .style('padding-bottom', '0px')
     .style('visibility', 'visible'); //.style('height','300px');
-}
+};
 
 function downloadSelectedExpr() {
   let sel2text = '';
-  for (let i = 0; i < all_outlines.length; i++) {
-    if (all_outlines[i].selected) {
+  for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+    if (forceLayout.all_outlines[i].selected) {
       sel2text = sel2text + ',' + i.toString();
     }
   }
@@ -163,7 +165,7 @@ function downloadSelectedExpr() {
     .transition()
     .duration(200)
     .style('height', '120px')
-    .each('end', function() {
+    .each(() => {
       d3.select('#downloadSelectedExpr_message_div').style('visibility', 'inherit');
       d3.select('#downloadSelectedExpr_message_div')
         .select('text')
