@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { openInNewTab } from "./util";
+import { openInNewTab } from './util';
 
 function add_sticky_subdir(project_directory, sub_directory, order) {
   d3.json(project_directory + '/' + sub_directory + '/sticky_notes_data.json').then(data => {
@@ -67,4 +67,3 @@ function populate_sticky_subdirs_list(project_directory) {
     url: 'cgi-bin/list_directories_with_filename.py',
   });
 }
-

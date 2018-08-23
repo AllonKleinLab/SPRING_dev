@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import * as Spinner from 'spinner';
 
 import { SPRITE_IMG_WIDTH, rgbToHex } from './util';
 import { colorBar, forceLayout } from './main';
@@ -74,8 +75,8 @@ export default class CloneViewer {
       //.style("text-align", "center")
       .attr('id', 'clone_key_menu')
       .on('change', () => {
-        console.log(document.getElementById('clone_key_menu').value)
-        console.log(document.getElementById('clone_key_menu').nodeValue)
+        console.log(document.getElementById('clone_key_menu').value);
+        console.log(document.getElementById('clone_key_menu').nodeValue);
         this.clone_key = document.getElementById('clone_key_menu').nodeValue;
       });
 
@@ -180,7 +181,7 @@ export default class CloneViewer {
     node_color_options
       .append('button')
       .text('Burn')
-      .on('click',() =>  this.burn());
+      .on('click', () =>  this.burn());
 
     node_color_options
       .append('button')
@@ -279,7 +280,7 @@ export default class CloneViewer {
   }
 
   reset() {
-    
+    return;
   }
 
   show_waiting_wheel() {
@@ -567,10 +568,10 @@ export default class CloneViewer {
     for (let i=0; i<all_nodes.length; i++) {
       if (! all_outlines[i].selected) {
         rad = Math.sqrt((all_nodes[i].x-x)**2 + (all_nodes[i].y-y)**2);
-        if (rad < get_clone_radius()) { 
+        if (rad < get_clone_radius()) {
           if (node_status[i].source) {
             if (show_source_nodes) {
-              activate_node(i,true); 
+              activate_node(i,true);
             }
             activate_edges(i,true);
           }

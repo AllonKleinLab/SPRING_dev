@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import * as html2canvas from './html2canvas';
+import * as html2canvas from 'html2canvas';
 
 import { colorBar, forceLayout } from './main';
 import { collapse_settings } from './settings_script';
@@ -655,14 +655,12 @@ export default class Cluster {
     d3.select('#update_cluster_labels_box').style('background-color', 'white');
     d3.selectAll('.cluster_name_input').style('color', 'black');
 
-    html2canvas([document.getElementById('update_cluster_labels_box')], {
-      onrendered: function(canvas) {
-        let a = document.createElement('a');
-        // toDataURL defaults to png, so we need to request a jpeg, then convert for file download.
-        a.href = canvas.toDataURL('image/png');
-        a.download = 'SPRING_legend.png';
-        a.click();
-      },
+    html2canvas(document.getElementById('update_cluster_labels_box')).then(canvas => {
+      let a = document.createElement('a');
+      // toDataURL defaults to png, so we need to request a jpeg, then convert for file download.
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'SPRING_legend.png';
+      a.click();
     });
 
     d3.select('#cluster_label_button_bar').style('visibility', 'inherit');

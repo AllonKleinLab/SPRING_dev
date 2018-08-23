@@ -305,7 +305,7 @@ export default class PAGA {
       .attr('stroke', 'darkgray')
       .attr('x1', (d) => {
         return this.PAGA_node_dict[d.source].coordinates[0];
-      }) 
+      })
       .attr('y1', (d) => {
         return this.PAGA_node_dict[d.source].coordinates[1];
       })

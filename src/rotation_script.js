@@ -44,7 +44,7 @@ export const rotation_update = () => {
   let rotator_radius = d3.median(dels) * 1.5;
 
   const zoomScale = d3.zoomTransform(forceLayout.zoomer).k;
-  
+
   d3.select('#rotation_pivot')
     .attr('r', d3.min([13 / zoomScale, (rotator_radius + 30) / 3]))
     .style('stroke-width', d3.min([3 / zoomScale, 10]))
@@ -167,16 +167,16 @@ export const rotation_update = () => {
   function handle_dragended() {
     d3.select('#rotation_outer_circ').style('opacity', 0);
   }
-}
+};
 
 export const rotation_show = () => {
   d3.select('#rotation_outer_circ').style('visibility', 'visible');
   d3.select('#rotation_inner_circ').style('visibility', 'visible');
   d3.select('#rotation_pivot').style('visibility', 'visible');
-}
+};
 
 export const rotation_hide = () => {
   d3.select('#rotation_outer_circ').style('visibility', 'hidden');
   d3.select('#rotation_inner_circ').style('visibility', 'hidden');
   d3.select('#rotation_pivot').style('visibility', 'hidden');
-}
+};

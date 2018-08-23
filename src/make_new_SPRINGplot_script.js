@@ -242,6 +242,8 @@ export default class SpringPlot {
           reader.readAsText(file, 'UTF-8');
           reader.onload = evt => {
             this.custom_genes = evt.target.result;
+            console.log(evt.target);
+            console.log(evt.target.result);
             this.wrapper.style('padding', '4px 11px 4px 11px');
             this.wrapper.style('background-color', 'red');
             this.wrapper.select('span').text('Uploaded');
@@ -312,7 +314,7 @@ export default class SpringPlot {
     d3.select('#gene_list_upload_wrapper')
       .select('span')
       .text('Choose file');
-  };
+  }
 
   show_make_new_SPRINGplot_popup = () => {
     let mywidth = parseInt(
@@ -340,7 +342,7 @@ export default class SpringPlot {
       .style('padding-bottom', '0px')
       .style('visibility', 'visible')
       .style('height', STARTHEIGHT);
-  };
+  }
 
   submit_new_SPRINGplot() {
     let running_online = false;
@@ -381,7 +383,7 @@ export default class SpringPlot {
     } else {
       output_message = 'Please wait...<br>';
       output_message +=
-        "If everything goes smoothly, a link to your new subplot will appear when ready, and you'll receive a link via email (if provided).<br>";
+        'If everything goes smoothly, a link to your new subplot will appear when ready, and you\'ll receive a link via email (if provided).<br>';
       output_message += '<br>This may take several minutes.<br>';
       subplot_script = 'cgi-bin/spring_from_selection2.py';
     }
@@ -425,11 +427,11 @@ export default class SpringPlot {
         this_url: this_url,
         letPctl: letPctl,
       },
-      success: function(output_message) {
-        console.log(output_message);
+      success: function(success_message) {
+        console.log(success_message);
 
         if (running_online) {
-          let orig_message = output_message;
+          let orig_message = success_message;
           d3.select('#make_new_SPRINGplot_message_div')
             .select('text')
             .html(orig_message);
@@ -453,7 +455,7 @@ export default class SpringPlot {
         } else {
           d3.select('#make_new_SPRINGplot_message_div')
             .select('text')
-            .html(output_message);
+            .html(success_message);
         }
       },
       type: 'POST',

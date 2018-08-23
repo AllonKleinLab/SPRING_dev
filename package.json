@@ -1,16 +1,19 @@
 {
-  "name": "SPRING_dev",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "SPRING_Viewer",
+  "version": "1.7.0",
   "repository": "https://github.com/cBioCenter/SPRING_dev",
   "author": "Drew Diamantoukos <MercifulCode@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -p ./tsconfig.json"
+    "build": "rm -rf dist ; tsc -p ./tsconfig.json",
+    "lint": "tslint --config tslint.json --project tsconfig.json"
   },
   "devDependencies": {
     "@types/d3": "^5.0.0",
+    "@types/html2canvas": "^0.0.33",
     "@types/jquery": "^3.3.6",
-    "@types/pixi.js": "^4.8.0"
+    "@types/pixi.js": "^4.8.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1"
   }
 }

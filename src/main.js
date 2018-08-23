@@ -176,8 +176,8 @@ const getColorBarFromAjax = async args => {
     url: 'cgi-bin/load_counts.py',
   });
 
-  const colorBar = await ColorBar.create(sub_dir, python_data);
-  return colorBar;
+  const result = await ColorBar.create(sub_dir, python_data);
+  return result;
 };
 
 loadData()

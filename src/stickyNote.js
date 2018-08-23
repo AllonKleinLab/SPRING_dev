@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import sweetAlert from 'sweetalert';
 
 import { forceLayout, colorBar, selectionScript } from './main';
 
@@ -262,11 +263,8 @@ export default class StickyNote {
   }
 
   check_email() {
-    if (
-      $('#sticky_email_input')
-        .val()
-        .indexOf('@') > -1
-    ) {
+    const emailInput = $('#sticky_email_input').val();
+    if (typeof emailInput === 'string' && emailInput.indexOf('@') > -1) {
       return true;
     } else {
       return false;
@@ -319,7 +317,7 @@ export default class StickyNote {
     d3.selectAll('.sticky_note').each(d => {
       let note = d3.select(d);
       const bound_cells = note.attr('bound_cells').split(',');
-      if (bound_cells.filter(n => selected_cells.includes(n)).length > 0) {
+      if (bound_cells.filter(n => selected_cells.indexOf(n) >= 0).length > 0) {
         note.style('background-color', 'rgba(255,255,0,.4)');
         $(this.sticky_div.node()).prepend(note.node());
       }

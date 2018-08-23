@@ -157,7 +157,7 @@ export default class DownloadSelectedExpr {
       .style('top', '10px')
       .style('padding-bottom', '0px')
       .style('visibility', 'visible'); //.style('height','300px');
-  };
+  }
   downloadSelectedExpr() {
     let sel2text = '';
     for (let i = 0; i < forceLayout.all_outlines.length; i++) {

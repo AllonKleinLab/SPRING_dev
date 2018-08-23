@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import { colorBar } from "./main";
+import { colorBar } from './main';
 
 function cluster_setup() {
   let cluster_popup = d3
@@ -107,4 +107,4 @@ export const run_clustering = (mutable, graph_directory, sub_directory) => {
       .text('Sorry, this dataset cannot be edited.');
     show_notification(d3.select('#cluster_popup'));
   }
-}
+};

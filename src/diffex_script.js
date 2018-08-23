@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import * as Spinner from 'spinner';
 
 import { colorBar } from './main';
 
@@ -414,7 +415,7 @@ export const diffex_setup = (project_directory) => {
       .style('margin-top', '-6px')
       .style('margin-left', '3px');
   }
-}
+};
 
 function make_diffex_spinner(element) {
   let opts = {

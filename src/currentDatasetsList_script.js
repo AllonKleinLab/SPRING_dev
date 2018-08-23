@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import { openInNewTab } from "./util";
+import { openInNewTab } from './util';
 import { forceLayout } from './main';
 
 function add_list_item(project_directory, sub_directory, order) {

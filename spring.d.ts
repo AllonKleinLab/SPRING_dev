@@ -1,2 +1,3 @@
+declare module "spinner";
 
-declare namespace PIXI {}
+declare module "sweetAlert";

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false, // Report errors in .js files.
     "lib": [
       "dom",
       "es6",
@@ -10,7 +10,6 @@
     "module": "amd",
     "moduleResolution": "node",
     "outDir": "dist",
-    // "outFile": "dist/bundle.js",
     "target": "es6",
   },
   "include": [

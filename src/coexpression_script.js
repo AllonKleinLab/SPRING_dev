@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import * as Spinner from 'spinner';
 
 import { read_csv } from './util';
 

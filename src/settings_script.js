@@ -221,13 +221,13 @@ export const settings_setup = () => {
     /*
 		document.getElementById("settings_range_node_repulsion").value = 50;
 		node_repulsion_change(50);
-	
+
 		document.getElementById("settings_range_link_distance").value = 40;
 		link_distance_change(40);
 
 		document.getElementById("settings_range_link_strength").value = 20;
 		link_strength_change(20);
-	
+
 		document.getElementById("settings_range_gravity").value = 5;
 		gravity_change(5);
 		*/
@@ -250,7 +250,7 @@ export const settings_setup = () => {
     document.getElementById('settings_range_edge_opacity').value = 50;
     edge_opacity_change(50);
   }
-}
+};
 
 export const toggle_settings = () => {
   if (d3.select('#settings_dropdown').style('visibility') === 'hidden') {
@@ -258,7 +258,7 @@ export const toggle_settings = () => {
   } else {
     collapse_settings();
   }
-}
+};
 export const expand_settings = () => {
   forceLayout.closeDropdown();
   if (d3.select('#settings_dropdown').style('visibility') === 'hidden') {
@@ -268,7 +268,7 @@ export const expand_settings = () => {
       d3.select('#settings_restore_defaults_button').style('visibility', 'visible');
     }, 5);
   }
-}
+};
 
 export const collapse_settings = () => {
   if (
@@ -285,4 +285,4 @@ export const collapse_settings = () => {
     d3.select('#settings_restore_defaults_button').style('visibility', 'hidden');
     d3.select('#settings_dropdown').style('visibility', 'hidden');
   }
-}
+};

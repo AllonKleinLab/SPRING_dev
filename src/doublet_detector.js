@@ -62,7 +62,9 @@ export default class DoubletDetector {
       .attr('id', 'doublet_description')
       .append('text')
       .text(
-        'Predict mixed-celltype doublets. Uses a kNN classifier to find cells that look like simulated doublets. k sets the number neighbors used in the classifier, and r is the ratio of simulated doublets to observed cells.',
+        'Predict mixed-celltype doublets. \
+        Uses a kNN classifier to find cells that look like simulated doublets. \
+        k sets the number neighbors used in the classifier, and r is the ratio of simulated doublets to observed cells.',
       );
 
     this.doublet_notify_popup = d3
@@ -250,7 +252,7 @@ export default class DoubletDetector {
           });
           d3.text(graph_directory + '/' + sub_directory + '/color_data_gene_sets.csv' + '?_=' + noCache).then(text => {
             colorBar.gene_set_color_array = read_csv(text);
-            colorBar.dispatch.load(colorBar.gene_set_color_array, 'gene_sets');
+            colorBar.dispatch.call('load', this, colorBar.gene_set_color_array, 'gene_sets');
             colorBar.update_slider();
           });
         },

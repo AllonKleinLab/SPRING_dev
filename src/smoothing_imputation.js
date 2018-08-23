@@ -1,4 +1,6 @@
 import * as d3 from 'd3';
+import Spinner from 'spinner';
+
 import { forceLayout, colorBar, cloneViewer, graph_directory, sub_directory } from './main';
 
 export default class SmoothingImputation {
@@ -50,15 +52,15 @@ export default class SmoothingImputation {
     this.button_bar
       .append('button')
       .text('Restore')
-      .on('click', this.restore_colors);
+      .on('click', () => this.restore_colors());
     this.button_bar
       .append('button')
       .text('Smooth')
-      .on('click', this.perform_smoothing);
+      .on('click', () => this.perform_smoothing());
     this.button_bar
       .append('button')
       .text('Close')
-      .on('click', this.hide_imputation_popup);
+      .on('click', () => this.hide_imputation_popup());
 
     this.text_box = this.popup
       .append('div')
@@ -185,64 +187,68 @@ export default class SmoothingImputation {
         },
         //data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, beta:beta, n_rounds:N, raw_g:green_string},
         success: function(data) {
-          let t1 = new Date();
-          console.log('Smoothed the data: ', t1.getTime() - t0.getTime());
-          let datasplit = data.split('|');
-          let new_min = parseFloat(datasplit[0]) - 0.02;
-          let new_max = parseFloat(datasplit[1]);
+          if (data && data.length >= 1) {
+            let t1 = new Date();
+            console.log('Smoothed the data: ', t1.getTime() - t0.getTime());
+            let datasplit = data.split('|');
+            let new_min = parseFloat(datasplit[0]) - 0.02;
+            let new_max = parseFloat(datasplit[1]);
 
-          let current_min = 0;
-          let current_max = 0;
+            let current_min = 0;
+            let current_max = 0;
 
-          if (document.getElementById('channels_button').checked) {
-            current_min = 0;
-            current_max = parseFloat(d3.max(forceLayout.green_array));
-          } else {
-            current_max = parseFloat(d3.max(forceLayout.base_colors.map(forceLayout.max_color)));
-            current_min = parseFloat(d3.min(forceLayout.base_colors.map(forceLayout.min_color)));
-          }
-
-          function nrm(x) {
-            return ((parseFloat(x) - new_min + current_min) / (new_max - new_min + 0.01)) * (current_max - current_min);
-          }
-
-          let spl = datasplit[2].split(';');
-          let reds = spl[0].split(',').map(nrm);
-          let greens = spl[1].split(',').map(nrm);
-          let blues = spl[2].split(',').map(nrm);
-
-          if (document.getElementById('channels_button').checked) {
-            forceLayout.green_array = greens;
-            greens = greens.map(x => forceLayout.normalize_one_val(x));
-          }
-
-          if (sel_nodes.length === 0) {
-            for (let i = 0; i < forceLayout.all_nodes.length; i++) {
-              forceLayout.base_colors[i] = {
-                r: Math.floor(reds[i]),
-                g: Math.floor(greens[i]),
-                b: Math.floor(blues[i]),
-              };
+            if (document.getElementById('channels_button').checked) {
+              current_min = 0;
+              current_max = parseFloat(d3.max(colorBar.green_array));
+            } else {
+              current_max = parseFloat(d3.max(forceLayout.base_colors.map(colorBar.max_color)));
+              current_min = parseFloat(d3.min(forceLayout.base_colors.map(colorBar.min_color)));
             }
-          } else {
-            for (let i = 0; i < sel_nodes.length; i++) {
-              forceLayout.base_colors[sel_nodes[i]] = {
-                r: Math.floor(reds[i]),
-                g: Math.floor(greens[i]),
-                b: Math.floor(blues[i]),
-              };
+
+            function nrm(x) {
+              return ((parseFloat(x) - new_min + current_min) / (new_max - new_min + 0.01)) * (current_max - current_min);
             }
+
+            let spl = datasplit[2].split(';');
+            let reds = spl[0].split(',').map(nrm);
+            let greens = spl[1].split(',').map(nrm);
+            let blues = spl[2].split(',').map(nrm);
+
+            if (document.getElementById('channels_button').checked) {
+              colorBar.green_array = greens;
+              greens = greens.map(x => colorBar.normalize_one_val(x));
+            }
+
+            if (sel_nodes.length === 0) {
+              for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+                forceLayout.base_colors[i] = {
+                  r: Math.floor(reds[i]),
+                  g: Math.floor(greens[i]),
+                  b: Math.floor(blues[i]),
+                };
+              }
+            } else {
+              for (let i = 0; i < sel_nodes.length; i++) {
+                forceLayout.base_colors[sel_nodes[i]] = {
+                  r: Math.floor(reds[i]),
+                  g: Math.floor(greens[i]),
+                  b: Math.floor(blues[i]),
+                };
+              }
+            }
+
+            colorBar.updateColorMax();
+            this.hide_waiting_wheel();
+
+            forceLayout.app.stage.children[1].children.sort(function(a, b) {
+              return (
+                colorBar.average_color(forceLayout.base_colors[a.index]) -
+                colorBar.average_color(forceLayout.base_colors[b.index])
+              );
+            });
+          } else {
+            console.log('Got empty smoothing data.');
           }
-
-          colorBar.updateColorMax();
-          this.hide_waiting_wheel();
-
-          forceLayout.app.stage.children[1].children.sort(function(a, b) {
-            return (
-              colorBar.average_color(forceLayout.base_colors[a.index]) -
-              colorBar.average_color(forceLayout.base_colors[b.index])
-            );
-          });
         },
         type: 'POST',
         url: 'cgi-bin/smooth_gene.py',

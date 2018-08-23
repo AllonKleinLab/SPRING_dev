@@ -20,11 +20,10 @@ export const read_csv = text => {
   return dict;
 };
 
-
 export const openInNewTab = (url) => {
   let win = window.open(url, '_blank');
   win.focus();
-}
+};
 
 export const UrlExists = (url) => {
   $.get(url)
@@ -34,7 +33,7 @@ export const UrlExists = (url) => {
     .fail(function() {
       console.log('no');
     });
-}
+};
 
 export const makeTextFile = (text) => {
   let textFile = '';
@@ -46,7 +45,7 @@ export const makeTextFile = (text) => {
 
   textFile = window.URL.createObjectURL(data);
   return textFile;
-}
+};
 
 export const downloadFile = (text, name) => {
   if (
@@ -63,13 +62,13 @@ export const downloadFile = (text, name) => {
   hiddenElement.target = '_blank';
   hiddenElement.download = name;
   hiddenElement.click();
-}
+};
 
 export const componentToHex = (c) => {
   let hex = c.toString(16);
   return hex.length === 1 ? '0' + hex : hex;
-}
+};
 
 export const rgbToHex = (r, g, b) => {
   return '0x' + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
+};

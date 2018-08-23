@@ -31,44 +31,44 @@ export default class SelectionLogic {
       .append('div')
       .attr('id', 'selection_logic_popup');
 
-      this.add_new_bar =this.popup
+    this.add_new_bar = this.popup
       .append('div')
       .attr('id', 'selection_logic_add_new_bar')
       .on('mousedown', function() {
         d3.event.stopPropagation();
       });
 
-      this.add_new_bar
+    this.add_new_bar
       .append('label')
       .text('Selection name ')
       .append('input')
       .attr('id', 'selection_logic_input');
-      this.add_new_bar
+    this.add_new_bar
       .append('button')
       .text('Close')
       .on('click', this.hide_selection_logic_popup);
-      this.add_new_bar
+    this.add_new_bar
       .append('button')
       .text('Clear')
       .on('click', () => this.clear_options());
-      this.add_new_bar
+    this.add_new_bar
       .append('button')
       .text('Add')
       .on('click', () => this.add_selection());
 
-      this.andor_bar = this.popup.append('div').attr('id', 'selection_logic_andor_bar');
-      this.left_dropdown = this.andor_bar.append('select').style('margin-right', '20px');
-      this.andor_bar
+    this.andor_bar = this.popup.append('div').attr('id', 'selection_logic_andor_bar');
+    this.left_dropdown = this.andor_bar.append('select').style('margin-right', '20px');
+    this.andor_bar
       .append('button')
       .text('AND')
       .style('margin-right', '12px')
       .on('click', () => this.apply_and);
-      this.andor_bar
+    this.andor_bar
       .append('button')
       .text('OR')
       .on('click', () => this.apply_or);
 
-      this.right_dropdown = this.andor_bar.append('select').style('margin-left', '20px');
+    this.right_dropdown = this.andor_bar.append('select').style('margin-left', '20px');
 
     this.left_dropdown.append('option').text('Current selection');
     this.right_dropdown.append('option').text('Current selection');
@@ -163,11 +163,11 @@ export default class SelectionLogic {
       .append('option')
       .text(name.toString())
       .attr('selected', 'selected');
-      this.right_dropdown
+    this.right_dropdown
       .append('option')
       .text(name.toString())
       .attr('selected', 'selected');
-      this.selection_data[name.toString()] = this.get_selected_cells();
+    this.selection_data[name.toString()] = this.get_selected_cells();
   }
 
   get_selected_cells() {

@@ -490,7 +490,7 @@ export default class SelectionScript {
     let selection_filename = project_directory + '/selected_cells.txt';
     let new_selection = new Array();
     d3.text(selection_filename).then(text => {
-      text.split('\n').forEach((entry, index, array)=> {
+      text.split('\n').forEach((entry, index, array) => {
         if (entry !== '') {
           new_selection.push(parseInt(entry, 10));
         }

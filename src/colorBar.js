@@ -1408,14 +1408,14 @@ export default class ColorBar {
             scorecol.push(d);
           });
       }
-      let text = '';
+      text = '';
       termcol.forEach((d, i) => {
         text = text + '\n' + d + '\t' + scorecol[i];
       });
       text = text.slice(1, text.length);
     }
     this.downloadFile(text, 'enriched_terms.txt');
-  };
+  }
 
   make_legend(cat_color_map, cat_label_list) {
     d3.select('#count_column')
@@ -1724,17 +1724,17 @@ export default class ColorBar {
       }
     }
     return hover_cells;
-  };
+  }
 
   max_color = c => {
     return d3.max([c.r, c.b, c.g]);
-  };
+  }
 
   min_color = c => {
     return d3.min([c.r, c.b, c.g]);
-  };
+  }
 
   average_color = c => {
     return d3.mean([c.r, c.b, c.g]);
-  };
+  }
 }

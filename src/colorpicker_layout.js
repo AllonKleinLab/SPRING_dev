@@ -15,7 +15,7 @@ let tmp_cat_coloring = null;
 
 export const  colorpicker_submit = (hex) => {
   console.log(hex);
-}
+};
 
 export const colorpicker_setup = () => {
   let popup = d3.select('#colorpicker_popup');
@@ -77,7 +77,7 @@ export const colorpicker_setup = () => {
   function colorpicker_popup_dragended() {
     return;
   }
-}
+};
 
 export const  restore_colorpicker = () => {
   colorBar.setNodeColors();
@@ -96,7 +96,7 @@ export const  restore_colorpicker = () => {
       }
     });
   }
-}
+};
 
 export const  show_colorpicker_popup = (label) => {
   if (forceLayout.mutable) {
@@ -135,7 +135,7 @@ export const  show_colorpicker_popup = (label) => {
     d3.select('#colorpicker_popup').style('left', left.toString() + 'px');
     d3.select('#colorpicker_popup').style('visibility', 'visible');
   }
-}
+};
 
 export const  close_colorpicker_popup = () => {
   d3.select('#colorpicker_popup').style('visibility', 'hidden');
@@ -144,7 +144,7 @@ export const  close_colorpicker_popup = () => {
   d3.select('#colorpicker_popup').attr('current_color', '');
   d3.select('#colorpicker_popup').attr('current_track', '');
   tmp_cat_coloring = null;
-}
+};
 
 export const  colorpicker_update = () => {
   let rgb = d3.select('.colorpicker_new_color').style('background-color');
@@ -177,7 +177,7 @@ export const  colorpicker_update = () => {
       }
     });
   }
-}
+};
 
 export const save_colorpicker_colors = () => {
   let current_track = document.getElementById('labels_menu').value;
@@ -204,4 +204,4 @@ export const save_colorpicker_colors = () => {
       });
     }
   }
-}
+};

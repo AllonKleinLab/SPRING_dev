@@ -277,7 +277,7 @@ export default class ForceLayout {
 
           let color = 6579301;
           let s = new LineSprite(4, color, x1, y1, x2, y2);
-          s.color = color;
+          s._color = color;
           this.edge_container.addChild(s);
           this.all_edges.push(s);
           this.all_edge_ends.push({ source: source, target: target });
@@ -289,10 +289,10 @@ export default class ForceLayout {
       this.app.stage.addChild(this.edge_container);
       this.app.stage.addChild(sprites);
     }
-  };
+  }
 
   dragstarted() {
-    if (selectionScript === 'drag_pan_zoom') {
+    if (selectionScript.selection_mode === 'drag_pan_zoom') {
       let dim = document.getElementById('svg_graph').getBoundingClientRect();
       let x = d3.event.sourceEvent.clientX - dim.left;
       let y = d3.event.sourceEvent.clientY - dim.top;
@@ -462,14 +462,14 @@ export default class ForceLayout {
     }
     this.adjust_edges();
     this.stashed_coordinates = this.stashed_coordinates.slice(0, this.stashed_coordinates.length - 1);
-  };
+  }
 
   move_node = (i, x, y) => {
     this.all_nodes[i].x = x;
     this.all_nodes[i].y = y;
     this.all_outlines[i].x = x;
     this.all_outlines[i].y = y;
-  };
+  }
 
   adjust_edges = () => {
     for (let i in this.all_edges) {
@@ -479,7 +479,7 @@ export default class ForceLayout {
       this.all_edges[i].y2 = this.all_nodes[this.all_edge_ends[i].target].y;
       this.all_edges[i].updatePosition();
     }
-  };
+  }
 
   animation = () => {
     // check if animation exists. if so, hide sprites and load it
@@ -554,7 +554,7 @@ export default class ForceLayout {
         this.sprites.visible = true;
         this.edge_container.visible = true;
       });
-  };
+  }
 
   blend_edges = () => {
     this.edge_container.alpha = 0;
@@ -572,7 +572,7 @@ export default class ForceLayout {
     }
 
     next_frame(-1, 0, 0.5, 10);
-  };
+  }
 
   toggleForce = () => {
     if (this.force_on === 1) {
@@ -588,25 +588,29 @@ export default class ForceLayout {
         .select('button')
         .text('Pause');
       this.force_on = 1;
-      this.force.resume();
+      if (this.force) {
+        this.force = d3.forceSimulation();
+      }
+      this.force.tick();
     }
-  };
+  }
 
   hideAccessories = () => {
     d3.selectAll('.other_frills').style('visibility', 'hidden');
     d3.selectAll('.selection_option').style('visibility', 'hidden');
     d3.selectAll('.colorbar_item').style('visibility', 'hidden');
     d3.select('svg').style('background-color', 'white');
-  };
+  }
 
   showAccessories = () => {
     d3.selectAll('.other_frills').style('visibility', 'visible');
     d3.selectAll('.selection_option').style('visibility', 'visible');
     d3.selectAll('.colorbar_item').style('visibility', 'visible');
     d3.select('svg').style('background-color', '#D6D6D6');
-  };
+  }
 
   downloadSelection = () => {
+    let name = window.location.search;
     let cell_filter_filename = window.location.search.slice(1, name.length) + '/cell_filter.txt';
     d3.text(cell_filter_filename).then(cellText => {
       let cell_nums = cellText.split('\n');
@@ -618,7 +622,7 @@ export default class ForceLayout {
       }
       downloadFile(text, 'selected_cells.txt');
     });
-  };
+  }
 
   downloadCoordinates = () => {
     let text = '';
@@ -626,7 +630,7 @@ export default class ForceLayout {
       text += i.toString() + ',' + this.all_nodes[i].x.toString() + ',' + this.all_nodes[i].y.toString() + '\n';
     }
     downloadFile(text, 'coordinates.txt');
-  };
+  }
 
   initiateButtons = () => {
     d3.select('#help').on('click', () => {
@@ -724,24 +728,24 @@ export default class ForceLayout {
     d3.select('#run_clustering').on('click', () => run_clustering());
     d3.select('#show_PAGA_popup').on('click', () => paga.show_PAGA_popup());
     d3.select('#toggle_legend_hover_tooltip_button').on('click', () => colorBar.toggle_legend_hover_tooltip());
-  };
-  
+  }
+
   download_png = () => {
     let searchPaths = window.location.search.split('/');
     const path = searchPaths[searchPaths.length - 2] + '_' + searchPaths[searchPaths.length - 1] + '.png';
     this.download_sprite_as_png(this.app.renderer, this.app.stage, path);
-  };
+  }
 
   download_sprite_as_png = (renderer, sprite, fileName) => {
     renderer.extract.canvas(sprite).toBlob(b => {
       let a = document.createElement('a');
-      document.body.append(a);
+      document.body.appendChild(a);
       a.download = fileName;
       a.href = URL.createObjectURL(b);
       a.click();
       a.remove();
     }, 'image/png');
-  };
+  }
 
   showToolsDropdown() {
     if (d3.select('#tools_dropdown').style('height') === 'auto') {
@@ -775,7 +779,6 @@ export default class ForceLayout {
 
   closeDropdown() {
     let dropdowns = document.getElementsByClassName('dropdown-content');
-    let i;
     for (let i = 0; i < dropdowns.length; i++) {
       let openDropdown = dropdowns[i];
       if (openDropdown.classList.contains('show')) {
@@ -937,5 +940,5 @@ export default class ForceLayout {
         url: 'cgi-bin/save_data.py',
       });
     }
-  };
+  }
 }
