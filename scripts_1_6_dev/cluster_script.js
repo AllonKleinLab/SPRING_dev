@@ -24,7 +24,7 @@ export default class Cluster {
     }
   }
 
-  constructor(project_directory) {
+  constructor() {
     this.spectrum_dropdown = false;
     this.explain_dropdown = false;
 
@@ -43,7 +43,7 @@ export default class Cluster {
         .on('end', this.cluster_box_dragended),
     );
 
-    d3.select('#cluster_view_button').on('click', function() {
+    d3.select('#cluster_view_button').on('click', () => {
       this.current_clus_name = 'Cluster' + document.getElementById('enter_cluster_number').value;
       let N = parseInt(document.getElementById('enter_cluster_number').value, 10);
       let Nmax = Object.keys(this.clustering_data.clusters).length;
@@ -57,7 +57,7 @@ export default class Cluster {
       }
     });
 
-    d3.select('#cluster_apply_button').on('click', function() {
+    d3.select('#cluster_apply_button').on('click', () => {
       this.current_clus_name = 'Cluster' + document.getElementById('enter_cluster_number').value;
       let N = parseInt(document.getElementById('enter_cluster_number').value, 10);
       let Nmax = Object.keys(this.clustering_data.clusters).length;
@@ -101,9 +101,9 @@ export default class Cluster {
     d3.select('#update_cluster_labels_box').call(
       d3
         .drag()
-        .on('start', this.update_cluster_labels_box_dragstarted)
-        .on('drag', this.update_cluster_labels_box_dragged)
-        .on('end', this.update_cluster_labels_box_dragended),
+        .on('start', () => this.update_cluster_labels_box_dragstarted())
+        .on('drag', () => this.update_cluster_labels_box_dragged())
+        .on('end', () => this.update_cluster_labels_box_dragended()),
     );
   }
   // <-- Cluster Constructor End -->

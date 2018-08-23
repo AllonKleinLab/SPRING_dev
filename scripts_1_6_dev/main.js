@@ -3,25 +3,29 @@ import * as d3 from 'd3';
 import CloneViewer from './clone_viewer.js';
 import Cluster from './cluster_script.js';
 import ColorBar from './colorBar';
+import DoubletDetector from './doublet_detector.js';
+import DownloadSelectedExpr from './downloadSelectedExpr_script.js';
 import ForceLayout from './forceLayout_script.js';
 import PAGA from './PAGA_viewer.js';
 import SelectionScript from './selection_script.js';
 import SpringPlot from './make_new_SPRINGplot_script.js';
+import SelectionLogic from './selection_logic.js';
+import SmoothingImputation from './smoothing_imputation.js';
 import StickyNote from './stickyNote.js';
 
 import { colorpicker_setup } from './colorpicker_layout.js';
-import { doublet_setup } from './doublet_detector.js';
-import { downloadSelectedExpr_setup } from './downloadSelectedExpr_script.js';
-import { imputation_setup } from './smoothing_imputation.js';
-import { selection_logic_setup } from './selection_logic.js';
 import { settings_setup, collapse_settings } from './settings_script.js';
 
 export let cloneViewer;
 export let cluster;
 export let colorBar;
+export let doubletDetector;
+export let downloadSelectedExpr;
 export let forceLayout;
 export let paga;
 export let selectionScript;
+export let selectionLogic;
+export let smoothingImputation;
 export let springPlot;
 export let stickyNote;
 
@@ -60,11 +64,11 @@ const callback = async () => {
   forceLayout.setup_layout_dropdown();
 
   springPlot = SpringPlot.create();
-  downloadSelectedExpr_setup();
+  downloadSelectedExpr = DownloadSelectedExpr.create();
 
-  imputation_setup();
-  doublet_setup();
-  selection_logic_setup();
+  smoothingImputation = SmoothingImputation.create();
+  doubletDetector = DoubletDetector.create();
+  selectionLogic = SelectionLogic.create();
   colorpicker_setup();
   paga = await PAGA.create();
 

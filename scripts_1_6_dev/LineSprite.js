@@ -17,6 +17,7 @@ export class LineSprite extends PIXI.Sprite {
     this.updatePosition();
     this.anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5);
   };
+  // <-- LineSprite Constructor End -->
 
   static initCanvas () {
     LineSprite.canvas = document.createElement("canvas");

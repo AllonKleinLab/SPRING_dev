@@ -546,6 +546,7 @@ export default class ColorBar {
 
     return this;
   }
+  // <-- ColorBar Constructor End -->
 
   async loadData() {
     // open json file containing gene sets and populate drop down menu

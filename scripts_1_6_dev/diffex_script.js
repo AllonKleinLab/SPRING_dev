@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+
 import { colorBar } from './main';
 
 export const diffex_setup = (project_directory) => {
@@ -207,10 +208,7 @@ export const diffex_setup = (project_directory) => {
       .attr('class', 'main');
 
     // draw the x axis
-    scatter_xAxis = d3.svg
-      .axis()
-      .scale(scatter_x)
-      .orient('bottom');
+    scatter_xAxis = d3.axisBottom(scatter_x);
 
     main
       .append('g')
@@ -229,10 +227,7 @@ export const diffex_setup = (project_directory) => {
       .text('Negative selection (blue)');
 
     // draw the y axis
-    scatter_yAxis = d3.svg
-      .axis()
-      .scale(scatter_y)
-      .orient('left');
+    scatter_yAxis = d3.axisLeft(scatter_y);
 
     main
       .append('g')

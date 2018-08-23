@@ -1,61 +1,85 @@
 import * as d3 from 'd3';
 import { forceLayout, colorBar, cloneViewer, graph_directory, sub_directory } from './main';
 
-export const imputation_setup =  () => {
-  let popup = d3
-    .select('#force_layout')
-    .append('div')
-    .attr('id', 'imputation_popup');
+export default class SmoothingImputation {
+  static _instance;
 
-  let button_bar = popup
-    .append('div')
-    .attr('id', 'imputation_button_bar')
-    .on('mousedown', function() {
-      d3.event.stopPropagation();
-    });
+  static get instance() {
+    if (!this._instance) {
+      throw new Error('You must first call SmoothingImputation.create()!');
+    }
+    return this._instance;
+  }
 
-  button_bar
-    .append('label')
-    .text('N = ')
-    .append('input')
-    .attr('id', 'imputation_N_input')
-    .property('value', 10);
-  button_bar
-    .append('label')
-    .text('\u03B2 = ')
-    .append('input')
-    .attr('id', 'imputation_beta_input')
-    .property('value', 0.1);
-  button_bar
-    .append('button')
-    .text('Restore')
-    .on('click', restore_colors);
-  button_bar
-    .append('button')
-    .text('Smooth')
-    .on('click', perform_smoothing);
-  button_bar
-    .append('button')
-    .text('Close')
-    .on('click', hide_imputation_popup);
+  static async create() {
+    if (!this._instance) {
+      this._instance = new SmoothingImputation();
+      return this._instance;
+    } else {
+      throw new Error(
+        'SmoothingImputation.create() has already been called, get the existing instance with SmoothingImputation.instance!',
+      );
+    }
+  }
 
-  let text_box = popup
-    .append('div')
-    .attr('id', 'imputation_description')
-    .append('text')
-    .text('Smooth gene expression on the graph. Increase N or decrease 	\u03B2 to enhance the degree of smoothing.');
+  constructor() {
+    this.popup = d3
+      .select('#force_layout')
+      .append('div')
+      .attr('id', 'imputation_popup');
 
-  d3.select('#imputation_popup').call(
-    d3.drag()
-      .on('start', imputation_popup_dragstarted)
-      .on('drag', imputation_popup_dragged)
-      .on('end', imputation_popup_dragended),
-  );
+    this.button_bar = this.popup
+      .append('div')
+      .attr('id', 'imputation_button_bar')
+      .on('mousedown', function() {
+        d3.event.stopPropagation();
+      });
 
-  function imputation_popup_dragstarted() {
+    this.button_bar
+      .append('label')
+      .text('N = ')
+      .append('input')
+      .attr('id', 'imputation_N_input')
+      .property('value', 10);
+    this.button_bar
+      .append('label')
+      .text('\u03B2 = ')
+      .append('input')
+      .attr('id', 'imputation_beta_input')
+      .property('value', 0.1);
+    this.button_bar
+      .append('button')
+      .text('Restore')
+      .on('click', this.restore_colors);
+    this.button_bar
+      .append('button')
+      .text('Smooth')
+      .on('click', this.perform_smoothing);
+    this.button_bar
+      .append('button')
+      .text('Close')
+      .on('click', this.hide_imputation_popup);
+
+    this.text_box = this.popup
+      .append('div')
+      .attr('id', 'imputation_description')
+      .append('text')
+      .text('Smooth gene expression on the graph. Increase N or decrease 	\u03B2 to enhance the degree of smoothing.');
+
+    d3.select('#imputation_popup').call(
+      d3
+        .drag()
+        .on('start', () => this.imputation_popup_dragstarted())
+        .on('drag', () => this.imputation_popup_dragged())
+        .on('end', () => this.imputation_popup_dragended()),
+    );
+  }
+  // <-- SmoothingImputation Constructor End -->
+
+  imputation_popup_dragstarted() {
     d3.event.sourceEvent.stopPropagation();
   }
-  function imputation_popup_dragged() {
+  imputation_popup_dragged() {
     let cx = parseFloat(
       d3
         .select('#imputation_popup')
@@ -71,12 +95,13 @@ export const imputation_setup =  () => {
     d3.select('#imputation_popup').style('left', (cx + d3.event.dx).toString() + 'px');
     d3.select('#imputation_popup').style('top', (cy + d3.event.dy).toString() + 'px');
   }
-  function imputation_popup_dragended() {
+
+  imputation_popup_dragended() {
     return;
   }
 
-  function show_waiting_wheel() {
-    popup.append('div').attr('id', 'wheel_mask');
+  show_waiting_wheel() {
+    this.popup.append('div').attr('id', 'wheel_mask');
     let opts = {
       className: 'spinner', // The CSS class to assign to the spinner
       color: '#000', // #rgb or #rrggbb or array of colors
@@ -104,16 +129,16 @@ export const imputation_setup =  () => {
     $(target).data('spinner', spinner);
   }
 
-  function restore_colors() {
+  restore_colors() {
     colorBar.setNodeColors();
   }
 
-  function hide_waiting_wheel() {
+  hide_waiting_wheel() {
     $('.spinner').remove();
     $('#wheel_mask').remove();
   }
 
-  function perform_smoothing() {
+  perform_smoothing() {
     if (true) {
       let t0 = new Date();
       //update_slider();
@@ -145,7 +170,7 @@ export const imputation_setup =  () => {
       all_b = all_b.slice(1, all_b.length);
       sel = '#' + sel.slice(1, sel.length);
 
-      show_waiting_wheel();
+      this.show_waiting_wheel();
       console.log(sel);
       $.ajax({
         data: {
@@ -168,7 +193,7 @@ export const imputation_setup =  () => {
 
           let current_min = 0;
           let current_max = 0;
-          
+
           if (document.getElementById('channels_button').checked) {
             current_min = 0;
             current_max = parseFloat(d3.max(forceLayout.green_array));
@@ -193,19 +218,30 @@ export const imputation_setup =  () => {
 
           if (sel_nodes.length === 0) {
             for (let i = 0; i < forceLayout.all_nodes.length; i++) {
-              forceLayout.base_colors[i] = { r: Math.floor(reds[i]), g: Math.floor(greens[i]), b: Math.floor(blues[i]) };
+              forceLayout.base_colors[i] = {
+                r: Math.floor(reds[i]),
+                g: Math.floor(greens[i]),
+                b: Math.floor(blues[i]),
+              };
             }
           } else {
             for (let i = 0; i < sel_nodes.length; i++) {
-              forceLayout.base_colors[sel_nodes[i]] = { r: Math.floor(reds[i]), g: Math.floor(greens[i]), b: Math.floor(blues[i]) };
+              forceLayout.base_colors[sel_nodes[i]] = {
+                r: Math.floor(reds[i]),
+                g: Math.floor(greens[i]),
+                b: Math.floor(blues[i]),
+              };
             }
           }
 
           colorBar.updateColorMax();
-          hide_waiting_wheel();
+          this.hide_waiting_wheel();
 
           forceLayout.app.stage.children[1].children.sort(function(a, b) {
-            return colorBar.average_color(forceLayout.base_colors[a.index]) - colorBar.average_color(forceLayout.base_colors[b.index]);
+            return (
+              colorBar.average_color(forceLayout.base_colors[a.index]) -
+              colorBar.average_color(forceLayout.base_colors[b.index])
+            );
           });
         },
         type: 'POST',
@@ -213,29 +249,29 @@ export const imputation_setup =  () => {
       });
     }
   }
-}
 
-export const show_imputation_popup = () => {
-  let mywidth = parseInt(
-    d3
-      .select('#imputation_popup')
-      .style('width')
-      .split('px')[0],
-    10,
-  );
-  let svg_width = parseInt(
-    d3
-      .select('svg')
-      .style('width')
-      .split('px')[0],
-    10,
-  );
-  d3.select('#imputation_popup')
-    .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
-    .style('top', '80px')
-    .style('visibility', 'visible');
-}
+  show_imputation_popup() {
+    let mywidth = parseInt(
+      d3
+        .select('#imputation_popup')
+        .style('width')
+        .split('px')[0],
+      10,
+    );
+    let svg_width = parseInt(
+      d3
+        .select('svg')
+        .style('width')
+        .split('px')[0],
+      10,
+    );
+    d3.select('#imputation_popup')
+      .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
+      .style('top', '80px')
+      .style('visibility', 'visible');
+  }
 
-export const hide_imputation_popup = () => {
-  d3.select('#imputation_popup').style('visibility', 'hidden');
+  hide_imputation_popup() {
+    d3.select('#imputation_popup').style('visibility', 'hidden');
+  }
 }

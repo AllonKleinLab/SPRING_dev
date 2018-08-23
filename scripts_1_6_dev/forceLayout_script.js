@@ -1,15 +1,11 @@
 import * as d3 from 'd3';
 
 import { LineSprite } from './LineSprite';
-import { graph_directory, colorBar, cloneViewer, paga, selectionScript } from './main';
+import { graph_directory, colorBar, cloneViewer, paga, selectionLogic, selectionScript, smoothingImputation, springPlot, downloadSelectedExpr } from './main';
 import { SPRITE_IMG_WIDTH, downloadFile, rgbToHex } from './util';
 import { collapse_settings } from './settings_script';
 import { rotation_update } from './rotation_script';
-import { show_downloadSelectedExpr_popup } from './downloadSelectedExpr_script';
-import { show_make_new_SPRINGplot_popup } from './make_new_SPRINGplot_script';
 import { run_clustering } from './cluster2_script';
-import { show_selection_logic_popup } from './selection_logic';
-import { show_imputation_popup } from './smoothing_imputation';
 
 export default class ForceLayout {
   static _instance;
@@ -168,6 +164,7 @@ export default class ForceLayout {
     d3.select('#toggle_edges_layout').on('click', () => this.toggle_edges());
     return this;
   }
+  // <-- ForceLayout Constructor End -->
 
   async loadData() {
     const filePath = this.project_directory + '/' + this.sub_directory + '/mutability.txt';
@@ -714,16 +711,16 @@ export default class ForceLayout {
 
     d3.select('#download_selection').on('click', () => this.downloadSelection());
 
-    d3.select('#show_download__selected_expr_popup').on('click', () => show_downloadSelectedExpr_popup());
+    d3.select('#show_download__selected_expr_popup').on('click', () => downloadSelectedExpr.show_downloadSelectedExpr_popup());
 
-    d3.select('#show_make_new_SPRINGplot_popup').on('click', () => show_make_new_SPRINGplot_popup());
+    d3.select('#show_make_new_SPRINGplot_popup').on('click', () => springPlot.show_make_new_SPRINGplot_popup());
 
     d3.select('#start_clone_viewer').on('click', () => {
       cloneViewer.start_clone_viewer();
     });
-    d3.select('#show_imputation_popup').on('click', () => show_imputation_popup());
-    d3.select('#show_selection_logic_popup').on('click', () => show_selection_logic_popup());
-    d3.select('#show_doublet_popup').on('click', () => show_make_new_SPRINGplot_popup());
+    d3.select('#show_imputation_popup').on('click', () => smoothingImputation.show_imputation_popup());
+    d3.select('#show_selection_logic_popup').on('click', () => selectionLogic.show_selection_logic_popup());
+    d3.select('#show_doublet_popup').on('click', () => springPlot.show_make_new_SPRINGplot_popup());
     d3.select('#run_clustering').on('click', () => run_clustering());
     d3.select('#show_PAGA_popup').on('click', () => paga.show_PAGA_popup());
     d3.select('#toggle_legend_hover_tooltip_button').on('click', () => colorBar.toggle_legend_hover_tooltip());

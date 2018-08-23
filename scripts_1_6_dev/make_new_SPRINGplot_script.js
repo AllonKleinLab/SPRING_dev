@@ -278,6 +278,7 @@ export default class SpringPlot {
         .on('end', () => this.make_new_SPRINGplot_popup_dragended()),
     );
   }
+  // <-- SpringPlot Constructor End -->
 
   make_new_SPRINGplot_popup_dragstarted() {
     d3.event.sourceEvent.stopPropagation();

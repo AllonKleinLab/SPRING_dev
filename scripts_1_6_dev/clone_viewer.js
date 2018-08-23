@@ -250,6 +250,7 @@ export default class CloneViewer {
 
     return this;
   }
+  // <-- CloneViewer Constructor End -->
 
   async loadData() {
     this.clone_map = {};

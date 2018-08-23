@@ -124,6 +124,7 @@ export default class PAGA {
 
     this.noCache = new Date().getTime();
   }
+  // <-- PAGA Constructor End -->
 
   async loadData() {
     try {

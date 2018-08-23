@@ -2,74 +2,106 @@ import * as d3 from 'd3';
 
 import { colorBar, forceLayout, selectionScript } from './main';
 
-export const selection_logic_setup = () => {
-  let selection_data = {};
+export default class SelectionLogic {
+  static _instance;
 
-  let popup = d3
-    .select('#force_layout')
-    .append('div')
-    .attr('id', 'selection_logic_popup');
+  static get instance() {
+    if (!this._instance) {
+      throw new Error('You must first call SelectionLogic.create()!');
+    }
+    return this._instance;
+  }
 
-  let add_new_bar = popup
-    .append('div')
-    .attr('id', 'selection_logic_add_new_bar')
-    .on('mousedown', function() {
-      d3.event.stopPropagation();
-    });
+  static async create() {
+    if (!this._instance) {
+      this._instance = new SelectionLogic();
+      return this._instance;
+    } else {
+      throw new Error(
+        'SelectionLogic.create() has already been called, get the existing instance with SelectionLogic.instance!',
+      );
+    }
+  }
 
-  add_new_bar
-    .append('label')
-    .text('Selection name ')
-    .append('input')
-    .attr('id', 'selection_logic_input');
-  add_new_bar
-    .append('button')
-    .text('Close')
-    .on('click', hide_selection_logic_popup);
-  add_new_bar
-    .append('button')
-    .text('Clear')
-    .on('click', clear_options);
-  add_new_bar
-    .append('button')
-    .text('Add')
-    .on('click', add_selection);
+  constructor() {
+    this.selection_data = {};
 
-  let andor_bar = popup.append('div').attr('id', 'selection_logic_andor_bar');
-  let left_dropdown = andor_bar.append('select').style('margin-right', '20px');
-  andor_bar
-    .append('button')
-    .text('AND')
-    .style('margin-right', '12px')
-    .on('click', apply_and);
-  andor_bar
-    .append('button')
-    .text('OR')
-    .on('click', apply_or);
-  let right_dropdown = andor_bar.append('select').style('margin-left', '20px');
+    this.popup = d3
+      .select('#force_layout')
+      .append('div')
+      .attr('id', 'selection_logic_popup');
 
-  left_dropdown.append('option').text('Current selection');
-  right_dropdown.append('option').text('Current selection');
+      this.add_new_bar =this.popup
+      .append('div')
+      .attr('id', 'selection_logic_add_new_bar')
+      .on('mousedown', function() {
+        d3.event.stopPropagation();
+      });
 
-  function get_selections() {
-    let left_name = left_dropdown.property('value');
-    let right_name = right_dropdown.property('value');
+      this.add_new_bar
+      .append('label')
+      .text('Selection name ')
+      .append('input')
+      .attr('id', 'selection_logic_input');
+      this.add_new_bar
+      .append('button')
+      .text('Close')
+      .on('click', this.hide_selection_logic_popup);
+      this.add_new_bar
+      .append('button')
+      .text('Clear')
+      .on('click', () => this.clear_options());
+      this.add_new_bar
+      .append('button')
+      .text('Add')
+      .on('click', () => this.add_selection());
+
+      this.andor_bar = this.popup.append('div').attr('id', 'selection_logic_andor_bar');
+      this.left_dropdown = this.andor_bar.append('select').style('margin-right', '20px');
+      this.andor_bar
+      .append('button')
+      .text('AND')
+      .style('margin-right', '12px')
+      .on('click', () => this.apply_and);
+      this.andor_bar
+      .append('button')
+      .text('OR')
+      .on('click', () => this.apply_or);
+
+      this.right_dropdown = this.andor_bar.append('select').style('margin-left', '20px');
+
+    this.left_dropdown.append('option').text('Current selection');
+    this.right_dropdown.append('option').text('Current selection');
+
+    d3.select('#selection_logic_popup').call(
+      d3
+        .drag()
+        .on('start', () => this.selection_logic_popup_dragstarted())
+        .on('drag', () => this.selection_logic_popup_dragged())
+        .on('end', () => this.selection_logic_popup_dragended()),
+    );
+  }
+  // <-- SelectionLogic Constructor End -->
+
+  get_selections() {
+    let left_name = this.left_dropdown.property('value');
+    let right_name = this.right_dropdown.property('value');
     let left_sel = [];
     if (left_name === 'Current selection') {
-      left_sel = get_selected_cells();
+      left_sel = this.get_selected_cells();
     } else {
-      left_sel = selection_data[left_name];
+      left_sel = this.selection_data[left_name];
     }
     let right_sel = [];
     if (right_name === 'Current selection') {
-      right_sel = get_selected_cells();
+      right_sel = this.get_selected_cells();
     } else {
-      right_sel = selection_data[right_name];
+      right_sel = this.selection_data[right_name];
     }
     return [left_sel, right_sel];
   }
 
-  function union_arrays(x, y) {
+  union_arrays(x, y) {
     let obj = {};
     for (let i = x.length - 1; i >= 0; --i) {
       obj[x[i]] = x[i];
@@ -87,21 +119,22 @@ export const selection_logic_setup = () => {
     return res;
   }
 
-  function apply_or() {
-    let sels = get_selections();
-    let new_sel = union_arrays(sels[0], sels[1]);
-    set_selections(new_sel);
+  apply_or() {
+    let sels = this.get_selections();
+    let new_sel = this.union_arrays(sels[0], sels[1]);
+    this.set_selections(new_sel);
+    this.get_selections();
   }
 
-  function apply_and() {
-    let sels = get_selections();
+  apply_and() {
+    let sels = this.get_selections();
     let new_sel = sels[0].filter(function(n) {
       return sels[1].indexOf(n) !== -1;
     });
-    set_selections(new_sel);
+    this.set_selections(new_sel);
   }
 
-  function set_selections(sel) {
+  set_selections(sel) {
     for (let i = 0; i < forceLayout.all_outlines.length; i++) {
       forceLayout.all_outlines[i].selected = false;
       forceLayout.all_outlines[i].alpha = 0;
@@ -115,29 +148,29 @@ export const selection_logic_setup = () => {
     colorBar.count_clusters(forceLayout.all_nodes);
   }
 
-  function clear_options() {
-    left_dropdown.selectAll('option').remove();
-    left_dropdown.append('option').text('Current selection');
-    right_dropdown.selectAll('option').remove();
-    right_dropdown.append('option').text('Current selection');
-    selection_data = {};
+  clear_options() {
+    this.left_dropdown.selectAll('option').remove();
+    this.left_dropdown.append('option').text('Current selection');
+    this.right_dropdown.selectAll('option').remove();
+    this.right_dropdown.append('option').text('Current selection');
+    this.selection_data = {};
   }
 
-  function add_selection() {
+  add_selection() {
     let name = $('#selection_logic_input').val();
     $('#selection_logic_input').val('');
-    left_dropdown
+    this.left_dropdown
       .append('option')
       .text(name.toString())
       .attr('selected', 'selected');
-    right_dropdown
+      this.right_dropdown
       .append('option')
       .text(name.toString())
       .attr('selected', 'selected');
-    selection_data[name.toString()] = get_selected_cells();
+      this.selection_data[name.toString()] = this.get_selected_cells();
   }
 
-  function get_selected_cells() {
+  get_selected_cells() {
     let sel = [];
     for (let i = 0; i < forceLayout.all_outlines.length; i++) {
       if (forceLayout.all_outlines[i].selected) {
@@ -147,10 +180,11 @@ export const selection_logic_setup = () => {
     return sel;
   }
 
-  function selection_logic_popup_dragstarted() {
+  selection_logic_popup_dragstarted() {
     d3.event.sourceEvent.stopPropagation();
   }
-  function selection_logic_popup_dragged() {
+
+  selection_logic_popup_dragged() {
     let cx = parseFloat(
       d3
         .select('#selection_logic_popup')
@@ -166,39 +200,33 @@ export const selection_logic_setup = () => {
     d3.select('#selection_logic_popup').style('left', (cx + d3.event.dx).toString() + 'px');
     d3.select('#selection_logic_popup').style('top', (cy + d3.event.dy).toString() + 'px');
   }
-  function selection_logic_popup_dragended() {
+
+  selection_logic_popup_dragended() {
     return;
   }
 
-  d3.select('#selection_logic_popup').call(
-    d3.drag()
-      .on('start', selection_logic_popup_dragstarted)
-      .on('drag', selection_logic_popup_dragged)
-      .on('end', selection_logic_popup_dragended),
-  );
-}
+  show_selection_logic_popup() {
+    let mywidth = parseInt(
+      d3
+        .select('#selection_logic_popup')
+        .style('width')
+        .split('px')[0],
+      10,
+    );
+    let svg_width = parseInt(
+      d3
+        .select('svg')
+        .style('width')
+        .split('px')[0],
+      10,
+    );
+    d3.select('#selection_logic_popup')
+      .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
+      .style('top', '220px')
+      .style('visibility', 'visible');
+  }
 
-export const show_selection_logic_popup = () => {
-  let mywidth = parseInt(
-    d3
-      .select('#selection_logic_popup')
-      .style('width')
-      .split('px')[0],
-    10,
-  );
-  let svg_width = parseInt(
-    d3
-      .select('svg')
-      .style('width')
-      .split('px')[0],
-    10,
-  );
-  d3.select('#selection_logic_popup')
-    .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
-    .style('top', '220px')
-    .style('visibility', 'visible');
-}
-
-export const hide_selection_logic_popup = () => {
-  d3.select('#selection_logic_popup').style('visibility', 'hidden');
+  hide_selection_logic_popup() {
+    d3.select('#selection_logic_popup').style('visibility', 'hidden');
+  }
 }

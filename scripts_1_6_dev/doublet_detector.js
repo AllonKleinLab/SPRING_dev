@@ -2,75 +2,99 @@ import * as d3 from 'd3';
 import { colorBar, forceLayout, graph_directory, sub_directory, cloneViewer } from './main';
 import { read_csv } from './util';
 
-export const doublet_setup = () => {
-  let popup = d3
-    .select('#force_layout')
-    .append('div')
-    .attr('id', 'doublet_popup');
+export default class DoubletDetector {
+  static _instance;
 
-  let button_bar = popup
-    .append('div')
-    .attr('id', 'doublet_button_bar')
-    .on('mousedown', function() {
-      d3.event.stopPropagation();
-    });
+  static get instance() {
+    if (!this._instance) {
+      throw new Error('You must first call DoubletDetector.create()!');
+    }
+    return this._instance;
+  }
 
-  button_bar
-    .append('label')
-    .text('k = ')
-    .append('input')
-    .attr('id', 'doublet_k_input')
-    .property('value', 50);
-  button_bar
-    .append('label')
-    .text('r = ')
-    .append('input')
-    .attr('id', 'doublet_r_input')
-    .property('value', 2);
-  button_bar
-    .append('button')
-    .text('Run')
-    .on('click', run_doublet_detector);
-  button_bar
-    .append('button')
-    .text('Close')
-    .on('click', hide_doublet_popup);
+  static async create() {
+    if (!this._instance) {
+      this._instance = new DoubletDetector();
+      return this._instance;
+    } else {
+      throw new Error(
+        'DoubletDetector.create() has already been called, get the existing instance with DoubletDetector.instance!',
+      );
+    }
+  }
 
-  let text_box = popup
-    .append('div')
-    .attr('id', 'doublet_description')
-    .append('text')
-    .text(
-      'Predict mixed-celltype doublets. Uses a kNN classifier to find cells that look like simulated doublets. k sets the number neighbors used in the classifier, and r is the ratio of simulated doublets to observed cells.',
+  constructor() {
+    this.popup = d3
+      .select('#force_layout')
+      .append('div')
+      .attr('id', 'doublet_popup');
+
+    this.button_bar = this.popup
+      .append('div')
+      .attr('id', 'doublet_button_bar')
+      .on('mousedown', function() {
+        d3.event.stopPropagation();
+      });
+
+    this.button_bar
+      .append('label')
+      .text('k = ')
+      .append('input')
+      .attr('id', 'doublet_k_input')
+      .property('value', 50);
+    this.button_bar
+      .append('label')
+      .text('r = ')
+      .append('input')
+      .attr('id', 'doublet_r_input')
+      .property('value', 2);
+    this.button_bar
+      .append('button')
+      .text('Run')
+      .on('click', this.run_doublet_detector);
+    this.button_bar
+      .append('button')
+      .text('Close')
+      .on('click', this.hide_doublet_popup);
+
+    this.text_box = this.popup
+      .append('div')
+      .attr('id', 'doublet_description')
+      .append('text')
+      .text(
+        'Predict mixed-celltype doublets. Uses a kNN classifier to find cells that look like simulated doublets. k sets the number neighbors used in the classifier, and r is the ratio of simulated doublets to observed cells.',
+      );
+
+    this.doublet_notify_popup = d3
+      .select('#force_layout')
+      .append('div')
+      .attr('id', 'doublet_notification')
+      .style('visibility', 'hidden');
+    this.doublet_notify_popup
+      .append('div')
+      .attr('id', 'doublet_notify_text')
+      .append('text')
+      .text('Doublet detector finished! See custom colors menu.');
+
+    this.doublet_notify_popup
+      .append('button')
+      .text('Close')
+      .on('mousedown', () => this.hide_doublet_notification());
+
+    d3.select('#doublet_popup').call(
+      d3
+        .drag()
+        .on('start', () => this.doublet_popup_dragstarted())
+        .on('drag', () => this.doublet_popup_dragged())
+        .on('end', () => this.doublet_popup_dragended()),
     );
+  }
+  // <-- DoubletDetector Constructor End -->
 
-  let doublet_notify_popup = d3
-    .select('#force_layout')
-    .append('div')
-    .attr('id', 'doublet_notification')
-    .style('visibility', 'hidden');
-  doublet_notify_popup
-    .append('div')
-    .attr('id', 'doublet_notify_text')
-    .append('text')
-    .text('Doublet detector finished! See custom colors menu.');
-
-  doublet_notify_popup
-    .append('button')
-    .text('Close')
-    .on('mousedown', hide_doublet_notification);
-
-  d3.select('#doublet_popup').call(
-    d3.drag()
-      .on('start', doublet_popup_dragstarted)
-      .on('drag', doublet_popup_dragged)
-      .on('end', doublet_popup_dragended),
-  );
-
-  function doublet_popup_dragstarted() {
+  doublet_popup_dragstarted() {
     d3.event.sourceEvent.stopPropagation();
   }
-  function doublet_popup_dragged() {
+  doublet_popup_dragged() {
     let cx = parseFloat(
       d3
         .select('#doublet_popup')
@@ -86,7 +110,8 @@ export const doublet_setup = () => {
     d3.select('#doublet_popup').style('left', (cx + d3.event.dx).toString() + 'px');
     d3.select('#doublet_popup').style('top', (cy + d3.event.dy).toString() + 'px');
   }
-  function doublet_popup_dragended() {
+
+  doublet_popup_dragended() {
     return;
   }
 
@@ -170,7 +195,8 @@ export const doublet_setup = () => {
   // 	//d3.select("#doublet_notification").transition(1500).style('visibility','hidden');
   // }
 
-  function run_doublet_detector() {
+  // <-- DoubletDetector Constructor End -->
+  run_doublet_detector() {
     if (forceLayout.mutable) {
       let t0 = new Date();
       let k = $('#doublet_k_input').val();
@@ -182,8 +208,8 @@ export const doublet_setup = () => {
       d3.select('#doublet_notification')
         .select('text')
         .text('Running doublet detector... you will be notified upon completion.');
-      show_doublet_notification();
-      hide_doublet_popup();
+      this.show_doublet_notification();
+      this.hide_doublet_popup();
 
       console.log(k, r);
       $.ajax({
@@ -194,7 +220,7 @@ export const doublet_setup = () => {
           d3.select('#doublet_notification')
             .select('text')
             .text('Doublet detector finished! See Custom Colors menu.');
-          show_doublet_notification();
+          this.show_doublet_notification();
           if (d3.select('#clone_viewer_popup').style('visibility') === 'visible') {
             $('#clone_viewer_popup').remove();
             for (let i = 0; i < forceLayout.all_outlines.length; i++) {
@@ -235,49 +261,14 @@ export const doublet_setup = () => {
       d3.select('#doublet_notification')
         .select('text')
         .text('Sorry, this dataset cannot be edited.');
-      show_doublet_notification();
+      this.show_doublet_notification();
     }
   }
-}
 
-function show_doublet_notification() {
-  let mywidth = parseInt(
-    d3
-      .select('#doublet_notification')
-      .style('width')
-      .split('px')[0],
-    10,
-  );
-  let svg_width = parseInt(
-    d3
-      .select('svg')
-      .style('width')
-      .split('px')[0],
-    10,
-  );
-
-  d3.select('#doublet_notification')
-    .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
-    .style('top', '0px')
-    .style('opacity', 0.0)
-    .style('visibility', 'visible')
-    .transition()
-    .duration(500)
-    .style('opacity', 1.0);
-}
-
-export const  hide_doublet_notification = () => {
-  console.log('hide');
-  d3.select('#doublet_notification')
-    .style('opacity', 0.0)
-    .style('visibility', 'hidden');
-}
-
-export const show_doublet_popup = () => {
-  if (forceLayout.mutable) {
+  show_doublet_notification() {
     let mywidth = parseInt(
       d3
-        .select('#doublet_popup')
+        .select('#doublet_notification')
         .style('width')
         .split('px')[0],
       10,
@@ -289,18 +280,53 @@ export const show_doublet_popup = () => {
         .split('px')[0],
       10,
     );
-    d3.select('#doublet_popup')
-      .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
-      .style('top', '80px')
-      .style('visibility', 'visible');
-  } else {
-    d3.select('#doublet_notification')
-      .select('text')
-      .text('Sorry, this dataset cannot be edited.');
-    show_doublet_notification();
-  }
-}
 
-export const hide_doublet_popup = () => {
-  d3.select('#doublet_popup').style('visibility', 'hidden');
+    d3.select('#doublet_notification')
+      .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
+      .style('top', '0px')
+      .style('opacity', 0.0)
+      .style('visibility', 'visible')
+      .transition()
+      .duration(500)
+      .style('opacity', 1.0);
+  }
+
+  hide_doublet_notification() {
+    console.log('hide');
+    d3.select('#doublet_notification')
+      .style('opacity', 0.0)
+      .style('visibility', 'hidden');
+  }
+
+  show_doublet_popup() {
+    if (forceLayout.mutable) {
+      let mywidth = parseInt(
+        d3
+          .select('#doublet_popup')
+          .style('width')
+          .split('px')[0],
+        10,
+      );
+      let svg_width = parseInt(
+        d3
+          .select('svg')
+          .style('width')
+          .split('px')[0],
+        10,
+      );
+      d3.select('#doublet_popup')
+        .style('left', (svg_width / 2 - mywidth / 2).toString() + 'px')
+        .style('top', '80px')
+        .style('visibility', 'visible');
+    } else {
+      d3.select('#doublet_notification')
+        .select('text')
+        .text('Sorry, this dataset cannot be edited.');
+      this.show_doublet_notification();
+    }
+  }
+
+  hide_doublet_popup() {
+    d3.select('#doublet_popup').style('visibility', 'hidden');
+  }
 }

@@ -105,6 +105,7 @@ export default class StickyNote {
 
     return this;
   }
+  // <-- StickyNote Constructor End -->
 
   async loadData() {
     let paths = window.location.search;

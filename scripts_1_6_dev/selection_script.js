@@ -274,6 +274,7 @@ export default class SelectionScript {
       .select('button')
       .on('click', () => this.deselect_all());
   }
+  // <-- SelectionScript Constructor End -->
 
   switch_pos_neg() {
     let pos_cells = [];
