@@ -53,9 +53,9 @@ export const downloadFile = (text, name) => {
     d3
       .select('#sound_toggle')
       .select('img')
-      .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+      .attr('src') === 'src/sound_effects/icon_speaker.svg'
   ) {
-    let snd = new Audio('scripts_1_6_dev/sound_effects/download_sound.wav');
+    let snd = new Audio('src/sound_effects/download_sound.wav');
     snd.play();
   }
   let hiddenElement = document.createElement('a');

@@ -61,9 +61,9 @@ export default class ForceLayout {
       d3
         .select('#sound_toggle')
         .select('img')
-        .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+        .attr('src') === 'src/sound_effects/icon_speaker.svg'
     ) {
-      let snd = new Audio('scripts_1_6_dev/sound_effects/opennew_sound.wav');
+      let snd = new Audio('src/sound_effects/opennew_sound.wav');
       snd.play();
     }
 

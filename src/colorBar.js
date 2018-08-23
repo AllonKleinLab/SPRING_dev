@@ -1025,9 +1025,9 @@ export default class ColorBar {
         d3
           .select('#sound_toggle')
           .select('img')
-          .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+          .attr('src') === 'src/sound_effects/icon_speaker.svg'
       ) {
-        const snd = new Audio('scripts_1_6_dev/sound_effects/openclose_sound.wav');
+        const snd = new Audio('src/sound_effects/openclose_sound.wav');
         snd.play();
       }
       // setNodeColors();
@@ -1059,9 +1059,9 @@ export default class ColorBar {
       d3
         .select('#sound_toggle')
         .select('img')
-        .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+        .attr('src') === 'src/sound_effects/icon_speaker.svg'
     ) {
-      const snd = new Audio('scripts_1_6_dev/sound_effects/openclose_sound.wav');
+      const snd = new Audio('src/sound_effects/openclose_sound.wav');
       snd.play();
     }
     d3.select('#termsheet').style('left', '-200px');
@@ -1083,9 +1083,9 @@ export default class ColorBar {
         d3
           .select('#sound_toggle')
           .select('img')
-          .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+          .attr('src') === 'src/sound_effects/icon_speaker.svg'
       ) {
-        const snd = new Audio('scripts_1_6_dev/sound_effects/openclose_sound.wav');
+        const snd = new Audio('src/sound_effects/openclose_sound.wav');
         snd.play();
       }
       // setNodeColors();
@@ -1117,9 +1117,9 @@ export default class ColorBar {
       d3
         .select('#sound_toggle')
         .select('img')
-        .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+        .attr('src') === 'src/sound_effects/icon_speaker.svg'
     ) {
-      const snd = new Audio('scripts_1_6_dev/sound_effects/openclose_sound.wav');
+      const snd = new Audio('src/sound_effects/openclose_sound.wav');
       snd.play();
     }
     d3.select('#termsheet').style('left', '-200px');
@@ -1356,9 +1356,9 @@ export default class ColorBar {
       d3
         .select('#sound_toggle')
         .select('img')
-        .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+        .attr('src') === 'src/sound_effects/icon_speaker.svg'
     ) {
-      const snd = new Audio('scripts_1_6_dev/sound_effects/download_sound.wav');
+      const snd = new Audio('src/sound_effects/download_sound.wav');
       snd.play();
     }
     const hiddenElement = document.createElement('a');

@@ -14,7 +14,7 @@
     "target": "es6",
   },
   "include": [
-    "./scripts_1_6_dev",
+    "./src",
     "./spring.d.ts"
   ],
   "exclude": [

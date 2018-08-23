@@ -54,21 +54,21 @@ export let stickyNote;
 
 d3.select('#sound_toggle')
   .append('img')
-  .attr('src', 'scripts_1_6_dev/sound_effects/icon_mute.svg')
+  .attr('src', 'src/sound_effects/icon_mute.svg')
   .on('click', function() {
     if (
       d3
         .select('#sound_toggle')
         .select('img')
-        .attr('src') === 'scripts_1_6_dev/sound_effects/icon_speaker.svg'
+        .attr('src') === 'src/sound_effects/icon_speaker.svg'
     ) {
       d3.select('#sound_toggle')
         .select('img')
-        .attr('src', 'scripts_1_6_dev/sound_effects/icon_mute.svg');
+        .attr('src', 'src/sound_effects/icon_mute.svg');
     } else {
       d3.select('#sound_toggle')
         .select('img')
-        .attr('src', 'scripts_1_6_dev/sound_effects/icon_speaker.svg');
+        .attr('src', 'src/sound_effects/icon_speaker.svg');
     }
   });
 
