@@ -1513,9 +1513,9 @@ export default class ColorBar {
     this.count_clusters();
   }
 
-  categorical_click(d, cat_label_list, all_nodes) {
+  categorical_click(d, cat_label_list) {
     this.all_selected = true;
-    for (let i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       if (cat_label_list[i] === d) {
         if (!(forceLayout.all_outlines[i].selected || forceLayout.all_outlines[i].compared)) {
           this.all_selected = false;
@@ -1524,7 +1524,7 @@ export default class ColorBar {
     }
 
     const my_nodes = [];
-    for (let i = 0; i < all_nodes.length; i++) {
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       if (cat_label_list[i] === d) {
         my_nodes.push(i);
         if (this.all_selected) {
@@ -1535,18 +1535,18 @@ export default class ColorBar {
           if (selectionScript.selection_mode === 'negative_select') {
             forceLayout.all_outlines[i].compared = true;
             forceLayout.all_outlines[i].tint = '0x0000ff';
-            forceLayout.all_outlines[i].alpha = all_nodes[i].alpha;
+            forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
           } else {
             forceLayout.all_outlines[i].selected = true;
             forceLayout.all_outlines[i].tint = '0xffff00';
-            forceLayout.all_outlines[i].alpha = all_nodes[i].alpha;
+            forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
           }
         }
       }
     }
 
-    if (all_nodes.length < 25000) {
-      this.shrinkNodes(6, 10, my_nodes, all_nodes);
+    if (forceLayout.all_nodes.length < 25000) {
+      this.shrinkNodes(6, 10, my_nodes, forceLayout.all_nodes);
     }
     selectionScript.update_selected_count();
     this.count_clusters();
@@ -1577,7 +1577,7 @@ export default class ColorBar {
             .select('p')
             .text('');
           if (counts[d] > 0) {
-            d3.select(d)
+            d3.select(nodes[i])
               .attr('count', counts[d])
               .attr('pct', Math.floor((counts[d] / cat_counts[d]) * 1000) / 10)
               .style('visibility', 'visible')

@@ -192,14 +192,10 @@ export default class SelectionScript {
     this.base_radius = parseInt(d3.select('#settings_range_node_size').attr('value'), 10) / 100;
     this.large_radius = this.base_radius * 3;
 
-    // const xBrushExtent = d3.brushX().extent(xScale)
-    // const yBrushExtent = d3.brushY().extent(yScale);
-
-    this.brusher = d3
-      .brush()
+    this.brusher = d3.brush()
       // .extent([xBrushExtent, yBrushExtent])
       .on('brush', () => {
-        let extent = d3.selectAll('.brush .extent').node().getBoundingClientRect();
+        let extent = d3.selectAll('.brush .selection').node().getBoundingClientRect();
         for (let i = 0; i < forceLayout.all_nodes.length; i++) {
           let d = forceLayout.all_nodes[i];
           let dim = document.getElementById('svg_graph').getBoundingClientRect();
@@ -239,8 +235,9 @@ export default class SelectionScript {
         colorBar.count_clusters();
       })
       .on('end', (d) => {
-        d3.event.target.clear();
-        d3.select(d).call(d3.event.target);
+        // this.brush.call(d3.brush().move, null);
+        d3.event.selection = null;
+        // d3.select(d).call(d3.event.target);
         let selected = [];
         for (let i in forceLayout.all_outlines) {
           if (forceLayout.all_outlines.selected) {
