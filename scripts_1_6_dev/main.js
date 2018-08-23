@@ -16,17 +16,40 @@ import StickyNote from './stickyNote.js';
 import { colorpicker_setup } from './colorpicker_layout.js';
 import { settings_setup, collapse_settings } from './settings_script.js';
 
+/** @type CloneViewer */
 export let cloneViewer;
+
+/** @type Cluster */
 export let cluster;
+
+/** @type ColorBar */
 export let colorBar;
+
+/** @type DoubletDetector */
 export let doubletDetector;
+
+/** @type DownloadSelectedExpr */
 export let downloadSelectedExpr;
+
+/** @type ForceLayout */
 export let forceLayout;
+
+/** @type PAGA */
 export let paga;
+
+/** @type SelectionScript */
 export let selectionScript;
+
+/** @type SelectionLogic */
 export let selectionLogic;
+
+/** @type SmoothingImputation */
 export let smoothingImputation;
+
+/** @type SpringPlot */
 export let springPlot;
+
+/** @type StickyNote */
 export let stickyNote;
 
 d3.select('#sound_toggle')
@@ -72,12 +95,12 @@ const callback = async () => {
   colorpicker_setup();
   paga = await PAGA.create();
 
-  //load_text_annotation();
-  //stratify_setup();
-  //show_stratify_popup();
-  //start_clone_viewer();
-  //show_imputation_popup();
-  //show_colorpicker_popup('HSC_HSC_fate1');
+  // load_text_annotation();
+  // stratify_setup();
+  // show_stratify_popup();
+  // start_clone_viewer();
+  // show_imputation_popup();
+  // show_colorpicker_popup('HSC_HSC_fate1');
 
   window.onclick = function(event) {
     if (!event.target.matches('#settings_dropdown *')) {

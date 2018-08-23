@@ -12,7 +12,7 @@ export default class DoubletDetector {
     return this._instance;
   }
 
-  static async create() {
+  static create() {
     if (!this._instance) {
       this._instance = new DoubletDetector();
       return this._instance;

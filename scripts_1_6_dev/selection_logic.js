@@ -12,7 +12,7 @@ export default class SelectionLogic {
     return this._instance;
   }
 
-  static async create() {
+  static create() {
     if (!this._instance) {
       this._instance = new SelectionLogic();
       return this._instance;

@@ -14,7 +14,7 @@ export default class SpringPlot {
     return this._instance;
   }
 
-  static async create(project_directory, color_menu_genes) {
+  static create(project_directory, color_menu_genes) {
     if (!this._instance) {
       this._instance = new SpringPlot();
       return this._instance;

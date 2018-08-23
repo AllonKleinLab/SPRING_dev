@@ -11,7 +11,7 @@ export default class SmoothingImputation {
     return this._instance;
   }
 
-  static async create() {
+  static create() {
     if (!this._instance) {
       this._instance = new SmoothingImputation();
       return this._instance;
