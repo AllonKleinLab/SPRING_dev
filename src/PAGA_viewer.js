@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { project_directory } from './main';
 
 export default class PAGA {
   static _instance;
@@ -128,10 +129,7 @@ export default class PAGA {
 
   async loadData() {
     try {
-      const name = window.location.search;
-      const data = await d3.json(
-        window.location.search.slice(1, name.length) + '/PAGA_data.json' + '?_=' + this.noCache,
-      );
+      const data = await d3.json(project_directory + '/PAGA_data.json' + '?_=' + this.noCache);
       if (data !== undefined) {
         this.PAGA_data = data;
 

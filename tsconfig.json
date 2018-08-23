@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "checkJs": false, // Report errors in .js files.
+    "checkJs": true, // Report errors in .js files.
     "lib": [
       "dom",
       "es6",

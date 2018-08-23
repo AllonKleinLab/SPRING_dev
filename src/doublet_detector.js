@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { colorBar, forceLayout, graph_directory, sub_directory, cloneViewer } from './main';
+import { colorBar, forceLayout, cloneViewer, project_directory, graph_directory } from './main';
 import { read_csv } from './util';
 
 export default class DoubletDetector {
@@ -215,7 +215,7 @@ export default class DoubletDetector {
 
       console.log(k, r);
       $.ajax({
-        data: { base_dir: graph_directory, sub_dir: graph_directory + '/' + sub_directory, k: k, r: r },
+        data: { base_dir: graph_directory, sub_dir: project_directory, k: k, r: r },
         success: function(data) {
           let t1 = new Date();
           console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
@@ -247,10 +247,10 @@ export default class DoubletDetector {
           // hide_processing_mask();
           // open json file containing gene sets and populate drop down menu
           let noCache = new Date().getTime();
-          d3.json(graph_directory + '/' + sub_directory + '/color_stats.json' + '?_=' + noCache).then(colorData => {
+          d3.json(project_directory + '/color_stats.json' + '?_=' + noCache).then(colorData => {
             colorBar.color_stats = colorData;
           });
-          d3.text(graph_directory + '/' + sub_directory + '/color_data_gene_sets.csv' + '?_=' + noCache).then(text => {
+          d3.text(project_directory + '/color_data_gene_sets.csv' + '?_=' + noCache).then(text => {
             colorBar.gene_set_color_array = read_csv(text);
             colorBar.dispatch.call('load', this, colorBar.gene_set_color_array, 'gene_sets');
             colorBar.update_slider();

@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { show_colorpicker_popup } from './colorpicker_layout';
-import { forceLayout, graph_directory, selectionScript, sub_directory } from './main';
+import { forceLayout, graph_directory, selectionScript, project_directory } from './main';
 import { rgbToHex } from './util';
 
 export default class ColorBar {
@@ -13,9 +13,9 @@ export default class ColorBar {
     return this._instance;
   }
 
-  static async create(project_directory, color_menu_genes) {
+  static async create(color_menu_genes) {
     if (!this._instance) {
-      this._instance = new ColorBar(project_directory, color_menu_genes);
+      this._instance = new ColorBar(color_menu_genes);
 
       await this._instance.loadData();
 
@@ -25,8 +25,7 @@ export default class ColorBar {
     }
   }
 
-  constructor(project_directory, color_menu_genes) {
-    this.project_directory = project_directory;
+  constructor(color_menu_genes) {
     this.color_menu_genes = color_menu_genes;
     this.color_profiles = {};
     this.color_option = 'gradient';
@@ -551,7 +550,7 @@ export default class ColorBar {
   async loadData() {
     // open json file containing gene sets and populate drop down menu
     this.categorical_coloring_data = await d3.json(
-      this.project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache,
+      project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache,
     );
     Object.keys(this.categorical_coloring_data).forEach(k => {
       const label_counts = {};
@@ -567,14 +566,14 @@ export default class ColorBar {
     this.dispatch.call('load', this, this.categorical_coloring_data, 'cell_labels');
     this.update_slider();
 
-    this.color_stats = await d3.json(this.project_directory + '/color_stats.json' + '?_=' + this.noCache);
+    this.color_stats = await d3.json(project_directory + '/color_stats.json' + '?_=' + this.noCache);
     this.addStreamExp(this.color_menu_genes);
 
     this.last_gene = '';
     this.gene_entered = false;
 
     // open json file containing gene sets and populate drop down menu
-    const text = await d3.text(this.project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
+    const text = await d3.text(project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
     this.gene_set_color_array = this.read_csv(text);
 
     // gradientMenu.selectAll("option").remove();
@@ -634,7 +633,7 @@ export default class ColorBar {
       const green_selection = document.getElementById('autocomplete').value;
 
       $.ajax({
-        data: { base_dir: graph_directory, sub_dir: graph_directory + '/' + sub_directory, gene: green_selection },
+        data: { base_dir: graph_directory, sub_dir: project_directory, gene: green_selection },
         success: data => {
           const t1 = new Date();
           console.log('Read gene data: ', t1.getTime() - t0.getTime());
@@ -1226,7 +1225,7 @@ export default class ColorBar {
         base_dir: graph_directory,
         compared_cells: '',
         selected_cells: sel2text,
-        sub_dir: graph_directory + '/' + sub_directory,
+        sub_dir: project_directory,
       },
       success: data => {
         const t1 = new Date();
@@ -1327,7 +1326,7 @@ export default class ColorBar {
           base_dir: graph_directory,
           compared_cells: comp2text,
           selected_cells: sel2text,
-          sub_dir: graph_directory + '/' + sub_directory,
+          sub_dir: project_directory,
         },
         success: data => {
           const t1 = new Date();

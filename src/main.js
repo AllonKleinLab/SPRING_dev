@@ -72,6 +72,85 @@ d3.select('#sound_toggle')
     }
   });
 
+  
+
+let name = window.location.search;
+let my_origin = window.location.origin;
+let my_pathname = window.location.pathname;
+let path_split = my_pathname.split('/');
+let path_start = path_split.slice(0, path_split.length - 1).join('/');
+path_split[path_split.length - 1] = 'springViewer_1_5_dev.html';
+
+let dynamic_path = path_split.join('/');
+
+d3.select('#changeViewer_link').attr('href', my_origin + dynamic_path + name);
+let base_dirs = name.slice(1, name.length).split('/');
+let base_dir_name = base_dirs.slice(0, base_dirs.length - 1).join('/');
+
+d3.select('#all_SPRINGplots_menu').attr('href', my_origin + path_start + '/currentDatasetsList.html?' + base_dir_name);
+
+let tmp = name.slice(1, name.length).split('/');
+
+export let graph_directory = tmp.slice(0, tmp.length - 1).join('/');
+export let sub_directory = tmp[tmp.length - 1];
+export let project_directory =  graph_directory + '/' + sub_directory;
+
+document.title = `SPRING Viewer - ${tmp[tmp.length - 1]}`;
+
+d3.select('#force_layout')
+  .select('svg')
+  .remove();
+d3.select('#color_chooser')
+  .selectAll('div')
+  .remove();
+d3.select('#color_chooser')
+  .selectAll('input')
+  .remove();
+d3.select('#color_chooser')
+  .selectAll('select')
+  .remove();
+
+const loadData = async () => {
+  forceLayout = await ForceLayout.create();
+  settings_setup();
+  colorBar = await getColorBarFromAjax();
+  cloneViewer = await CloneViewer.create();
+  selectionScript = await SelectionScript.create();
+  stickyNote = await StickyNote.create();
+  cluster = await Cluster.create();
+  await callback();
+};
+
+const getColorBarFromAjax = async args => {
+  const python_data = await $.ajax({
+    data: { base_dir: graph_directory },
+    type: 'POST',
+    url: 'cgi-bin/load_counts.py',
+  });
+
+  const result = await ColorBar.create(python_data);
+  return result;
+};
+
+window.addEventListener('message', async (event) => {
+  if (event.data.type === 'load-data') {
+    sub_directory = event.data.payload;
+    project_directory =  graph_directory + '/' + sub_directory;
+    await loadData();
+  } else {
+    console.log(event);
+  }
+}, false);
+
+loadData()
+  .then(res => {
+    console.log('Spring done loading!');
+    window.postMessage({type: 'load-data', payload: 'p12'}, window.location.origin);
+  })
+  .catch(e => {
+    console.log(e);
+  });
+
 const callback = async () => {
   d3.select('#load_colors').remove();
 
@@ -114,76 +193,3 @@ const callback = async () => {
     }
   };
 };
-
-let name = window.location.search;
-let my_origin = window.location.origin;
-let my_pathname = window.location.pathname;
-let path_split = my_pathname.split('/');
-let path_start = path_split.slice(0, path_split.length - 1).join('/');
-path_split[path_split.length - 1] = 'springViewer_1_5_dev.html';
-
-let dynamic_path = path_split.join('/');
-
-d3.select('#changeViewer_link').attr('href', my_origin + dynamic_path + name);
-let base_dirs = name.slice(1, name.length).split('/');
-let base_dir_name = base_dirs.slice(0, base_dirs.length - 1).join('/');
-
-d3.select('#all_SPRINGplots_menu').attr('href', my_origin + path_start + '/currentDatasetsList.html?' + base_dir_name);
-
-export let graph_directory = name.slice(1, name.length);
-let tmp = graph_directory.split('/');
-graph_directory = tmp.slice(0, tmp.length - 1).join('/');
-
-export let sub_directory = tmp[tmp.length - 1];
-
-document.title = tmp[tmp.length - 1];
-
-d3.select('#force_layout')
-  .select('svg')
-  .remove();
-d3.select('#color_chooser')
-  .selectAll('div')
-  .remove();
-d3.select('#color_chooser')
-  .selectAll('input')
-  .remove();
-d3.select('#color_chooser')
-  .selectAll('select')
-  .remove();
-
-const loadData = async () => {
-
-  forceLayout = await ForceLayout.create(graph_directory, sub_directory);
-
-  settings_setup();
-
-  colorBar = await getColorBarFromAjax();
-  cloneViewer = await CloneViewer.create();
-  selectionScript = await SelectionScript.create();
-  stickyNote = await StickyNote.create();
-  cluster = await Cluster.create();
-
-  await callback();
-};
-
-const getColorBarFromAjax = async args => {
-  let base_dir = graph_directory;
-  let sub_dir = graph_directory + '/' + sub_directory;
-
-  const python_data = await $.ajax({
-    data: { base_dir: base_dir },
-    type: 'POST',
-    url: 'cgi-bin/load_counts.py',
-  });
-
-  const result = await ColorBar.create(sub_dir, python_data);
-  return result;
-};
-
-loadData()
-  .then(res => {
-    console.log('Data loaded!');
-  })
-  .catch(e => {
-    console.log(e);
-  });

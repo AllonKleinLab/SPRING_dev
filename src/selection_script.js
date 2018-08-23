@@ -193,7 +193,6 @@ export default class SelectionScript {
     this.large_radius = this.base_radius * 3;
 
     this.brusher = d3.brush()
-      // .extent([xBrushExtent, yBrushExtent])
       .on('brush', () => {
         let extent = d3.selectAll('.brush .selection').node().getBoundingClientRect();
         for (let i = 0; i < forceLayout.all_nodes.length; i++) {
@@ -235,9 +234,10 @@ export default class SelectionScript {
         colorBar.count_clusters();
       })
       .on('end', (d) => {
-        // this.brush.call(d3.brush().move, null);
-        d3.event.selection = null;
-        // d3.select(d).call(d3.event.target);
+        // Ensures we don't recursively call 'brush end' events: https://github.com/d3/d3-brush/issues/25
+        if (d3.event.sourceEvent.type !== 'end') {
+          this.brusher.move(this.brush, null);
+        }
         let selected = [];
         for (let i in forceLayout.all_outlines) {
           if (forceLayout.all_outlines.selected) {

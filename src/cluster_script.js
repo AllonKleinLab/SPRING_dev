@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as html2canvas from 'html2canvas';
 
-import { colorBar, forceLayout } from './main';
+import { colorBar, forceLayout, sub_directory } from './main';
 import { collapse_settings } from './settings_script';
 
 export default class Cluster {
@@ -32,7 +32,7 @@ export default class Cluster {
     this.current_clus_name = '';
     this.last_clus_name = '';
     d3.select('#cluster_dropdown_button').on('click', this.showClusterDropdown);
-    this.name = window.location.search.split('/')[2];
+    this.name = sub_directory;
 
     this.svg_width = parseInt(d3.select('svg').attr('width'), 10);
     d3.select('#create_cluster_box').call(
@@ -170,7 +170,7 @@ export default class Cluster {
 
   hide_create_cluster_box = () => {
     d3.select('#create_cluster_box').style('visibility', 'hidden');
-  };
+  }
 
   show_create_cluster_box = () => {
     let mywidth = parseInt(
@@ -638,8 +638,7 @@ export default class Cluster {
 
   save_cluster_data() {
     this.clustering_data.Current_clustering = this.current_clus_name;
-    let name = window.location.search.split('/')[2];
-    let path = 'clustering_data/' + name + '_clustering_data_clustmp.json';
+    const path = 'clustering_data/' + this.name + '_clustering_data_clustmp.json';
     $.ajax({
       data: { path: path, content: JSON.stringify(this.clustering_data, null, '    ') },
       type: 'POST',
@@ -648,7 +647,7 @@ export default class Cluster {
   }
 
   download_legend_image() {
-    let original_visibility = d3.select('#update_cluster_labels_box').style('visibility');
+    const original_visibility = d3.select('#update_cluster_labels_box').style('visibility');
     this.show_update_cluster_labels_box();
     d3.select('#cluster_label_button_bar').style('visibility', 'hidden');
     d3.select('#cluster_label_button_bar').style('height', '5px');
@@ -656,7 +655,7 @@ export default class Cluster {
     d3.selectAll('.cluster_name_input').style('color', 'black');
 
     html2canvas(document.getElementById('update_cluster_labels_box')).then(canvas => {
-      let a = document.createElement('a');
+      const a = document.createElement('a');
       // toDataURL defaults to png, so we need to request a jpeg, then convert for file download.
       a.href = canvas.toDataURL('image/png');
       a.download = 'SPRING_legend.png';

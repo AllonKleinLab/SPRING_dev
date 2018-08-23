@@ -3,7 +3,7 @@ import * as Spinner from 'spinner';
 
 import { colorBar } from './main';
 
-export const diffex_setup = (project_directory) => {
+export const diffex_setup = () => {
   let scatter_zoom = 0.2;
   let scatter_size = 4;
   let scatter_jitter = 0;

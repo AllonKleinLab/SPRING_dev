@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import sweetAlert from 'sweetalert';
 
-import { forceLayout, colorBar, selectionScript } from './main';
+import { forceLayout, colorBar, selectionScript, project_directory } from './main';
 
 export default class StickyNote {
   static _instance;
@@ -109,8 +109,7 @@ export default class StickyNote {
   // <-- StickyNote Constructor End -->
 
   async loadData() {
-    let paths = window.location.search;
-    this.sticky_path = paths.slice(1, paths.length) + '/sticky_notes_data.json';
+    this.sticky_path = project_directory + '/sticky_notes_data.json';
     try {
       await $.get(this.sticky_path);
       const data = await d3.json(this.sticky_path);
@@ -250,8 +249,7 @@ export default class StickyNote {
         all_data.push(my_data);
       }
     });
-    let path = window.location.search;
-    path = path.slice(1, path.length) + '/sticky_notes_data.json';
+    const path = project_directory + '/sticky_notes_data.json';
     $.ajax({
       data: { path: path, content: JSON.stringify(all_data, null, ' ') },
       success: () => {

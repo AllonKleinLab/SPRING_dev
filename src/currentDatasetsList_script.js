@@ -71,7 +71,7 @@ function add_list_item(project_directory, sub_directory, order) {
       'Num_Neighbors',
       'Num_Force_Iter',
     ];
-    for (s in keys) {
+    for (const s in keys) {
       info_box
         .append('tspan')
         .append('text')
@@ -175,8 +175,8 @@ function add_list_item(project_directory, sub_directory, order) {
 }
 
 function populate_dataset_subdirs_list(project_directory) {
-  let title = project_directory.split('/');
-  title = title[title.length - 1];
+  const directories = project_directory.split('/');
+  const title = directories[directories.length - 1];
   d3.select('#project_directory_title').text('SPRING subplots of "' + title + '"');
 
   let splitURL = window.location.href.split('?')[0].split('/');

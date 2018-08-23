@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import * as Spinner from 'spinner';
 
 import { SPRITE_IMG_WIDTH, rgbToHex } from './util';
-import { colorBar, forceLayout } from './main';
+import { colorBar, forceLayout, project_directory } from './main';
 
 export default class CloneViewer {
   static _instance;
@@ -256,8 +256,7 @@ export default class CloneViewer {
   async loadData() {
     this.clone_map = {};
     const noCache = new Date().getTime();
-    const name = window.location.search.split('/')[2];
-    const filePath = window.location.search.slice(1, name.length) + '/clone_map.json';
+    const filePath = project_directory + '/clone_map.json';
     try {
       const cloneData = await d3.json(filePath + '?_=' + noCache);
       //console.log(error);

@@ -1,7 +1,18 @@
 import * as d3 from 'd3';
 
 import { LineSprite } from './LineSprite';
-import { graph_directory, colorBar, cloneViewer, paga, selectionLogic, selectionScript, smoothingImputation, springPlot, downloadSelectedExpr } from './main';
+import {
+  colorBar,
+  cloneViewer,
+  paga,
+  selectionLogic,
+  selectionScript,
+  smoothingImputation,
+  springPlot,
+  downloadSelectedExpr,
+  project_directory,
+  sub_directory,
+} from './main';
 import { SPRITE_IMG_WIDTH, downloadFile, rgbToHex } from './util';
 import { collapse_settings } from './settings_script';
 import { rotation_update } from './rotation_script';
@@ -17,9 +28,9 @@ export default class ForceLayout {
     return this._instance;
   }
 
-  static async create(project_directory, sub_directory) {
+  static async create() {
     if (!this._instance) {
-      this._instance = new ForceLayout(project_directory, sub_directory);
+      this._instance = new ForceLayout();
       await this._instance.loadData();
       return this._instance;
     } else {
@@ -29,9 +40,7 @@ export default class ForceLayout {
     }
   }
 
-  constructor(project_directory, sub_directory) {
-    this.project_directory = project_directory;
-    this.sub_directory = sub_directory;
+  constructor() {
     this.width = window.innerWidth - 15;
     this.height = window.innerHeight - 70;
 
@@ -167,7 +176,7 @@ export default class ForceLayout {
   // <-- ForceLayout Constructor End -->
 
   async loadData() {
-    const filePath = this.project_directory + '/' + this.sub_directory + '/mutability.txt';
+    const filePath = project_directory + '/mutability.txt';
     try {
       const mutableText = await d3.text(filePath);
       if (mutableText === null) {
@@ -180,7 +189,7 @@ export default class ForceLayout {
     }
 
     // Read coordinates file if it exists
-    const coordinates_filename = graph_directory + '/' + this.sub_directory + '/coordinates.txt';
+    const coordinates_filename = project_directory + '/coordinates.txt';
     const text = await d3.text(coordinates_filename);
     text.split('\n').forEach((entry, index, array) => {
       let items = entry.split(',');
@@ -260,7 +269,7 @@ export default class ForceLayout {
       this.neighbors[i] = [];
     }
     try {
-      const edgesText = await d3.text(this.project_directory + '/' + this.sub_directory + '/edges.csv');
+      const edgesText = await d3.text(project_directory + '/edges.csv');
       edgesText.split('\n').forEach((entry, index) => {
         if (entry.length > 0) {
           let items = entry.split(';');
@@ -483,7 +492,7 @@ export default class ForceLayout {
 
   animation = () => {
     // check if animation exists. if so, hide sprites and load it
-    const filePath = graph_directory + '/' + this.sub_directory + '/animation.txt';
+    const filePath = project_directory + '/animation.txt';
     d3.text(filePath)
       .then(data => {
         let animation_frames = [];
@@ -612,6 +621,7 @@ export default class ForceLayout {
   downloadSelection = () => {
     let name = window.location.search;
     let cell_filter_filename = window.location.search.slice(1, name.length) + '/cell_filter.txt';
+    console.log(`Variable 'cell_filter_filename':\n${cell_filter_filename}\n${JSON.stringify(cell_filter_filename, null, 2)}`);
     d3.text(cell_filter_filename).then(cellText => {
       let cell_nums = cellText.split('\n');
       let text = '';
@@ -663,7 +673,7 @@ export default class ForceLayout {
             });
           let name = window.location.search;
           let path =
-            'coordinates/' + name.slice(9, name.length).split('/')[1] + '_coordinates.' + this.sub_directory + '.txt';
+            'coordinates/' + name.slice(9, name.length).split('/')[1] + '_coordinates.' + sub_directory + '.txt';
           $.ajax({
             data: { path: path, content: text },
             type: 'POST',
@@ -715,7 +725,9 @@ export default class ForceLayout {
 
     d3.select('#download_selection').on('click', () => this.downloadSelection());
 
-    d3.select('#show_download__selected_expr_popup').on('click', () => downloadSelectedExpr.show_downloadSelectedExpr_popup());
+    d3.select('#show_download__selected_expr_popup').on('click', () =>
+      downloadSelectedExpr.show_downloadSelectedExpr_popup(),
+    );
 
     d3.select('#show_make_new_SPRINGplot_popup').on('click', () => springPlot.show_make_new_SPRINGplot_popup());
 
