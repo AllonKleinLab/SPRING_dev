@@ -30,7 +30,7 @@ selected_clusters = data.getvalue('selected_clusters')
 compared_clusters = data.getvalue('compared_clusters')
 current_dir = base_dir + current_dir_short
 new_dir = base_dir + new_dir_short
-this_url = 'https://kleintools.hms.harvard.edu/tools/springViewer_1_6_dev.html'
+this_url = 'https://kleintools.hms.harvard.edu/tools/springViewer.html'
 
 all_errors = []
 

@@ -41,7 +41,7 @@ function add_sticky_subdir(project_directory, sub_directory, order) {
       let my_origin = window.location.origin;
       let my_pathname_split = window.location.pathname.split('/');
       let my_pathname_new =
-        my_pathname_split.slice(0, my_pathname_split.length - 1).join('/') + '/springViewer_1_6_dev.html';
+        my_pathname_split.slice(0, my_pathname_split.length - 1).join('/') + '/springViewer.html';
       let my_url_new = my_origin + my_pathname_new + '?' + project_directory + '/' + sub_directory;
       console.log(my_url_new);
       openInNewTab(my_url_new);
