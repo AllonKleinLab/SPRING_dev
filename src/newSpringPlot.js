@@ -1,9 +1,11 @@
+import { forceLayout, graph_directory, sub_directory } from './main';
+
 function newSpringPlot(callback) {
   console.log('boop');
 
   let sel2text = '';
-  for (let i = 0; i < all_outlines.length; i++) {
-    if (all_outlines[i].selected) {
+  for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+    if (forceLayout.all_outlines[i].selected) {
       sel2text = sel2text + ',' + i.toString();
     }
   }

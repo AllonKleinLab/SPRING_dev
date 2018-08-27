@@ -3,6 +3,7 @@ import { colorBar, forceLayout, cloneViewer, project_directory, graph_directory 
 import { read_csv } from './util';
 
 export default class DoubletDetector {
+  /** @type DoubletDetector */
   static _instance;
 
   static get instance() {

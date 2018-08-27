@@ -5,6 +5,7 @@ import { colorBar, forceLayout, sub_directory } from './main';
 import { collapse_settings } from './settings_script';
 
 export default class Cluster {
+  /** @type Cluster */
   static _instance;
 
   static get instance() {
@@ -170,7 +171,7 @@ export default class Cluster {
 
   hide_create_cluster_box = () => {
     d3.select('#create_cluster_box').style('visibility', 'hidden');
-  }
+  };
 
   show_create_cluster_box = () => {
     let mywidth = parseInt(

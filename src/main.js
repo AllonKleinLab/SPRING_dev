@@ -72,8 +72,6 @@ d3.select('#sound_toggle')
     }
   });
 
-  
-
 let name = window.location.search;
 let my_origin = window.location.origin;
 let my_pathname = window.location.pathname;
@@ -93,7 +91,7 @@ let tmp = name.slice(1, name.length).split('/');
 
 export let graph_directory = tmp.slice(0, tmp.length - 1).join('/');
 export let sub_directory = tmp[tmp.length - 1];
-export let project_directory =  graph_directory + '/' + sub_directory;
+export let project_directory = graph_directory + '/' + sub_directory;
 
 document.title = `SPRING Viewer - ${tmp[tmp.length - 1]}`;
 
@@ -132,20 +130,10 @@ const getColorBarFromAjax = async args => {
   return result;
 };
 
-window.addEventListener('message', async (event) => {
-  if (event.data.type === 'load-data') {
-    sub_directory = event.data.payload;
-    project_directory =  graph_directory + '/' + sub_directory;
-    await loadData();
-  } else {
-    console.log(event);
-  }
-}, false);
-
 loadData()
   .then(res => {
-    console.log('Spring done loading!');
-    window.postMessage({type: 'load-data', payload: 'p12'}, window.location.origin);
+    console.log('Spring done loading');
+    window.parent.postMessage({ type: 'loaded' }, 'http://localhost:8080');
   })
   .catch(e => {
     console.log(e);
@@ -180,6 +168,10 @@ const callback = async () => {
   // start_clone_viewer();
   // show_imputation_popup();
   // show_colorpicker_popup('HSC_HSC_fate1');
+
+  window.addEventListener('message', e => {
+    console.log(e);
+  });
 
   window.onclick = function(event) {
     if (!event.target.matches('#settings_dropdown *')) {

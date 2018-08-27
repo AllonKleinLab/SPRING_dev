@@ -4,6 +4,7 @@ import Spinner from 'spinner';
 import { forceLayout, colorBar, cloneViewer, graph_directory, sub_directory } from './main';
 
 export default class SmoothingImputation {
+  /** @type SmoothingImputation */
   static _instance;
 
   static get instance() {
@@ -206,7 +207,9 @@ export default class SmoothingImputation {
             }
 
             function nrm(x) {
-              return ((parseFloat(x) - new_min + current_min) / (new_max - new_min + 0.01)) * (current_max - current_min);
+              return (
+                ((parseFloat(x) - new_min + current_min) / (new_max - new_min + 0.01)) * (current_max - current_min)
+              );
             }
 
             let spl = datasplit[2].split(';');

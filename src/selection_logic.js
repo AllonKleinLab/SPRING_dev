@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import { colorBar, forceLayout, selectionScript } from './main';
 
 export default class SelectionLogic {
+  /** @type SelectionLogic */
   static _instance;
 
   static get instance() {

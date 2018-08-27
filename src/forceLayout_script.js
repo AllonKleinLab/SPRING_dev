@@ -17,8 +17,10 @@ import { SPRITE_IMG_WIDTH, downloadFile, rgbToHex } from './util';
 import { collapse_settings } from './settings_script';
 import { rotation_update } from './rotation_script';
 import { run_clustering } from './cluster2_script';
+import { getData } from './file_helper';
 
 export default class ForceLayout {
+  /** @type ForceLayout */
   static _instance;
 
   static get instance() {
@@ -190,17 +192,21 @@ export default class ForceLayout {
 
     // Read coordinates file if it exists
     const coordinates_filename = project_directory + '/coordinates.txt';
-    const text = await d3.text(coordinates_filename);
-    text.split('\n').forEach((entry, index, array) => {
-      let items = entry.split(',');
-      if (items.length > 1) {
-        let xx = parseFloat($.trim(items[1]));
-        let yy = parseFloat($.trim(items[2]));
-        let nn = parseInt($.trim(items[0]), 10);
-        this.coordinates.push([xx, yy]);
-      }
-    });
 
+    const text = await getData('coordinates', 'txt');
+    if (!text.push) {
+      text.split('\n').forEach((entry, index, array) => {
+        let items = entry.split(',');
+        if (items.length > 1) {
+          let xx = parseFloat($.trim(items[1]));
+          let yy = parseFloat($.trim(items[2]));
+          let nn = parseInt($.trim(items[0]), 10);
+          this.coordinates.push([xx, yy]);
+        }
+      });
+    } else {
+      this.coordinates = text;
+    }
     document.getElementById('pixi_canvas_holder').appendChild(this.app.view);
 
     this.sprites.interactive = true;
@@ -298,7 +304,7 @@ export default class ForceLayout {
       this.app.stage.addChild(this.edge_container);
       this.app.stage.addChild(sprites);
     }
-  }
+  };
 
   dragstarted() {
     if (selectionScript.selection_mode === 'drag_pan_zoom') {
@@ -471,14 +477,14 @@ export default class ForceLayout {
     }
     this.adjust_edges();
     this.stashed_coordinates = this.stashed_coordinates.slice(0, this.stashed_coordinates.length - 1);
-  }
+  };
 
   move_node = (i, x, y) => {
     this.all_nodes[i].x = x;
     this.all_nodes[i].y = y;
     this.all_outlines[i].x = x;
     this.all_outlines[i].y = y;
-  }
+  };
 
   adjust_edges = () => {
     for (let i in this.all_edges) {
@@ -488,7 +494,7 @@ export default class ForceLayout {
       this.all_edges[i].y2 = this.all_nodes[this.all_edge_ends[i].target].y;
       this.all_edges[i].updatePosition();
     }
-  }
+  };
 
   animation = () => {
     // check if animation exists. if so, hide sprites and load it
@@ -563,7 +569,7 @@ export default class ForceLayout {
         this.sprites.visible = true;
         this.edge_container.visible = true;
       });
-  }
+  };
 
   blend_edges = () => {
     this.edge_container.alpha = 0;
@@ -581,7 +587,7 @@ export default class ForceLayout {
     }
 
     next_frame(-1, 0, 0.5, 10);
-  }
+  };
 
   toggleForce = () => {
     if (this.force_on === 1) {
@@ -602,26 +608,28 @@ export default class ForceLayout {
       }
       this.force.tick();
     }
-  }
+  };
 
   hideAccessories = () => {
     d3.selectAll('.other_frills').style('visibility', 'hidden');
     d3.selectAll('.selection_option').style('visibility', 'hidden');
     d3.selectAll('.colorbar_item').style('visibility', 'hidden');
     d3.select('svg').style('background-color', 'white');
-  }
+  };
 
   showAccessories = () => {
     d3.selectAll('.other_frills').style('visibility', 'visible');
     d3.selectAll('.selection_option').style('visibility', 'visible');
     d3.selectAll('.colorbar_item').style('visibility', 'visible');
     d3.select('svg').style('background-color', '#D6D6D6');
-  }
+  };
 
   downloadSelection = () => {
     let name = window.location.search;
     let cell_filter_filename = window.location.search.slice(1, name.length) + '/cell_filter.txt';
-    console.log(`Variable 'cell_filter_filename':\n${cell_filter_filename}\n${JSON.stringify(cell_filter_filename, null, 2)}`);
+    console.log(
+      `Variable 'cell_filter_filename':\n${cell_filter_filename}\n${JSON.stringify(cell_filter_filename, null, 2)}`,
+    );
     d3.text(cell_filter_filename).then(cellText => {
       let cell_nums = cellText.split('\n');
       let text = '';
@@ -632,7 +640,7 @@ export default class ForceLayout {
       }
       downloadFile(text, 'selected_cells.txt');
     });
-  }
+  };
 
   downloadCoordinates = () => {
     let text = '';
@@ -640,7 +648,7 @@ export default class ForceLayout {
       text += i.toString() + ',' + this.all_nodes[i].x.toString() + ',' + this.all_nodes[i].y.toString() + '\n';
     }
     downloadFile(text, 'coordinates.txt');
-  }
+  };
 
   initiateButtons = () => {
     d3.select('#help').on('click', () => {
@@ -740,13 +748,13 @@ export default class ForceLayout {
     d3.select('#run_clustering').on('click', () => run_clustering());
     d3.select('#show_PAGA_popup').on('click', () => paga.show_PAGA_popup());
     d3.select('#toggle_legend_hover_tooltip_button').on('click', () => colorBar.toggle_legend_hover_tooltip());
-  }
+  };
 
   download_png = () => {
     let searchPaths = window.location.search.split('/');
     const path = searchPaths[searchPaths.length - 2] + '_' + searchPaths[searchPaths.length - 1] + '.png';
     this.download_sprite_as_png(this.app.renderer, this.app.stage, path);
-  }
+  };
 
   download_sprite_as_png = (renderer, sprite, fileName) => {
     renderer.extract.canvas(sprite).toBlob(b => {
@@ -757,7 +765,7 @@ export default class ForceLayout {
       a.click();
       a.remove();
     }, 'image/png');
-  }
+  };
 
   showToolsDropdown() {
     if (d3.select('#tools_dropdown').style('height') === 'auto') {
@@ -952,5 +960,5 @@ export default class ForceLayout {
         url: 'cgi-bin/save_data.py',
       });
     }
-  }
+  };
 }

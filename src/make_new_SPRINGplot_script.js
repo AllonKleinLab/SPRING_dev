@@ -5,6 +5,7 @@ const MAXHEIGHT = 660;
 const STARTHEIGHT = 610;
 
 export default class SpringPlot {
+  /** @type SpringPlot */
   static _instance;
 
   static get instance() {
@@ -14,7 +15,7 @@ export default class SpringPlot {
     return this._instance;
   }
 
-  static create(project_directory, color_menu_genes) {
+  static create() {
     if (!this._instance) {
       this._instance = new SpringPlot();
       return this._instance;
@@ -314,7 +315,7 @@ export default class SpringPlot {
     d3.select('#gene_list_upload_wrapper')
       .select('span')
       .text('Choose file');
-  }
+  };
 
   show_make_new_SPRINGplot_popup = () => {
     let mywidth = parseInt(
@@ -342,7 +343,7 @@ export default class SpringPlot {
       .style('padding-bottom', '0px')
       .style('visibility', 'visible')
       .style('height', STARTHEIGHT);
-  }
+  };
 
   submit_new_SPRINGplot() {
     let running_online = false;
@@ -383,7 +384,7 @@ export default class SpringPlot {
     } else {
       output_message = 'Please wait...<br>';
       output_message +=
-        'If everything goes smoothly, a link to your new subplot will appear when ready, and you\'ll receive a link via email (if provided).<br>';
+        "If everything goes smoothly, a link to your new subplot will appear when ready, and you'll receive a link via email (if provided).<br>";
       output_message += '<br>This may take several minutes.<br>';
       subplot_script = 'cgi-bin/spring_from_selection2.py';
     }

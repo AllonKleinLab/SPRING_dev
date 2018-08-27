@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import { forceLayout, graph_directory, sub_directory } from './main';
 
 export default class DownloadSelectedExpr {
+  /** @type DownloadSelectedExpr */
   static _instance;
 
   static get instance() {
@@ -157,7 +158,7 @@ export default class DownloadSelectedExpr {
       .style('top', '10px')
       .style('padding-bottom', '0px')
       .style('visibility', 'visible'); //.style('height','300px');
-  }
+  };
   downloadSelectedExpr() {
     let sel2text = '';
     for (let i = 0; i < forceLayout.all_outlines.length; i++) {

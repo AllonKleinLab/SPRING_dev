@@ -132,20 +132,23 @@ export const settings_setup = () => {
     });
 
   function node_repulsion_change(val) {
-    forceLayout.force.charge(-val / 10);
-    forceLayout.force.start();
+    forceLayout.force.force('repulsion', d3.forceManyBody().strength(-val / 10));
+    forceLayout.force.restart();
   }
+
   function link_distance_change(val) {
-    forceLayout.force.linkDistance(val / 10);
-    forceLayout.force.start();
+    forceLayout.force.force('linkDistance', d3.forceLink().strength(val / 10));
+    forceLayout.force.restart();
   }
+
   function link_strength_change(val) {
-    forceLayout.force.linkStrength(val / 10);
-    forceLayout.force.start();
+    forceLayout.force.force('linkDistance', d3.forceLink().strength(val / 10));
+    forceLayout.force.restart();
   }
+
   function gravity_change(val) {
-    forceLayout.force.gravity(val / 100);
-    forceLayout.force.start();
+    forceLayout.force.force('gravity', d3.forceY(val));
+    forceLayout.force.tick();
   }
 
   function check_any_selected() {
@@ -183,7 +186,7 @@ export const settings_setup = () => {
 
   function background_color_change(val) {
     const parsedVal = parseInt(val, 10);
-    forceLayout.app.renderer.backgroundColor = rgbToHex(parsedVal, parsedVal, parsedVal);
+    forceLayout.app.renderer.backgroundColor = parseInt(rgbToHex(parsedVal, parsedVal, parsedVal), 16);
     /*
 		if (val < 125) {
 			text_anos.ba.style.fill = '#B8B8B8';
@@ -259,6 +262,7 @@ export const toggle_settings = () => {
     collapse_settings();
   }
 };
+
 export const expand_settings = () => {
   forceLayout.closeDropdown();
   if (d3.select('#settings_dropdown').style('visibility') === 'hidden') {

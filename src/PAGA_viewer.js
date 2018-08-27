@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import { project_directory } from './main';
 
 export default class PAGA {
+  /** @type PAGA */
   static _instance;
 
   static get instance() {
@@ -158,7 +159,7 @@ export default class PAGA {
               .on('drag', () => this.dragged())
               .on('end', () => this.dragended()),
           )
-          .on('click', (d) => {
+          .on('click', d => {
             if (!d3.event.defaultPrevented) {
               d.selected = !d.selected;
               this.PAGA_redraw();
@@ -166,7 +167,7 @@ export default class PAGA {
           });
 
         this.PAGA_node_dict = {};
-        data.nodes.forEach((d) => {
+        data.nodes.forEach(d => {
           this.PAGA_node_dict[d.index] = d;
           d.coordinates_original = Object.assign({}, d.coordinates);
         });
@@ -301,22 +302,22 @@ export default class PAGA {
     d3.selectAll('.PAGA_link')
       .attr('opacity', 0.8)
       .attr('stroke', 'darkgray')
-      .attr('x1', (d) => {
+      .attr('x1', d => {
         return this.PAGA_node_dict[d.source].coordinates[0];
       })
-      .attr('y1', (d) => {
+      .attr('y1', d => {
         return this.PAGA_node_dict[d.source].coordinates[1];
       })
-      .attr('x2', (d) => {
+      .attr('x2', d => {
         return this.PAGA_node_dict[d.target].coordinates[0];
       })
-      .attr('y2', (d) => {
+      .attr('y2', d => {
         return this.PAGA_node_dict[d.target].coordinates[1];
       })
-      .attr('stroke-width', (d) => {
+      .attr('stroke-width', d => {
         return d.weight * edge_scale;
       })
-      .style('visibility', (d) => {
+      .style('visibility', d => {
         if (d.weight > this.PAGA_data.edge_weight_meta.min_edge_weight) {
           return 'visible';
         } else {

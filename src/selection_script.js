@@ -3,6 +3,7 @@ import { rotation_hide } from './rotation_script';
 import { colorBar, forceLayout } from './main';
 
 export default class SelectionScript {
+  /** @type SelectionScript */
   static _instance;
 
   static get instance() {
@@ -192,9 +193,13 @@ export default class SelectionScript {
     this.base_radius = parseInt(d3.select('#settings_range_node_size').attr('value'), 10) / 100;
     this.large_radius = this.base_radius * 3;
 
-    this.brusher = d3.brush()
+    this.brusher = d3
+      .brush()
       .on('brush', () => {
-        let extent = d3.selectAll('.brush .selection').node().getBoundingClientRect();
+        let extent = d3
+          .selectAll('.brush .selection')
+          .node()
+          .getBoundingClientRect();
         for (let i = 0; i < forceLayout.all_nodes.length; i++) {
           let d = forceLayout.all_nodes[i];
           let dim = document.getElementById('svg_graph').getBoundingClientRect();
@@ -233,17 +238,25 @@ export default class SelectionScript {
         this.update_selected_count();
         colorBar.count_clusters();
       })
-      .on('end', (d) => {
+      .on('end', d => {
         // Ensures we don't recursively call 'brush end' events: https://github.com/d3/d3-brush/issues/25
         if (d3.event.sourceEvent.type !== 'end') {
           this.brusher.move(this.brush, null);
         }
+
         let selected = [];
-        for (let i in forceLayout.all_outlines) {
-          if (forceLayout.all_outlines.selected) {
-            selected.push(i);
+        let indices = [];
+        for (let i = 0; i < forceLayout.all_outlines.length; ++i) {
+          if (forceLayout.all_outlines[i].selected) {
+            selected.push(forceLayout.all_outlines[i]);
+            indices.push(i);
           }
         }
+
+        window.parent.postMessage(
+          { type: 'selected-cells-update', payload: { indices, selected } },
+          'http://localhost:8080',
+        );
         if (selected.length === 0) {
           rotation_hide();
         }
@@ -370,14 +383,18 @@ export default class SelectionScript {
   update_selected_count() {
     let num_selected = 0;
     let num_compared = 0;
+    const selectedNodeIndices = new Array();
+
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       if (forceLayout.all_outlines[i].selected) {
         num_selected += 1;
+        selectedNodeIndices.push(i);
       }
       if (forceLayout.all_outlines[i].compared) {
         num_compared += 1;
       }
     }
+
     if (num_selected === 0 && this.pos_count_extended) {
       this.pos_count_extended = false;
       if (!this.neg_count_extended) {
@@ -495,8 +512,8 @@ export default class SelectionScript {
           new_selection.push(parseInt(entry, 10));
         }
       });
-      d3.selectAll('.node circle').classed('selected', (d) => {
-        if (new_selection.includes(d.name)) {
+      d3.selectAll('.node circle').classed('selected', d => {
+        if (new_selection.indexOf(d.name) >= 0) {
           d.selected = true;
           return true;
         }

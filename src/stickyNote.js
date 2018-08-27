@@ -4,6 +4,7 @@ import sweetAlert from 'sweetalert';
 import { forceLayout, colorBar, selectionScript, project_directory } from './main';
 
 export default class StickyNote {
+  /** @type StickyNote */
   static _instance;
 
   static get instance() {

@@ -5,6 +5,7 @@ import { SPRITE_IMG_WIDTH, rgbToHex } from './util';
 import { colorBar, forceLayout, project_directory } from './main';
 
 export default class CloneViewer {
+  /** @type CloneViewer */
   static _instance;
 
   static get instance() {
@@ -181,7 +182,7 @@ export default class CloneViewer {
     node_color_options
       .append('button')
       .text('Burn')
-      .on('click', () =>  this.burn());
+      .on('click', () => this.burn());
 
     node_color_options
       .append('button')
@@ -378,7 +379,10 @@ export default class CloneViewer {
     }
     colorBar.update_tints();
     forceLayout.app.stage.children[1].children.sort((a, b) => {
-      return colorBar.average_color(forceLayout.base_colors[a.index]) - colorBar.average_color(forceLayout.base_colors[b.index]);
+      return (
+        colorBar.average_color(forceLayout.base_colors[a.index]) -
+        colorBar.average_color(forceLayout.base_colors[b.index])
+      );
     });
 
     this.clear_clone_overlays();
