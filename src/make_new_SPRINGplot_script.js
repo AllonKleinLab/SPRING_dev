@@ -77,8 +77,8 @@ export default class SpringPlot {
       .attr('id', 'input_description')
       .style('width', '217px')
       .style('height', '22px')
-      .on('keydown', function() {
-        setTimeout(function() {
+      .on('keydown', () => {
+        setTimeout(() => {
           let o = d3.select('#input_description');
           o.style('height', '1px');
           o.style('height', o.node().scrollHeight.toString() + 'px');
@@ -203,7 +203,7 @@ export default class SpringPlot {
       .append('button')
       .text('No')
       .attr('id', 'input_animation')
-      .on('click', function() {
+      .on('click', () => {
         if (d3.select(this).text() === 'Yes') {
           d3.select(this).text('No');
         } else {
@@ -263,13 +263,13 @@ export default class SpringPlot {
     this.popup
       .append('div')
       .attr('id', 'make_new_SPRINGplot_message_div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .style('overflow', 'scroll')
       .append('text');
 
-    d3.selectAll('.make_new_SPRINGplot_input_div').on('mousedown', function() {
+    d3.selectAll('.make_new_SPRINGplot_input_div').on('mousedown', () => {
       d3.event.stopPropagation();
     });
 
@@ -428,7 +428,7 @@ export default class SpringPlot {
         this_url: this_url,
         letPctl: letPctl,
       },
-      success: function(success_message) {
+      success: success_message => {
         console.log(success_message);
 
         if (running_online) {
@@ -438,7 +438,7 @@ export default class SpringPlot {
             .html(orig_message);
 
           function checkLog() {
-            jQuery.get(graph_directory + '/' + new_dir + '/lognewspring2.txt', function(logdata) {
+            jQuery.get(graph_directory + '/' + new_dir + '/lognewspring2.txt', logdata => {
               let logdata_split = logdata.split('\n');
               let display_message = orig_message + '<br>' + logdata_split[logdata_split.length - 2];
               d3.select('#make_new_SPRINGplot_message_div')

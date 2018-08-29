@@ -35,7 +35,7 @@ export default class SelectionLogic {
     this.add_new_bar = this.popup
       .append('div')
       .attr('id', 'selection_logic_add_new_bar')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       });
 
@@ -129,7 +129,7 @@ export default class SelectionLogic {
 
   apply_and() {
     let sels = this.get_selections();
-    let new_sel = sels[0].filter(function(n) {
+    let new_sel = sels[0].filter(n => {
       return sels[1].indexOf(n) !== -1;
     });
     this.set_selections(new_sel);

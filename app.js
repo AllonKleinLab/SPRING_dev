@@ -14,17 +14,26 @@ requirejs.config({
 
 window.cacheData = new Map();
 
-window.addEventListener('message', e => {
-  const parsedData = JSON.parse(e.data);
-  switch (parsedData.type) {
-    case 'init': {
-      if (parsedData.payload.coordinates) {
-        window.cacheData.set('coordinates', parsedData.payload.coordinates);
+window.addEventListener('message', event => {
+  if (event.origin === window.location.origin) {
+    return;
+  }
+  try {
+    const parsedData = JSON.parse(event.data);
+    switch (parsedData.type) {
+      case 'init': {
+        if (parsedData.payload.coordinates) {
+          window.cacheData.set('coordinates', parsedData.payload.coordinates);
+        }
+      }
+      default: {
+        break;
       }
     }
-    default: {
-      break;
-    }
+  } catch (err) {
+    console.log(`Unable to parse received message.\n\
+    Data: ${event.data}
+    Error: ${err}`);
   }
 });
 

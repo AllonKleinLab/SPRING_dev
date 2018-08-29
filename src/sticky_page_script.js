@@ -12,7 +12,7 @@ function add_sticky_subdir(project_directory, sub_directory, order) {
     header.append('p').text(' - ' + data.length.toString() + ' sticky notes');
 
     let all_stickies = list_item.append('div').attr('class', 'all_stickies');
-    data.forEach(function(d) {
+    data.forEach(d => {
       let sticky = all_stickies.append('div').attr('class', 'one_sticky');
       sticky.append('p').text(d.text);
       let emails = d.emails;
@@ -26,7 +26,7 @@ function add_sticky_subdir(project_directory, sub_directory, order) {
       .append('text')
       .attr('class', 'show_more_less_text')
       .text('Expand')
-      .on('click', function() {
+      .on('click', () => {
         d3.event.stopPropagation();
         if (d3.select(this).text() === 'Expand') {
           list_item.transition('200').style('height', $(list_item.node())[0].scrollHeight.toString() + 'px');
@@ -37,11 +37,10 @@ function add_sticky_subdir(project_directory, sub_directory, order) {
         }
       });
 
-    list_item.on('click', function() {
+    list_item.on('click', () => {
       let my_origin = window.location.origin;
       let my_pathname_split = window.location.pathname.split('/');
-      let my_pathname_new =
-        my_pathname_split.slice(0, my_pathname_split.length - 1).join('/') + '/springViewer.html';
+      let my_pathname_new = my_pathname_split.slice(0, my_pathname_split.length - 1).join('/') + '/springViewer.html';
       let my_url_new = my_origin + my_pathname_new + '?' + project_directory + '/' + sub_directory;
       console.log(my_url_new);
       openInNewTab(my_url_new);
@@ -56,7 +55,7 @@ function populate_sticky_subdirs_list(project_directory) {
 
   $.ajax({
     data: { path: project_directory, filename: 'sticky_notes_data.json' },
-    success: function(output_message) {
+    success: output_message => {
       let subdirs = output_message.split(',');
       console.log(subdirs);
       for (let i in subdirs) {

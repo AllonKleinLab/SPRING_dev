@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-export const  SPRITE_IMG_WIDTH = 32;
+export const SPRITE_IMG_WIDTH = 32;
 
 export const read_csv = text => {
   const dict = {};
@@ -20,22 +20,22 @@ export const read_csv = text => {
   return dict;
 };
 
-export const openInNewTab = (url) => {
+export const openInNewTab = url => {
   let win = window.open(url, '_blank');
   win.focus();
 };
 
-export const UrlExists = (url) => {
+export const UrlExists = url => {
   $.get(url)
-    .done(function() {
+    .done(() => {
       console.log('yes');
     })
-    .fail(function() {
+    .fail(() => {
       console.log('no');
     });
 };
 
-export const makeTextFile = (text) => {
+export const makeTextFile = text => {
   let textFile = '';
   let data = new Blob([text], { type: 'text/plain' });
 
@@ -64,11 +64,17 @@ export const downloadFile = (text, name) => {
   hiddenElement.click();
 };
 
-export const componentToHex = (c) => {
+export const componentToHex = c => {
   let hex = c.toString(16);
   return hex.length === 1 ? '0' + hex : hex;
 };
 
 export const rgbToHex = (r, g, b) => {
   return '0x' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+};
+
+export const postMessageToParent = message => {
+  if (document.referrer.length > 0 && window.location.origin !== document.referrer) {
+    window.parent.postMessage(message, document.referrer);
+  }
 };

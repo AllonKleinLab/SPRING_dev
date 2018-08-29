@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import Spinner from 'spinner';
+import * as Spinner from 'spinner';
 
 import { forceLayout, colorBar, cloneViewer, graph_directory, sub_directory } from './main';
 
@@ -34,7 +34,7 @@ export default class SmoothingImputation {
     this.button_bar = this.popup
       .append('div')
       .attr('id', 'imputation_button_bar')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       });
 
@@ -187,7 +187,7 @@ export default class SmoothingImputation {
           sub_dir: graph_directory + '/' + sub_directory,
         },
         //data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, beta:beta, n_rounds:N, raw_g:green_string},
-        success: function(data) {
+        success: data => {
           if (data && data.length >= 1) {
             let t1 = new Date();
             console.log('Smoothed the data: ', t1.getTime() - t0.getTime());
@@ -241,9 +241,8 @@ export default class SmoothingImputation {
             }
 
             colorBar.updateColorMax();
-            this.hide_waiting_wheel();
 
-            forceLayout.app.stage.children[1].children.sort(function(a, b) {
+            forceLayout.app.stage.children[1].children.sort((a, b) => {
               return (
                 colorBar.average_color(forceLayout.base_colors[a.index]) -
                 colorBar.average_color(forceLayout.base_colors[b.index])
@@ -252,6 +251,7 @@ export default class SmoothingImputation {
           } else {
             console.log('Got empty smoothing data.');
           }
+          this.hide_waiting_wheel();
         },
         type: 'POST',
         url: 'cgi-bin/smooth_gene.py',

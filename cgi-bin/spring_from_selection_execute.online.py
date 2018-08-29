@@ -163,7 +163,7 @@ update_log_html(logf, 'Saving stats...')
 custom_colors = {}
 f = open(current_dir + '/color_data_gene_sets.csv', 'r')
 for l in f:
-    print l[:100]
+    print (l[:100])
     cols = l.strip('\n').split(',')
     custom_colors[cols[0]] = map(float, np.array(cols[1:])[extra_filter])
 for k,v in custom_colors.items():
@@ -212,7 +212,7 @@ else:
 
 if len(gene_filter)==0: 
     update_log_html(logf, 'Error: No genes survived filtering')
-    print 'Error: No genes survived filtering'
+    print ('Error: No genes survived filtering')
     sys.exit()
     
 t1 = time.time()

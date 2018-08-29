@@ -82,13 +82,13 @@ export default class DownloadSelectedExpr {
     this.popup
       .append('div')
       .attr('id', 'downloadSelectedExpr_message_div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .style('overflow', 'scroll')
       .append('text');
 
-    d3.selectAll('.downloadSelectedExpr_input_div').on('mousedown', function() {
+    d3.selectAll('.downloadSelectedExpr_input_div').on('mousedown', () => {
       d3.event.stopPropagation();
     });
 
@@ -206,7 +206,7 @@ export default class DownloadSelectedExpr {
         selected_cells: sel2text,
         selection_name: subset_name,
       },
-      success: function(data) {
+      success: data => {
         let t1 = new Date();
         //console.log(data);
         d3.select('#downloadSelectedExpr_message_div')

@@ -102,7 +102,7 @@ export default class CloneViewer {
 
     this.popup
       .append('div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .append('label')
@@ -116,7 +116,7 @@ export default class CloneViewer {
 
     this.popup
       .append('div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .append('label')
@@ -130,7 +130,7 @@ export default class CloneViewer {
 
     this.popup
       .append('div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .append('label')
@@ -144,7 +144,7 @@ export default class CloneViewer {
 
     this.popup
       .append('div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .append('label')
@@ -478,14 +478,14 @@ export default class CloneViewer {
       dim_target_circle(0.75);
     }, 150);
 
-    function dim_target_circle(newX) {
+    const dim_target_circle = newX => {
       if (newX > 0 && this.targetCircle.alpha === newX) {
         this.targetCircle.alpha = newX - 0.08;
-        let dimmer = setTimeout(function() {
+        let dimmer = setTimeout(() => {
           dim_target_circle(newX - 0.08);
         }, 20);
       }
-    }
+    };
   }
 
   start_clone_viewer() {

@@ -23,6 +23,13 @@ export default class PAGA {
   }
 
   constructor() {
+    this.PAGA_data = {
+      edge_weight_meta: {
+        max_edge_weight: 1,
+        min_edge_weight: 1,
+      },
+    };
+
     this.popup = d3
       .select('#force_layout')
       .append('div')
@@ -44,7 +51,7 @@ export default class PAGA {
 
     this.popup
       .append('div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .append('label')
@@ -58,7 +65,7 @@ export default class PAGA {
 
     this.popup
       .append('div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .append('label')
@@ -72,7 +79,7 @@ export default class PAGA {
 
     this.popup
       .append('div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .append('label')
@@ -86,7 +93,7 @@ export default class PAGA {
 
     this.popup
       .append('div')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       })
       .append('label')
@@ -243,7 +250,7 @@ export default class PAGA {
   }
 
   reset_positions() {
-    d3.selectAll('.PAGA_node').each(function(d) {
+    d3.selectAll('.PAGA_node').each(d => {
       d.coordinates = Object.assign({}, d.coordinates_original);
     });
     this.PAGA_redraw();
@@ -255,12 +262,12 @@ export default class PAGA {
 
   deselect_PAGA() {
     let any_selected = false;
-    d3.selectAll('.PAGA_node').each(function(d) {
+    d3.selectAll('.PAGA_node').each(d => {
       if (d.selected) {
         any_selected = true;
       }
     });
-    d3.selectAll('.PAGA_node').each(function(d) {
+    d3.selectAll('.PAGA_node').each(d => {
       d.selected = !any_selected;
     });
     this.PAGA_redraw();
@@ -279,19 +286,19 @@ export default class PAGA {
     let edge_scale = (d3.select('#PAGA_edge_width_slider').node().value / 40) ** 3;
 
     d3.selectAll('.PAGA_node')
-      .attr('cx', function(d) {
+      .attr('cx', d => {
         return d.coordinates[0];
       })
-      .attr('cy', function(d) {
+      .attr('cy', d => {
         return d.coordinates[1];
       })
-      .attr('r', function(d) {
+      .attr('r', d => {
         return Math.sqrt(d.size) * 2 * node_scale;
       })
-      .attr('fill', function(d) {
+      .attr('fill', d => {
         return d.color;
       })
-      .attr('stroke-width', function(d) {
+      .attr('stroke-width', d => {
         if (d.selected) {
           return (15 + (Math.sqrt(d.size) / 5) * node_scale).toString() + 'px';
         } else {
@@ -332,7 +339,6 @@ export default class PAGA {
   }
 
   toggle_PAGA_visibility() {
-    console.log(document.getElementById('PAGA_visibility_checkbox'));
     if (document.getElementById('PAGA_visibility_checkbox').checked) {
       d3.selectAll('.PAGA_node').style('visibility', 'visible');
       d3.selectAll('.PAGA_link').style('visibility', 'visible');

@@ -33,7 +33,7 @@ export default class DoubletDetector {
     this.button_bar = this.popup
       .append('div')
       .attr('id', 'doublet_button_bar')
-      .on('mousedown', function() {
+      .on('mousedown', () => {
         d3.event.stopPropagation();
       });
 
@@ -217,7 +217,7 @@ export default class DoubletDetector {
       console.log(k, r);
       $.ajax({
         data: { base_dir: graph_directory, sub_dir: project_directory, k: k, r: r },
-        success: function(data) {
+        success: data => {
           let t1 = new Date();
           console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
           d3.select('#doublet_notification')

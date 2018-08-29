@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { project_directory } from './main';
 
 export const getData = async (name, fileType) => {
-  if (window.cacheData.has(name)) {
+  if (window.cacheData && window.cacheData.has(name)) {
     console.log(`I have cached data for ${name}!`);
     return window.cacheData.get(name);
   }

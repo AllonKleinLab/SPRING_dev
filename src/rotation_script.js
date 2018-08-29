@@ -19,7 +19,10 @@ export const rotation_update = () => {
   let real_scale = 1;
 
   const vis = d3.select('#vis');
-  vis.attr('transform', 'translate(' + [forceLayout.sprites.x, forceLayout.sprites.y] + ')' + ' scale(' + forceLayout.sprites.scale.x + ')');
+  vis.attr(
+    'transform',
+    'translate(' + [forceLayout.sprites.x, forceLayout.sprites.y] + ')' + ' scale(' + forceLayout.sprites.scale.x + ')',
+  );
   vis.append('circle').attr('id', 'rotation_outer_circ');
   vis.append('circle').attr('id', 'rotation_inner_circ');
   vis.append('circle').attr('id', 'rotation_pivot');
@@ -62,22 +65,24 @@ export const rotation_update = () => {
     .style('stroke-width', 6 / zoomScale);
 
   d3.select('#rotation_outer_circ')
-    .on('mouseover', function() {
+    .on('mouseover', () => {
       d3.select('#rotation_outer_circ').style('opacity', 0.5);
     })
-    .on('mouseout', function() {
+    .on('mouseout', () => {
       d3.select('#rotation_outer_circ').style('opacity', 0);
     });
 
   d3.select('#rotation_pivot').call(
-    d3.drag()
+    d3
+      .drag()
       .on('start', pivot_dragstarted)
       .on('drag', pivot_dragged)
       .on('end', pivot_dragended),
   );
 
   d3.select('#rotation_outer_circ').call(
-    d3.drag()
+    d3
+      .drag()
       .on('start', handle_dragstarted)
       .on('drag', handle_dragged)
       .on('end', handle_dragended),

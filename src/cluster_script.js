@@ -21,7 +21,7 @@ export default class Cluster {
       await this._instance.loadData();
       return this._instance;
     } else {
-      throw new Error('StickyNote.create() has already been called, get the existing instance with Cluster.instance!');
+      throw new Error('Cluster.create() has already been called, get the existing instance with Cluster.instance!');
     }
   }
 
@@ -87,7 +87,7 @@ export default class Cluster {
       colorBar.categorical_coloring_data['Current clustering'] = this.clustering_data.clusters[this.current_clus_name];
     });
 
-    d3.select('#enter_cluster_number').on('mousedown', function() {
+    d3.select('#enter_cluster_number').on('mousedown', () => {
       d3.event.stopPropagation();
     });
 
@@ -199,7 +199,7 @@ export default class Cluster {
     if (d3.select('#cluster_dropdown').style('height') === 'auto') {
       forceLayout.closeDropdown();
       collapse_settings();
-      setTimeout(function() {
+      setTimeout(() => {
         document.getElementById('cluster_dropdown').classList.toggle('show');
       }, 10);
     }
@@ -280,19 +280,19 @@ export default class Cluster {
     // Define the line
     let valueline = d3
       .line()
-      .x(function(d) {
+      .x(d => {
         return x(d[0]);
       })
-      .y(function(d) {
+      .y(d => {
         return y(d[1]);
       });
 
     let argmax_line = d3
       .line()
-      .x(function(d) {
+      .x(d => {
         return x(d[0]);
       })
-      .y(function(d) {
+      .y(d => {
         return y(d[1]);
       });
 
@@ -319,11 +319,11 @@ export default class Cluster {
     });
 
     // Scale the range of the data
-    let maxval = d3.max(this.gap_data, function(d) {
+    let maxval = d3.max(this.gap_data, d => {
       return d.y;
     });
     x.domain(
-      d3.extent(this.gap_data, function(d) {
+      d3.extent(this.gap_data, d => {
         return d.x;
       }),
     );
@@ -581,7 +581,7 @@ export default class Cluster {
         .attr('class', 'cluster_name_input')
         .attr('type', 'text')
         .attr('value', d)
-        .on('mousedown', function() {
+        .on('mousedown', () => {
           d3.event.stopPropagation();
         });
     });
@@ -677,10 +677,10 @@ export default class Cluster {
     let label_list = this.clustering_data.clusters[this.current_clus_name].label_list;
     d3.select('.node')
       .selectAll('circle')
-      .sort(function(a, b) {
+      .sort((a, b) => {
         return a.number - b.number;
       })
-      .each(function(d) {
+      .each(d => {
         text = text + d.name.toString() + ',' + label_list[d.number] + '\n';
       });
     colorBar.downloadFile(text, 'clustering.txt');

@@ -2,21 +2,21 @@ import * as d3 from 'd3';
 
 import { LineSprite } from './LineSprite';
 import {
-  colorBar,
   cloneViewer,
+  cluster2,
+  colorBar,
+  downloadSelectedExpr,
   paga,
+  project_directory,
   selectionLogic,
   selectionScript,
   smoothingImputation,
   springPlot,
-  downloadSelectedExpr,
-  project_directory,
   sub_directory,
 } from './main';
 import { SPRITE_IMG_WIDTH, downloadFile, rgbToHex } from './util';
 import { collapse_settings } from './settings_script';
 import { rotation_update } from './rotation_script';
-import { run_clustering } from './cluster2_script';
 import { getData } from './file_helper';
 
 export default class ForceLayout {
@@ -191,8 +191,6 @@ export default class ForceLayout {
     }
 
     // Read coordinates file if it exists
-    const coordinates_filename = project_directory + '/coordinates.txt';
-
     const text = await getData('coordinates', 'txt');
     if (!text.push) {
       text.split('\n').forEach((entry, index, array) => {
@@ -444,7 +442,7 @@ export default class ForceLayout {
       offset = d3.max(non_x) - d3.min(sel_x) + 5;
     }
 
-    function next_frame(steps, current_frame) {
+    const next_frame = (steps, current_frame) => {
       current_frame += 1;
       for (let i = 0; i < this.all_nodes.length; i++) {
         if (this.all_outlines[i].selected) {
@@ -464,7 +462,7 @@ export default class ForceLayout {
           this.blend_edges();
         }
       }
-    }
+    };
 
     this.edge_container.visible = false;
     next_frame(6, -1);
@@ -525,7 +523,7 @@ export default class ForceLayout {
 
         this.sprites.visible = true;
 
-        function next_frame_anim(current_frame) {
+        const next_frame_anim = current_frame => {
           current_frame += 1;
           let tmp_coordinates = animation_frames[current_frame];
 
@@ -537,15 +535,15 @@ export default class ForceLayout {
           }
 
           if (current_frame + 1 < animation_frames.length) {
-            setTimeout(function() {
+            setTimeout(() => {
               next_frame_anim(current_frame);
             }, 1);
           } else {
             next_frame_interp(-1, 10);
           }
-        }
+        };
 
-        function next_frame_interp(current_frame, steps) {
+        const next_frame_interp = (current_frame, steps) => {
           current_frame += 1;
           if (current_frame + 1 > steps || !any_diff) {
             this.blend_edges();
@@ -557,11 +555,11 @@ export default class ForceLayout {
               this.all_outlines[i].x += (this.coordinates[i][0] - last_frame[i][0]) / steps;
               this.all_outlines[i].y += (this.coordinates[i][1] - last_frame[i][1]) / steps;
             }
-            setTimeout(function() {
+            setTimeout(() => {
               next_frame_interp(current_frame, steps);
             }, 1);
           }
-        }
+        };
 
         next_frame_anim(-1);
       })
@@ -575,16 +573,16 @@ export default class ForceLayout {
     this.edge_container.alpha = 0;
     this.edge_container.visible = true;
 
-    function next_frame(current_frame, min, max, steps) {
+    const next_frame = (current_frame, min, max, steps) => {
       current_frame += 1;
       let alpha = (current_frame * (max - min)) / steps + min;
       this.edge_container.alpha = alpha;
       if (alpha < max) {
-        setTimeout(function() {
+        setTimeout(() => {
           next_frame(current_frame, min, max, steps);
         }, 5);
       }
-    }
+    };
 
     next_frame(-1, 0, 0.5, 10);
   };
@@ -742,12 +740,14 @@ export default class ForceLayout {
     d3.select('#start_clone_viewer').on('click', () => {
       cloneViewer.start_clone_viewer();
     });
+
     d3.select('#show_imputation_popup').on('click', () => smoothingImputation.show_imputation_popup());
     d3.select('#show_selection_logic_popup').on('click', () => selectionLogic.show_selection_logic_popup());
     d3.select('#show_doublet_popup').on('click', () => springPlot.show_make_new_SPRINGplot_popup());
-    d3.select('#run_clustering').on('click', () => run_clustering());
+    d3.select('#run_clustering').on('click', () => cluster2.run_clustering());
     d3.select('#show_PAGA_popup').on('click', () => paga.show_PAGA_popup());
     d3.select('#toggle_legend_hover_tooltip_button').on('click', () => colorBar.toggle_legend_hover_tooltip());
+    d3.select('#extend_selection').on('click', () => selectionScript.extend_selection());
   };
 
   download_png = () => {
@@ -823,21 +823,21 @@ export default class ForceLayout {
 
   fix() {
     if (d3.selectAll('.selected')[0].length === 0) {
-      d3.selectAll('.node circle').each(function(d) {
+      d3.selectAll('.node circle').each(d => {
         d.fixed = true;
       });
     }
-    d3.selectAll('.selected').each(function(d) {
+    d3.selectAll('.selected').each(d => {
       d.fixed = true;
     });
   }
 
   unfix() {
-    d3.selectAll('.selected').each(function(d) {
+    d3.selectAll('.selected').each(d => {
       d.fixed = false;
     });
     if (d3.selectAll('.selected')[0].length === 0) {
-      d3.selectAll('.node circle').each(function(d) {
+      d3.selectAll('.node circle').each(d => {
         d.fixed = false;
       });
     }

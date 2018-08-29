@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 
 import CloneViewer from './clone_viewer.js';
 import Cluster from './cluster_script.js';
+import Cluster2 from './cluster2_script.js';
 import ColorBar from './colorBar';
 import DoubletDetector from './doublet_detector.js';
 import DownloadSelectedExpr from './downloadSelectedExpr_script.js';
@@ -15,12 +16,16 @@ import StickyNote from './stickyNote.js';
 
 import { colorpicker_setup } from './colorpicker_layout.js';
 import { settings_setup, collapse_settings } from './settings_script.js';
+import { postMessageToParent } from './util.js';
 
 /** @type CloneViewer */
 export let cloneViewer;
 
 /** @type Cluster */
 export let cluster;
+
+/** @type Cluster2 */
+export let cluster2;
 
 /** @type ColorBar */
 export let colorBar;
@@ -55,7 +60,7 @@ export let stickyNote;
 d3.select('#sound_toggle')
   .append('img')
   .attr('src', 'src/sound_effects/icon_mute.svg')
-  .on('click', function() {
+  .on('click', () => {
     if (
       d3
         .select('#sound_toggle')
@@ -116,6 +121,7 @@ const loadData = async () => {
   selectionScript = await SelectionScript.create();
   stickyNote = await StickyNote.create();
   cluster = await Cluster.create();
+  cluster2 = await Cluster2.create();
   await callback();
 };
 
@@ -132,8 +138,8 @@ const getColorBarFromAjax = async args => {
 
 loadData()
   .then(res => {
-    console.log('Spring done loading');
-    window.parent.postMessage({ type: 'loaded' }, 'http://localhost:8080');
+    console.log('Spring done loading!');
+    postMessageToParent({ type: 'loaded' });
   })
   .catch(e => {
     console.log(e);
@@ -168,10 +174,6 @@ const callback = async () => {
   // start_clone_viewer();
   // show_imputation_popup();
   // show_colorpicker_popup('HSC_HSC_fate1');
-
-  window.addEventListener('message', e => {
-    console.log(e);
-  });
 
   window.onclick = function(event) {
     if (!event.target.matches('#settings_dropdown *')) {

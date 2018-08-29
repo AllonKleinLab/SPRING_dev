@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { show_colorpicker_popup } from './colorpicker_layout';
 import { forceLayout, graph_directory, selectionScript, project_directory } from './main';
-import { rgbToHex } from './util';
+import { rgbToHex, postMessageToParent } from './util';
 
 export default class ColorBar {
   /** @type ColorBar */
@@ -337,7 +337,7 @@ export default class ColorBar {
       .append('text')
       .attr('x', this.slider_scale)
       .attr('text-anchor', 'middle')
-      .text(function(d) {
+      .text(d => {
         return d;
       });
 
@@ -1433,7 +1433,7 @@ export default class ColorBar {
       .text('');
 
     d3.select('#count_column')
-      .on('mouseenter', function() {
+      .on('mouseenter', () => {
         d3.selectAll('.text_count_div').each(function() {
           var pct = d3
             .select(this)
@@ -1441,7 +1441,7 @@ export default class ColorBar {
             .text(d3.select(this).attr('pct') + '%');
         });
       })
-      .on('mouseleave', function() {
+      .on('mouseleave', () => {
         d3.selectAll('.text_count_div').each(function() {
           d3.select(this)
             .select('p')
@@ -1524,6 +1524,7 @@ export default class ColorBar {
     }
 
     const my_nodes = [];
+    const indices = [];
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       if (cat_label_list[i] === d) {
         my_nodes.push(i);
@@ -1537,6 +1538,7 @@ export default class ColorBar {
             forceLayout.all_outlines[i].tint = '0x0000ff';
             forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
           } else {
+            indices.push(i);
             forceLayout.all_outlines[i].selected = true;
             forceLayout.all_outlines[i].tint = '0xffff00';
             forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
@@ -1544,6 +1546,8 @@ export default class ColorBar {
         }
       }
     }
+
+    postMessageToParent({ type: 'selected-cells-update', payload: { indices } });
 
     if (forceLayout.all_nodes.length < 25000) {
       this.shrinkNodes(6, 10, my_nodes, forceLayout.all_nodes);

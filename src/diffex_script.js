@@ -21,7 +21,7 @@ export const diffex_setup = () => {
     .attr('id', 'diffex_closeopen')
     .append('button')
     .text('Open')
-    .on('click', function() {
+    .on('click', () => {
       if (d3.select('#diffex_panel').style('height') === '50px') {
         open_diffex();
       } else {
@@ -44,17 +44,17 @@ export const diffex_setup = () => {
 
   make_diffex_spinner('diffex_infobox');
 
-  d3.select('#diffex_size_slider').on('input', function() {
+  d3.select('#diffex_size_slider').on('input', () => {
     scatter_size = this.value / 15;
     quick_scatter_update();
   });
 
-  d3.select('#diffex_jitter_slider').on('input', function() {
+  d3.select('#diffex_jitter_slider').on('input', () => {
     scatter_jitter = parseFloat(this.value) / 50;
     quick_scatter_update();
   });
 
-  d3.select('#diffex_zoom_slider').on('input', function() {
+  d3.select('#diffex_zoom_slider').on('input', () => {
     scatter_zoom = 5 / (parseFloat(this.value) + 5);
     quick_scatter_update();
   });
@@ -64,7 +64,7 @@ export const diffex_setup = () => {
   function open_diffex() {
     gene_list = Object.keys(colorBar.all_gene_color_array);
     d3.selectAll('#diffex_panel').style('z-index', '4');
-    setTimeout(function() {
+    setTimeout(() => {
       d3.select('#diffex_refresh_button').style('visibility', 'visible');
       d3.select('#diffex_panel')
         .selectAll('svg')
@@ -72,8 +72,13 @@ export const diffex_setup = () => {
       d3.selectAll('.diffex_legend').style('visibility', 'visible');
       d3.select('#diffex_settings_box').style('visibility', 'visible');
     }, 200);
-    setTimeout(function() {
-      if (d3.select('#diffex_panel').select('svg').node() == null) {
+    setTimeout(() => {
+      if (
+        d3
+          .select('#diffex_panel')
+          .select('svg')
+          .node() == null
+      ) {
         refresh_selected_clusters();
       }
     }, 500);
@@ -106,7 +111,7 @@ export const diffex_setup = () => {
       .style('width', '280px')
       .style('bottom', '106px');
 
-    setTimeout(function() {
+    setTimeout(() => {
       d3.selectAll('#diffex_panel').style('z-index', '1');
     }, 500);
   }
@@ -130,10 +135,10 @@ export const diffex_setup = () => {
         .append('text')
         .text('No clusters selected');
     } else {
-      setTimeout(function() {
+      setTimeout(() => {
         d3.select('.diffex_spinner').style('visibility', 'visible');
       }, 1);
-      setTimeout(function() {
+      setTimeout(() => {
         make_diffex_legend();
         scatter_setup();
         d3.select('.diffex_spinner').style('visibility', 'hidden');
@@ -145,16 +150,16 @@ export const diffex_setup = () => {
   function scatter_setup() {
     let blue_selection = [];
     let yellow_selection = [];
-    d3.selectAll('.selected').each(function(d) {
+    d3.selectAll('.selected').each(d => {
       yellow_selection.push(d.number);
     });
-    d3.selectAll('.compared').each(function(d) {
+    d3.selectAll('.compared').each(d => {
       blue_selection.push(d.number);
     });
 
     let xx = [];
     let yy = [];
-    gene_list.forEach(function(d) {
+    gene_list.forEach(d => {
       xx.push(masked_average(colorBar.all_gene_color_array[d], blue_selection));
       yy.push(masked_average(colorBar.all_gene_color_array[d], yellow_selection));
     });
@@ -176,19 +181,21 @@ export const diffex_setup = () => {
     const width = document.getElementById('diffex_panel').offsetWidth - margin.left - margin.right;
     const height = document.getElementById('diffex_panel').offsetHeight - margin.top - margin.bottom;
 
-    scatter_x = d3.scaleLinear()
+    scatter_x = d3
+      .scaleLinear()
       .domain([
         0,
-        d3.max(scatter_data, function(d) {
+        d3.max(scatter_data, d => {
           return d[0] * scatter_zoom;
         }) + 0.02,
       ])
       .range([0, width]);
 
-    scatter_y = d3.scaleLinear()
+    scatter_y = d3
+      .scaleLinear()
       .domain([
         0,
-        d3.max(scatter_data, function(d) {
+        d3.max(scatter_data, d => {
           return d[0] * scatter_zoom;
         }) + 0.02,
       ])
@@ -276,36 +283,42 @@ export const diffex_setup = () => {
       .enter()
       .append('svg:circle')
       .attr('class', 'diffex-scatter-dots')
-      .attr('cx', function(d, i) {
+      .attr('cx', (d, i) => {
         return scatter_x(d[0] + d[2] * scatter_jitter);
       })
-      .attr('cy', function(d) {
+      .attr('cy', d => {
         return scatter_y(d[1] + d[2] * scatter_jitter);
       })
       .attr('r', scatter_size);
 
     d3.selectAll('.diffex-scatter-dots')
-      .on('mouseenter', function(d) {
+      .on('mouseenter', d => {
         let selectedG = d[4];
         d3.select('#tooltip_gene_name')
           .select('text')
           .text(selectedG);
         d3.select('#tooltip').style('background-color', 'green');
-        let ww = d3.select('#tooltip_gene_name').node().getBoundingClientRect().width;
+        let ww = d3
+          .select('#tooltip_gene_name')
+          .node()
+          .getBoundingClientRect().width;
         d3.select('#tooltip').style('width', (65 + ww).toString() + 'px');
         d3.select('#tooltip').style('visibility', 'visible');
 
-        let rect = d3.select('body').node().getBoundingClientRect();
+        let rect = d3
+          .select('body')
+          .node()
+          .getBoundingClientRect();
         d3.select('#tooltip')
           .style('bottom', rect.height - 5 - event.pageY + 'px')
           .style('right', rect.width - event.pageX + 20 + 'px');
         d3.select(this).attr('r', scatter_size * 3);
       })
-      .on('mouseleave', function() {
+      .on('mouseleave', () => {
         d3.select('#tooltip').style('visibility', 'hidden');
         d3.select(this).attr('r', scatter_size);
       })
-      .on('click', function(d) {
+      .on('click', d => {
         d3.select('#green_menu').node().value = d[4];
         colorBar.update_slider();
       });
@@ -316,7 +329,7 @@ export const diffex_setup = () => {
       return d3.sum(vals) / vals.length;
     } else {
       let out = 0;
-      indexes.forEach(function(d) {
+      indexes.forEach(d => {
         out = out + vals[d];
       });
       return out / indexes.length;
@@ -326,13 +339,13 @@ export const diffex_setup = () => {
   function quick_scatter_update() {
     scatter_x.domain([
       0,
-      d3.max(scatter_data, function(d) {
+      d3.max(scatter_data, d => {
         return d[0] * scatter_zoom;
       }) + 0.02,
     ]);
     scatter_y.domain([
       0,
-      d3.max(scatter_data, function(d) {
+      d3.max(scatter_data, d => {
         return d[0] * scatter_zoom;
       }) + 0.02,
     ]);
@@ -344,10 +357,10 @@ export const diffex_setup = () => {
       .enter()
       .append('svg:circle');
     d3.selectAll('.diffex-scatter-dots')
-      .attr('cx', function(d, i) {
+      .attr('cx', (d, i) => {
         return scatter_x(d[0] + d[2] * scatter_jitter);
       })
-      .attr('cy', function(d) {
+      .attr('cy', d => {
         return scatter_y(d[1] + d[3] * scatter_jitter);
       })
       .attr('r', scatter_size);
@@ -356,10 +369,10 @@ export const diffex_setup = () => {
   function make_diffex_legend() {
     let yellow_list = [];
     let blue_list = [];
-    d3.selectAll('.selected').each(function(d) {
+    d3.selectAll('.selected').each(d => {
       yellow_list.push(d);
     });
-    d3.selectAll('.compared').each(function(d) {
+    d3.selectAll('.compared').each(d => {
       blue_list.push(d);
     });
 
@@ -407,7 +420,7 @@ export const diffex_setup = () => {
       .append('div')
       .attr('class', 'diffex_text_label_div')
       .append('p')
-      .text(function(d) {
+      .text(d => {
         return d.name;
       })
       .style('float', 'left')

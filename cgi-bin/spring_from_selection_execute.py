@@ -229,7 +229,7 @@ def execute_spring(param_filename):
         gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
     
     if len(gene_filter)==0: 
-    	print 'Error: No genes survived filtering'
+    	print ('Error: No genes survived filtering')
     	sys.exit()
     
     t1 = time.time()

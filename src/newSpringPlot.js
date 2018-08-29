@@ -12,7 +12,7 @@ function newSpringPlot(callback) {
   sel2text = sel2text.slice(1, sel2text.length);
   $.ajax({
     data: { base_dir: graph_directory, current_dir: sub_directory, new_dir: 'poop', selected_cells: sel2text },
-    success: function(data) {
+    success: data => {
       console.log(data);
       $('#updater').html(data);
     },
