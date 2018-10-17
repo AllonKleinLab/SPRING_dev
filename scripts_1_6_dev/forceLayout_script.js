@@ -689,7 +689,7 @@ function download_sprite_as_png(renderer, sprite, fileName) {
 
 function downloadEdges() {
 	var text = ""
-	all_edge_ends.forEach(function(e) {
+	all_edge_ends.forEach(function(d) {
 		text = text + d.source.toString() + "," + d.target.toString() + "\n";
 	});
 	downloadFile(text,"edge_list.txt");
