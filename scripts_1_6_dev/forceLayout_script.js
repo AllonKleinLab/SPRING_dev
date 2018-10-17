@@ -687,6 +687,14 @@ function download_sprite_as_png(renderer, sprite, fileName) {
 	}, 'image/png');
 }
 
+function downloadEdges() {	
+	var text = ""
+	d3.select(".link").selectAll("line")
+		.each(function(d) { text = text + d.source.name + "," + d.target.name + "\n"; });
+	downloadFile(text,"edge_list.txt")
+}
+
+
 
 function showToolsDropdown() {
 	if (d3.select("#tools_dropdown").style("height") == 'auto') {
