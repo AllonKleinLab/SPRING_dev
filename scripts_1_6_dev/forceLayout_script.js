@@ -687,11 +687,12 @@ function download_sprite_as_png(renderer, sprite, fileName) {
 	}, 'image/png');
 }
 
-function downloadEdges() {	
+function downloadEdges() {
 	var text = ""
-	d3.select(".link").selectAll("line")
-		.each(function(d) { text = text + d.source.name + "," + d.target.name + "\n"; });
-	downloadFile(text,"edge_list.txt")
+	all_edge_ends.forEach(function(e) {
+		text = text + d.source.toString() + "," + d.target.toString() + "\n";
+	});
+	downloadFile(text,"edge_list.txt");
 }
 
 
