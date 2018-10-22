@@ -111,16 +111,16 @@ def load_npz(file_data):
 def load_npy(file_data):
     return scipy.sparse.csc_matrix(np.load(file_data))
 
-def load_text(file_data,delim='\t'):
+def load_text(file_data,delim='\t', load_cell_bcs=False):
     X_data = []
     X_row = []
     X_col = []
+    cell_bcs = []
 
     start_column = -1
     start_row = -1
     for row_ix, dat in enumerate(file_data):
         dat = dat.strip('\n').split(delim)
-
         if start_row == -1:
             current_col = 0
             found_float = False
@@ -140,7 +140,7 @@ def load_text(file_data,delim='\t'):
                         X_col.extend(col_ix)
                         X_row.extend([row_ix - start_row] * len(col_ix))
                         X_data.extend(rowdat[col_ix])
-
+                        if load_cell_bcs: cell_bcs.append(dat[0])
                     except:
                         current_col += 1
 
@@ -148,6 +148,7 @@ def load_text(file_data,delim='\t'):
                     current_col += 1
         else:
             try:
+                if load_cell_bcs: cell_bcs.append(dat[0])
                 rowdat = np.array(map(float, dat[start_column:]))
                 if len(rowdat) != ncol:
                     return 'ERROR: Rows have different numbers of numeric columns.'
@@ -160,11 +161,10 @@ def load_text(file_data,delim='\t'):
 
     if start_row == -1:
         return 'ERROR: no numeric values found'
-
     nrow = row_ix - start_row + 1
     E = scipy.sparse.coo_matrix((X_data, (X_row, X_col)), dtype=float, shape=(nrow, ncol)).tocsc()
-    
-    return E
+    if load_cell_bcs: return E, np.array(cell_bcs)
+    else: return E
 
 def text_to_sparse(file_data,delim='\t',start_row=0,start_column=0,data_type=float):
     output = [[]]
