@@ -5,13 +5,14 @@ function doublet_setup() {
 	var button_bar = popup.append('div').attr('id','doublet_button_bar')
 		.on('mousedown',function() { d3.event.stopPropagation(); });
 		
-	button_bar.append('label').text('k = ').append('input').attr('id','doublet_k_input').property('value',50);
-	button_bar.append('label').text('r = ').append('input').attr('id','doublet_r_input').property('value',2);
+	button_bar.append('label').html('<i>k</i> = ').append('input').attr('id','doublet_k_input').property('value',50);
+	button_bar.append('label').html('<i>r</i> = ').append('input').attr('id','doublet_r_input').property('value',2);
+	button_bar.append('label').html('<i>f</i> = ').append('input').attr('id','doublet_f_input').property('value',0.1);
 	button_bar.append('button').text('Run').on('click',run_doublet_detector);
 	button_bar.append('button').text('Close').on('click',hide_doublet_popup);
 
 	var text_box = popup.append('div').attr('id','doublet_description').append('text')
-		.text('Predict mixed-celltype doublets. Uses a kNN classifier to find cells that look like simulated doublets. k sets the number neighbors used in the classifier, and r is the ratio of simulated doublets to observed cells.');
+		.html('Predict mixed-celltype doublets. Uses a kNN classifier to identify transcriptomes that resemble simulated doublets. <br><br> <b><i>k </i> : </b> the number neighbors used in the classifier <br> <b><i>r </i> : </b> the ratio of simulated doublets to observed cells <br> <b><i>f </i> : </b> the expected doublet rate');
 
 
 	var doublet_notify_popup= d3.select('#force_layout').append('div')
@@ -129,6 +130,7 @@ function doublet_setup() {
 			var t0 = new Date();
 			var k = $('#doublet_k_input').val();
 			var r = $('#doublet_r_input').val();
+			var f = $('#doublet_f_input').val();
 
 			// show_processing_mask();
 			// hide_doublet_popup_slowly();
@@ -138,11 +140,11 @@ function doublet_setup() {
 			show_doublet_notification();
 			hide_doublet_popup();
 
-			console.log(k, r);
+			console.log(k, r, f);
 			$.ajax({
 				url: "cgi-bin/run_doublet_detector.py",
 				type: "POST",
-				data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, k:k, r:r},
+				data: {base_dir:graph_directory, sub_dir:graph_directory+'/'+sub_directory, k:k, r:r, f:f},
 				success: function(data) {
 					var t1 = new Date();
 					console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
@@ -170,7 +172,7 @@ function doublet_setup() {
 						clone_viewer_setup();
 					}
 					
-					hide_processing_mask();
+					//hide_processing_mask();
 					// open json file containing gene sets and populate drop down menu
 					var noCache = new Date().getTime();
 					d3.json(graph_directory+'/'+sub_directory+"/color_stats.json"+"?_="+noCache, function(data) { color_stats = data; });
@@ -178,6 +180,7 @@ function doublet_setup() {
 						gene_set_color_array = read_csv(text);
 						dispatch.load(gene_set_color_array,"gene_sets")	;
 						update_slider();
+						console.log('loaded doublet scores into menu');
 					});
 				}
 			});

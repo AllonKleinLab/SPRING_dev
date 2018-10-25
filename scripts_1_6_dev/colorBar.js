@@ -1073,6 +1073,16 @@ function colorBar(project_directory, color_menu_genes) {
 		hiddenElement.click();
 	}
 
+	function downloadFileDirect(path, filename) {
+		console.log(path);
+		var hiddenElement = document.createElement('a');
+		// hiddenElement.href = ''
+		hiddenElement.href = path;
+		hiddenElement.target = '_blank';
+		hiddenElement.download = filename;
+		hiddenElement.click();
+	}
+
 	downloadRankedTerms = function downloadRankedTerms() {
 		var num_selected = 0;
 		for (i=0; i<all_nodes.length; i++) {
@@ -1103,6 +1113,11 @@ function colorBar(project_directory, color_menu_genes) {
 		}
 		downloadFile(text,"enriched_terms.txt")
 	}
+
+	downloadDoubletScores = function downloadRankedTerms() {
+		downloadFileDirect(graph_directory+'/'+sub_directory + '/doublet_results.tsv', 'doublet_results.tsv')
+	}
+		
 }
 
 function make_legend(cat_color_map,cat_label_list) {
