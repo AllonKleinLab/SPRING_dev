@@ -146,7 +146,7 @@ export default class SelectionLogic {
       forceLayout.all_outlines[sel[i]].alpha = forceLayout.all_nodes[sel[i]].alpha;
     }
     selectionScript.update_selected_count();
-    colorBar.count_clusters(forceLayout.all_nodes);
+    colorBar.count_clusters();
   }
 
   clear_options() {

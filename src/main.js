@@ -186,4 +186,38 @@ const callback = async () => {
       forceLayout.closeDropdown();
     }
   };
+
+  window.addEventListener('message', event => {
+    if (event.origin === window.location.origin) {
+      return;
+    }
+    try {
+      const parsedData = JSON.parse(event.data);
+      switch (parsedData.type) {
+        case 'selected-cells-update': {
+          const { indices } = parsedData.payload;
+          if (indices) {
+            for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+              forceLayout.all_outlines[i].selected = false;
+              forceLayout.all_outlines[i].alpha = 0;
+            }
+            for (const coordinateIndex of indices) {
+              forceLayout.all_outlines[coordinateIndex].tint = '0xffff00';
+              forceLayout.all_outlines[coordinateIndex].selected = true;
+              forceLayout.all_outlines[coordinateIndex].alpha = forceLayout.all_nodes[coordinateIndex].alpha;
+            }
+            selectionScript.update_selected_count();
+          }
+        }
+        default: {
+          break;
+        }
+      }
+    } catch (err) {
+      console.log(`Unable to parse received message.\n\
+      Data: ${event.data}
+      Error: ${err}`);
+    }
+  });
+  
 };

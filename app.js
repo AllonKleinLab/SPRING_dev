@@ -26,6 +26,11 @@ window.addEventListener('message', event => {
           window.cacheData.set('coordinates', parsedData.payload.coordinates);
         }
       }
+      case 'selected-cells-update': {
+        if (parsedData.payload.coordinates) {
+          window.cacheData.set('selected-cells', parsedData.payload.coordinates);
+        }
+      }
       default: {
         break;
       }
