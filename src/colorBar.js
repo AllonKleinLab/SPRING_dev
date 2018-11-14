@@ -1547,7 +1547,7 @@ export default class ColorBar {
       }
     }
 
-    postMessageToParent({ type: 'selected-cells-update', payload: { indices } });
+    postMessageToParent({ type: 'selected-category-update', payload: { category: d, indices } });
 
     if (forceLayout.all_nodes.length < 25000) {
       this.shrinkNodes(6, 10, my_nodes, forceLayout.all_nodes);

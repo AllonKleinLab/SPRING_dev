@@ -122,7 +122,7 @@ const loadData = async () => {
   stickyNote = await StickyNote.create();
   cluster = await Cluster.create();
   cluster2 = await Cluster2.create();
-  await callback();
+  await setupUserInterface();
 };
 
 const getColorBarFromAjax = async args => {
@@ -145,9 +145,8 @@ loadData()
     console.log(e);
   });
 
-const callback = async () => {
+const setupUserInterface = async () => {
   d3.select('#load_colors').remove();
-
   forceLayout.initiateButtons();
   forceLayout.setup_download_dropdown();
   forceLayout.setup_tools_dropdown();
@@ -194,30 +193,64 @@ const callback = async () => {
     try {
       const parsedData = JSON.parse(event.data);
       switch (parsedData.type) {
-        case 'selected-cells-update': {
-          const { indices } = parsedData.payload;
-          if (indices) {
-            for (let i = 0; i < forceLayout.all_outlines.length; i++) {
-              forceLayout.all_outlines[i].selected = false;
-              forceLayout.all_outlines[i].alpha = 0;
-            }
-            for (const coordinateIndex of indices) {
-              forceLayout.all_outlines[coordinateIndex].tint = '0xffff00';
-              forceLayout.all_outlines[coordinateIndex].selected = true;
-              forceLayout.all_outlines[coordinateIndex].alpha = forceLayout.all_nodes[coordinateIndex].alpha;
-            }
-            selectionScript.update_selected_count();
+        case 'init': {
+          if (parsedData.payload.categories && parsedData.payload.categories.length >= 1) {
+            setCategorySelection(parsedData.payload.categories);
+            window.cacheData.set('categories', parsedData.payload.categories);
           }
+          if (parsedData.payload.indices && parsedData.payload.indices.length >= 1) {
+            setIndexSelection(parsedData.payload.indices);
+            window.cacheData.set('indices', parsedData.payload.indices);
+          }
+          break;
+        }
+        case 'selected-category-update': {
+          setCategorySelection(parsedData.payload.categories);
+          break;
+        }
+        case 'selected-cells-update': {
+          setIndexSelection(parsedData.payload.indices);
+          break;
         }
         default: {
           break;
         }
       }
+      selectionScript.update_selected_count();
     } catch (err) {
       console.log(`Unable to parse received message.\n\
       Data: ${event.data}
       Error: ${err}`);
     }
   });
-  
 };
+
+const setCategorySelection = (categories) => {
+  if (categories) {
+    const cat_label_list = colorBar.categorical_coloring_data.Sample.label_list;
+    for (let i = 0; i < forceLayout.all_nodes.length; i++) {
+      if (categories.includes(cat_label_list[i])) {
+        forceLayout.all_outlines[i].selected = true;
+        forceLayout.all_outlines[i].tint = '0xffff00';
+        forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
+      } else {
+        forceLayout.all_outlines[i].selected = false;
+        forceLayout.all_outlines[i].alpha = 0;
+      }
+    }
+  }
+}
+
+const setIndexSelection = (indices) => {
+  if (indices) {
+    for (let i = 0; i < forceLayout.all_outlines.length; i++) {
+      forceLayout.all_outlines[i].selected = false;
+      forceLayout.all_outlines[i].alpha = 0;
+    }
+    for (const coordinateIndex of indices) {
+      forceLayout.all_outlines[coordinateIndex].tint = '0xffff00';
+      forceLayout.all_outlines[coordinateIndex].selected = true;
+      forceLayout.all_outlines[coordinateIndex].alpha = forceLayout.all_nodes[coordinateIndex].alpha;
+    }
+  }
+}

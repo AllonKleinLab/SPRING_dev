@@ -12,9 +12,11 @@ requirejs.config({
   },
 });
 
-window.cacheData = new Map();
+if (!window.cacheData) {
+  window.cacheData = new Map();
+}
 
-window.addEventListener('message', event => {
+window.addEventListener('message', event => {  
   if (event.origin === window.location.origin) {
     return;
   }
@@ -22,8 +24,12 @@ window.addEventListener('message', event => {
     const parsedData = JSON.parse(event.data);
     switch (parsedData.type) {
       case 'init': {
-        if (parsedData.payload.coordinates) {
-          window.cacheData.set('coordinates', parsedData.payload.coordinates);
+        if (parsedData.payload.indices) {
+          window.cacheData.set('indices', parsedData.payload.indices);
+        }
+
+        if (parsedData.payload.categories) {
+          window.cacheData.set('categories', parsedData.payload.categories);
         }
       }
       case 'selected-cells-update': {
