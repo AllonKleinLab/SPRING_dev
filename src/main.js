@@ -15,6 +15,7 @@ import SmoothingImputation from './smoothing_imputation.js';
 import StickyNote from './stickyNote.js';
 
 import { colorpicker_setup } from './colorpicker_layout.js';
+import { getData } from './file_helper';
 import { settings_setup, collapse_settings } from './settings_script.js';
 import { postMessageToParent } from './util.js';
 
@@ -126,14 +127,19 @@ const loadData = async () => {
 };
 
 const getColorBarFromAjax = async args => {
-  const python_data = await $.ajax({
-    data: { base_dir: graph_directory },
-    type: 'POST',
-    url: 'cgi-bin/load_counts.py',
-  });
-
-  const result = await ColorBar.create(python_data);
-  return result;
+  try {
+    const python_data = await $.ajax({
+      data: { base_dir: graph_directory },
+      type: 'POST',
+      url: 'cgi-bin/load_counts.py',
+    });
+    const result = await ColorBar.create(python_data);
+    return result;
+  } catch (e) {
+    const geneData = await getData('genes', 'txt');
+    const result = await ColorBar.create(geneData);
+    return result;
+  }
 };
 
 loadData()
@@ -225,7 +231,7 @@ const setupUserInterface = async () => {
   });
 };
 
-const setCategorySelection = (categories) => {
+const setCategorySelection = categories => {
   if (categories) {
     const cat_label_list = colorBar.categorical_coloring_data.Sample.label_list;
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
@@ -239,9 +245,9 @@ const setCategorySelection = (categories) => {
       }
     }
   }
-}
+};
 
-const setIndexSelection = (indices) => {
+const setIndexSelection = indices => {
   if (indices) {
     for (let i = 0; i < forceLayout.all_outlines.length; i++) {
       forceLayout.all_outlines[i].selected = false;
@@ -253,4 +259,4 @@ const setIndexSelection = (indices) => {
       forceLayout.all_outlines[coordinateIndex].alpha = forceLayout.all_nodes[coordinateIndex].alpha;
     }
   }
-}
+};
