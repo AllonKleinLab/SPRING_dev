@@ -16,8 +16,8 @@ if (!window.cacheData) {
   window.cacheData = new Map();
 }
 
-window.addEventListener('message', event => {  
-  if (event.origin === window.location.origin) {
+window.addEventListener('message', event => {
+  if (!event.isTrusted && event.origin === window.location.origin) {
     return;
   }
   try {

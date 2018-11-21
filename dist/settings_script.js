@@ -2,6 +2,7 @@ define(["require", "exports", "d3", "./main", "./util"], function (require, expo
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.settings_setup = () => {
+        console.log('setting up settings_setup');
         let dropdown = d3
             .select('#button_panel')
             .append('div')

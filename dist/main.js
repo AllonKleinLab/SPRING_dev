@@ -73,12 +73,15 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
                 type: 'POST',
                 url: 'cgi-bin/load_counts.py',
             });
+            console.log('ajax returned');
             const result = yield colorBar_1.default.create(python_data);
+            console.log('returning python data');
             return result;
         }
         catch (e) {
             const geneData = yield file_helper_1.getData('genes', 'txt');
             const result = yield colorBar_1.default.create(geneData);
+            console.log('returning gene data');
             return result;
         }
     });
@@ -91,6 +94,7 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
         console.log(e);
     });
     const setupUserInterface = () => __awaiter(this, void 0, void 0, function* () {
+        console.log('setting up UI');
         d3.select('#load_colors').remove();
         exports.forceLayout.initiateButtons();
         exports.forceLayout.setup_download_dropdown();
@@ -113,6 +117,7 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
         // start_clone_viewer();
         // show_imputation_popup();
         // show_colorpicker_popup('HSC_HSC_fate1');
+        console.log('setting up window');
         window.onclick = function (event) {
             if (!event.target.matches('#settings_dropdown *')) {
                 settings_script_js_1.collapse_settings();
@@ -125,7 +130,7 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
             }
         };
         window.addEventListener('message', event => {
-            if (event.origin === window.location.origin) {
+            if (!event.isTrusted && event.origin === window.location.origin) {
                 return;
             }
             try {
@@ -154,6 +159,7 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
                         break;
                     }
                 }
+                console.log('updated selection');
                 exports.selectionScript.update_selected_count();
             }
             catch (err) {
@@ -180,6 +186,7 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
         }
     };
     const setIndexSelection = indices => {
+        console.log(`setting indices ${indices}`);
         if (indices) {
             for (let i = 0; i < exports.forceLayout.all_outlines.length; i++) {
                 exports.forceLayout.all_outlines[i].selected = false;

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+  "typeRoots": ["node_modules/@types"],
     "allowJs": true,
     "checkJs": true, // Report errors in .js files.
     "lib": [
@@ -17,6 +18,6 @@
     "./spring.d.ts"
   ],
   "exclude": [
-    "./node_modules",
+    "node_modules",
   ]
 }

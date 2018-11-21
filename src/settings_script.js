@@ -4,6 +4,7 @@ import { forceLayout } from './main';
 import { SPRITE_IMG_WIDTH, rgbToHex } from './util';
 
 export const settings_setup = () => {
+  console.log('setting up settings_setup');
   let dropdown = d3
     .select('#button_panel')
     .append('div')
