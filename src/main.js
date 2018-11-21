@@ -133,14 +133,11 @@ const getColorBarFromAjax = async args => {
       type: 'POST',
       url: 'cgi-bin/load_counts.py',
     });
-    console.log('ajax returned');
     const result = await ColorBar.create(python_data);
-    console.log('returning python data');
     return result;
   } catch (e) {
     const geneData = await getData('genes', 'txt');
     const result = await ColorBar.create(geneData);
-    console.log('returning gene data');
     return result;
   }
 };
@@ -155,7 +152,6 @@ loadData()
   });
 
 const setupUserInterface = async () => {
-  console.log('setting up UI');
   d3.select('#load_colors').remove();
   forceLayout.initiateButtons();
   forceLayout.setup_download_dropdown();
@@ -184,7 +180,6 @@ const setupUserInterface = async () => {
   // show_imputation_popup();
   // show_colorpicker_popup('HSC_HSC_fate1');
 
-  console.log('setting up window');
   window.onclick = function(event) {
     if (!event.target.matches('#settings_dropdown *')) {
       collapse_settings();
@@ -227,7 +222,6 @@ const setupUserInterface = async () => {
           break;
         }
       }
-      console.log('updated selection');
       selectionScript.update_selected_count();
     } catch (err) {
       console.log(`Unable to parse received message.\n\
@@ -254,7 +248,6 @@ const setCategorySelection = categories => {
 };
 
 const setIndexSelection = indices => {
-  console.log(`setting indices ${indices}`);
   if (indices) {
     for (let i = 0; i < forceLayout.all_outlines.length; i++) {
       forceLayout.all_outlines[i].selected = false;
