@@ -154,20 +154,23 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
                         break;
                     }
                 }
-                exports.selectionScript.update_selected_count();
             }
             catch (err) {
                 console.log(`Unable to parse received message.\n\
       Data: ${event.data}
       Error: ${err}`);
             }
+            finally {
+                exports.selectionScript.update_selected_count();
+                exports.colorBar.count_clusters();
+            }
         });
     });
     const setCategorySelection = categories => {
         if (categories) {
-            const cat_label_list = exports.colorBar.categorical_coloring_data.Sample.label_list;
+            const { label_colors, label_list } = exports.colorBar.categorical_coloring_data.Sample;
             for (let i = 0; i < exports.forceLayout.all_nodes.length; i++) {
-                if (categories.includes(cat_label_list[i])) {
+                if (categories.includes(label_list[i])) {
                     exports.forceLayout.all_outlines[i].selected = true;
                     exports.forceLayout.all_outlines[i].tint = '0xffff00';
                     exports.forceLayout.all_outlines[i].alpha = exports.forceLayout.all_nodes[i].alpha;
