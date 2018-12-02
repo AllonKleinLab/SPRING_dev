@@ -248,7 +248,6 @@ define(["require", "exports", "d3", "./main", "./util"], function (require, expo
                 .style('opacity', 1.0);
         }
         hide_doublet_notification() {
-            console.log('hide');
             d3.select('#doublet_notification')
                 .style('opacity', 0.0)
                 .style('visibility', 'hidden');

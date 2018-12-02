@@ -243,8 +243,6 @@ export default class SpringPlot {
           reader.readAsText(file, 'UTF-8');
           reader.onload = evt => {
             this.custom_genes = evt.target.result;
-            console.log(evt.target);
-            console.log(evt.target.result);
             this.wrapper.style('padding', '4px 11px 4px 11px');
             this.wrapper.style('background-color', 'red');
             this.wrapper.select('span').text('Uploaded');

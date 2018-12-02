@@ -211,7 +211,6 @@ export default class SelectionScript {
     this.brusher = d3
       .brush()
       .on('brush', () => {
-        console.log('selection brush');
         let extent = d3
           .selectAll('.brush .selection')
           .node()
@@ -227,7 +226,6 @@ export default class SelectionScript {
           let inrect = extent.left <= x && x < extent.right && extent.top <= y && y < extent.bottom;
           let o = forceLayout.all_outlines[i];
           if (this.selection_mode === 'positive_select' || this.selection_mode === 'negative_select') {
-            console.log('pos/neg selection');
             o.selected = (o.selected && !o.compared) || (this.selection_mode === 'positive_select' && inrect);
             o.compared = (o.compared && !o.selected) || (this.selection_mode === 'negative_select' && inrect);
           }
@@ -256,7 +254,6 @@ export default class SelectionScript {
         colorBar.count_clusters();
       })
       .on('end', d => {
-        console.log('selection brusher end')
         // Ensures we don't recursively call 'brush end' events: https://github.com/d3/d3-brush/issues/25
         if (d3.event.sourceEvent.type !== 'end') {
           this.brusher.move(this.brush, null);
@@ -318,7 +315,6 @@ export default class SelectionScript {
   }
 
   switch_mode() {
-    console.log(`selection script switch mode ${this.selection_mode}`);
     this.drag_pan_zoom_rect.transition('5').attr('fill-opacity', this.selection_mode === 'drag_pan_zoom' ? 0.5 : 0.15);
     this.positive_select_rect
       .transition()
@@ -330,8 +326,7 @@ export default class SelectionScript {
       .attr('fill-opacity', this.selection_mode === 'negative_select' ? 0.5 : 0.15);
     this.deselect_rect.transition('5').attr('fill-opacity', this.selection_mode === 'deselect' ? 0.5 : 0.15);
     if (this.selection_mode !== 'drag_pan_zoom') {
-      console.log('removing zoom events from svg graph')
-      d3.select('#svg_graph')
+      d3.select('#svg_graph').select('g')
         .call(forceLayout.zoomer)
         .on('mousedown.zoom', null)
         .on('touchstart.zoom', null)
@@ -342,7 +337,6 @@ export default class SelectionScript {
       this.brush.call(this.brusher);
     }
     if (this.selection_mode === 'drag_pan_zoom') {
-      console.log('removing zoom events from svg brush')
       this.brush
         .call(this.brusher)
         .on('mousedown.brush', null)
@@ -350,7 +344,7 @@ export default class SelectionScript {
         .on('touchmove.brush', null)
         .on('touchend.brush', null);
       this.brush.select('.background').style('cursor', 'auto');
-      d3.select('#svg_graph').call(forceLayout.zoomer);
+      d3.select('#svg_graph').select('g').call(forceLayout.zoomer);
     }
   }
 

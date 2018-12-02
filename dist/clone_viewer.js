@@ -384,7 +384,6 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
             return Math.pow(r, 1.5) / 8;
         }
         clone_mousemove() {
-            console.log(main_1.forceLayout.app.stage.children);
             let dim = document.getElementById('svg_graph').getBoundingClientRect();
             let x = d3.event.clientX - dim.left;
             let y = d3.event.clientY - dim.top;

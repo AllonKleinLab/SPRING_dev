@@ -435,7 +435,6 @@ export default class CloneViewer {
   }
 
   clone_mousemove() {
-    console.log(forceLayout.app.stage.children)
     let dim = document.getElementById('svg_graph').getBoundingClientRect();
     let x = d3.event.clientX - dim.left;
     let y = d3.event.clientY - dim.top;

@@ -38,7 +38,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             dels.push(Math.sqrt(Math.pow(all_xs[i] - cx, 2) + Math.pow(all_ys[i] - cy, 2)));
         }
         let rotator_radius = d3.median(dels) * 1.5;
-        const zoomScale = d3.zoomTransform(main_1.forceLayout.zoomer).k;
+        const zoomScale = d3.zoomTransform(vis.node()).k;
         d3.select('#rotation_pivot')
             .attr('r', d3.min([13 / zoomScale, (rotator_radius + 30) / 3]))
             .style('stroke-width', d3.min([3 / zoomScale, 10]))

@@ -209,9 +209,9 @@ define(["require", "exports", "d3", "spinner", "./main"], function (require, exp
                                 }
                             }
                             main_1.colorBar.updateColorMax();
-                            main_1.forceLayout.app.stage.children[1].children.sort((a, b) => {
-                                return (main_1.colorBar.average_color(main_1.forceLayout.base_colors[a.index]) -
-                                    main_1.colorBar.average_color(main_1.forceLayout.base_colors[b.index]));
+                            main_1.forceLayout.app.stage.children.sort((a, b) => {
+                                return (main_1.colorBar.average_color(main_1.forceLayout.base_colors[a.tabIndex]) -
+                                    main_1.colorBar.average_color(main_1.forceLayout.base_colors[b.tabIndex]));
                             });
                         }
                         else {

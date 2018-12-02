@@ -82,6 +82,7 @@ export default class SmoothingImputation {
   imputation_popup_dragstarted() {
     d3.event.sourceEvent.stopPropagation();
   }
+
   imputation_popup_dragged() {
     let cx = parseFloat(
       d3
@@ -242,10 +243,10 @@ export default class SmoothingImputation {
 
             colorBar.updateColorMax();
 
-            forceLayout.app.stage.children[1].children.sort((a, b) => {
+            forceLayout.app.stage.children.sort((a, b) => {
               return (
-                colorBar.average_color(forceLayout.base_colors[a.index]) -
-                colorBar.average_color(forceLayout.base_colors[b.index])
+                colorBar.average_color(forceLayout.base_colors[a.tabIndex]) -
+                colorBar.average_color(forceLayout.base_colors[b.tabIndex])
               );
             });
           } else {

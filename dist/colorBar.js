@@ -824,7 +824,6 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
                 d3.selectAll('#gradient_bar').attr('fill', '#7e7e7e');
                 d3.selectAll('#handle').style('fill', '#7e7e7e');
                 const name = document.getElementById('labels_menu').value;
-                console.log(this.categorical_coloring_data);
                 let cat_color_map = this.getSampleCategoricalColoringData().label_colors;
                 let cat_label_list = this.getSampleCategoricalColoringData().label_list;
                 d3.select('#legend_mask')

@@ -97,6 +97,7 @@ export default class DoubletDetector {
   doublet_popup_dragstarted() {
     d3.event.sourceEvent.stopPropagation();
   }
+
   doublet_popup_dragged() {
     let cx = parseFloat(
       d3
@@ -295,7 +296,6 @@ export default class DoubletDetector {
   }
 
   hide_doublet_notification() {
-    console.log('hide');
     d3.select('#doublet_notification')
       .style('opacity', 0.0)
       .style('visibility', 'hidden');

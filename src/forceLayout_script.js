@@ -59,7 +59,7 @@ export default class ForceLayout {
     this.mutable = null;
     this.sprites = new PIXI.Container();
     this.stashed_coordinates = new Array();
-    this.svg_graph = {};
+    this.svg_graph = d3.select(null);
     this.xScale = d3.scaleLinear();
     this.yScale = d3.scaleLinear();
     this.zoomer = d3.zoom();
@@ -220,7 +220,6 @@ export default class ForceLayout {
       stashed_coordinates[0][i] = [this.all_nodes[i].x, this.all_nodes[i].y];
     }
 
-    console.log('svg graph drag listener ?');
     this.svg_graph.call(
       d3
         .drag()
@@ -306,7 +305,6 @@ export default class ForceLayout {
   };
 
   dragstarted() {
-    console.log(`forcelayout dragstart ${selectionScript.selection_mode}`)
     if (selectionScript.selection_mode === 'drag_pan_zoom') {
       let dim = document.getElementById('svg_graph').getBoundingClientRect();
       let x = d3.event.sourceEvent.clientX - dim.left;
@@ -356,7 +354,6 @@ export default class ForceLayout {
   }
 
   dragged() {
-    console.log(`forcelayout dragged ${selectionScript.selection_mode}`)
     for (let i = 0; i < this.all_nodes.length; i++) {
       if (this.all_nodes[i].beingDragged) {
         this.all_nodes[i].x += d3.event.dx / this.sprites.scale.x;
@@ -380,7 +377,6 @@ export default class ForceLayout {
   }
 
   dragended() {
-    console.log(`forcelayout dragend ${selectionScript.selection_mode}`)
     this.being_dragged = false;
     for (let i = 0; i < this.all_nodes.length; i++) {
       this.all_nodes[i].beingDragged = false;
@@ -474,7 +470,7 @@ export default class ForceLayout {
 
   revert_positions = () => {
     let stash_i = this.stashed_coordinates.length - 1;
-    for (let i in this.stashed_coordinates[stash_i]) {
+    for (let i in this.stashed_coordinates  [stash_i]) {
       this.move_node(i, this.stashed_coordinates[stash_i][i][0], this.stashed_coordinates[stash_i][i][1]);
     }
     this.adjust_edges();
@@ -593,14 +589,12 @@ export default class ForceLayout {
 
   toggleForce = () => {
     if (this.force_on === 1) {
-      console.log('turning force off');
       d3.select('#toggleforce')
         .select('button')
         .text('Resume');
       this.force_on = 0;
       this.force.stop();
     } else {
-      console.log('turning force on');
       d3.select('#toggleforce')
         .select('button')
         .text('Pause');
@@ -629,9 +623,6 @@ export default class ForceLayout {
   downloadSelection = () => {
     let name = window.location.search;
     let cell_filter_filename = window.location.search.slice(1, name.length) + '/cell_filter.txt';
-    console.log(
-      `Variable 'cell_filter_filename':\n${cell_filter_filename}\n${JSON.stringify(cell_filter_filename, null, 2)}`,
-    );
     d3.text(cell_filter_filename).then(cellText => {
       let cell_nums = cellText.split('\n');
       let text = '';
@@ -941,8 +932,7 @@ export default class ForceLayout {
             this.sprites.scale.x +
             ')',
         );
-
-        // zoomer.scale(sprites.scale.x);
+        this.zoomer.scaleTo(d3.select('svg').select('g'), this.sprites.scale.x);
         step += 1;
         setTimeout(move, 10);
       }

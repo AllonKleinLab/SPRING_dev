@@ -46,7 +46,7 @@ export const rotation_update = () => {
   }
   let rotator_radius = d3.median(dels) * 1.5;
 
-  const zoomScale = d3.zoomTransform(forceLayout.zoomer).k;
+  const zoomScale = d3.zoomTransform(vis.node()).k;
 
   d3.select('#rotation_pivot')
     .attr('r', d3.min([13 / zoomScale, (rotator_radius + 30) / 3]))
@@ -91,6 +91,7 @@ export const rotation_update = () => {
   function pivot_dragstarted() {
     d3.event.sourceEvent.stopPropagation();
   }
+
   function pivot_dragged() {
     let cxFromD3 = parseFloat(
       d3
@@ -111,6 +112,7 @@ export const rotation_update = () => {
     d3.select('#rotation_outer_circ').style('cx', cxFromD3 + d3.event.dx);
     d3.select('#rotation_outer_circ').style('cy', cyFromD3 + d3.event.dy);
   }
+
   function pivot_dragended() {
     return;
   }
