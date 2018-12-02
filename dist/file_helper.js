@@ -16,12 +16,14 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
         }
         try {
             const filePath = `${main_1.project_directory}/${name}.${fileType}`;
-            return fetchFile(filePath, fileType);
+            const file = yield fetchFile(filePath, fileType);
+            return file;
         }
         catch (e) {
             try {
                 const filePath = `${main_1.project_directory}/../${name}.${fileType}`;
-                return fetchFile(filePath, fileType);
+                const file = yield fetchFile(filePath, fileType);
+                return file;
             }
             catch (e) {
                 console.log(e);
@@ -33,9 +35,9 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
         switch (fileType) {
             case 'txt':
             case 'csv':
-                return yield d3.text(filePath);
+                return d3.text(filePath);
             case 'json':
-                return yield d3.json(filePath);
+                return d3.json(filePath);
             default: {
                 return Promise.reject(`Sorry, currently no support for fileType '${fileType}'!`);
             }

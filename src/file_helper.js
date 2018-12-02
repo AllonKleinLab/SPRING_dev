@@ -9,11 +9,13 @@ export const getData = async (name, fileType) => {
 
   try {
     const filePath = `${project_directory}/${name}.${fileType}`;
-    return fetchFile(filePath, fileType);
+    const file = await fetchFile(filePath, fileType);
+    return file;
   } catch (e) {
     try {
       const filePath = `${project_directory}/../${name}.${fileType}`;
-      return fetchFile(filePath, fileType);
+      const file = await fetchFile(filePath, fileType);
+      return file;
     } catch (e) {
       console.log(e);
       return '';
@@ -21,13 +23,13 @@ export const getData = async (name, fileType) => {
   }
 };
 
-const  fetchFile = async (filePath, fileType) => {
+const fetchFile = async (filePath, fileType) => {
   switch (fileType) {
     case 'txt':
     case 'csv':
-      return await d3.text(filePath);
+      return  d3.text(filePath);
     case 'json':
-      return await d3.json(filePath);
+      return  d3.json(filePath);
     default: {
       return Promise.reject(`Sorry, currently no support for fileType '${fileType}'!`);
     }
