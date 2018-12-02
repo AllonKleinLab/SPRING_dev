@@ -497,6 +497,7 @@ define(["require", "exports", "d3", "./LineSprite", "./main", "./util", "./setti
                 for (let i in this.all_nodes) {
                     stashed_coordinates[0][i] = [this.all_nodes[i].x, this.all_nodes[i].y];
                 }
+                console.log('svg graph drag listener ?');
                 this.svg_graph.call(d3
                     .drag()
                     .on('start', () => this.dragstarted())
@@ -537,6 +538,7 @@ define(["require", "exports", "d3", "./LineSprite", "./main", "./util", "./setti
             }
         }
         dragstarted() {
+            console.log(`forcelayout dragstart ${main_1.selectionScript.selection_mode}`);
             if (main_1.selectionScript.selection_mode === 'drag_pan_zoom') {
                 let dim = document.getElementById('svg_graph').getBoundingClientRect();
                 let x = d3.event.sourceEvent.clientX - dim.left;
@@ -585,6 +587,7 @@ define(["require", "exports", "d3", "./LineSprite", "./main", "./util", "./setti
             }
         }
         dragged() {
+            console.log(`forcelayout dragged ${main_1.selectionScript.selection_mode}`);
             for (let i = 0; i < this.all_nodes.length; i++) {
                 if (this.all_nodes[i].beingDragged) {
                     this.all_nodes[i].x += d3.event.dx / this.sprites.scale.x;
@@ -605,6 +608,7 @@ define(["require", "exports", "d3", "./LineSprite", "./main", "./util", "./setti
             }
         }
         dragended() {
+            console.log(`forcelayout dragend ${main_1.selectionScript.selection_mode}`);
             this.being_dragged = false;
             for (let i = 0; i < this.all_nodes.length; i++) {
                 this.all_nodes[i].beingDragged = false;

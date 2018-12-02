@@ -158,8 +158,8 @@ const setupUserInterface = async () => {
   forceLayout.setup_tools_dropdown();
   forceLayout.center_view(false);
 
-  cloneViewer.clone_sprites.visible = false;
-  cloneViewer.edge_container.visible = false;
+  cloneViewer.clone_sprites.visible = true;
+  cloneViewer.edge_container.visible = true;
 
   forceLayout.animation();
   forceLayout.setup_layout_dropdown();
@@ -197,29 +197,31 @@ const setupUserInterface = async () => {
       return;
     }
     try {
-      const parsedData = JSON.parse(event.data);
-      switch (parsedData.type) {
-        case 'init': {
-          if (parsedData.payload.categories && parsedData.payload.categories.length >= 1) {
+      if (typeof event.data === 'object') {
+        const parsedData = JSON.parse(event.data);
+        switch (parsedData.type) {
+          case 'init': {
+            if (parsedData.payload.categories && parsedData.payload.categories.length >= 1) {
+              setCategorySelection(parsedData.payload.categories);
+              window.cacheData.set('categories', parsedData.payload.categories);
+            }
+            if (parsedData.payload.indices && parsedData.payload.indices.length >= 1) {
+              setIndexSelection(parsedData.payload.indices);
+              window.cacheData.set('indices', parsedData.payload.indices);
+            }
+            break;
+          }
+          case 'selected-category-update': {
             setCategorySelection(parsedData.payload.categories);
-            window.cacheData.set('categories', parsedData.payload.categories);
+            break;
           }
-          if (parsedData.payload.indices && parsedData.payload.indices.length >= 1) {
+          case 'selected-cells-update': {
             setIndexSelection(parsedData.payload.indices);
-            window.cacheData.set('indices', parsedData.payload.indices);
+            break;
           }
-          break;
-        }
-        case 'selected-category-update': {
-          setCategorySelection(parsedData.payload.categories);
-          break;
-        }
-        case 'selected-cells-update': {
-          setIndexSelection(parsedData.payload.indices);
-          break;
-        }
-        default: {
-          break;
+          default: {
+            break;
+          }
         }
       }
     } catch (err) {
@@ -235,7 +237,7 @@ const setupUserInterface = async () => {
 
 const setCategorySelection = categories => {
   if (categories) {
-    const { label_colors, label_list} = colorBar.categorical_coloring_data.Sample;
+    const { label_list} = colorBar.getSampleCategoricalColoringData();
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       if (categories.includes(label_list[i])) {
         forceLayout.all_outlines[i].selected = true;

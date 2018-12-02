@@ -96,8 +96,8 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
         exports.forceLayout.setup_download_dropdown();
         exports.forceLayout.setup_tools_dropdown();
         exports.forceLayout.center_view(false);
-        exports.cloneViewer.clone_sprites.visible = false;
-        exports.cloneViewer.edge_container.visible = false;
+        exports.cloneViewer.clone_sprites.visible = true;
+        exports.cloneViewer.edge_container.visible = true;
         exports.forceLayout.animation();
         exports.forceLayout.setup_layout_dropdown();
         exports.springPlot = make_new_SPRINGplot_script_js_1.default.create();
@@ -129,29 +129,31 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
                 return;
             }
             try {
-                const parsedData = JSON.parse(event.data);
-                switch (parsedData.type) {
-                    case 'init': {
-                        if (parsedData.payload.categories && parsedData.payload.categories.length >= 1) {
+                if (typeof event.data === 'object') {
+                    const parsedData = JSON.parse(event.data);
+                    switch (parsedData.type) {
+                        case 'init': {
+                            if (parsedData.payload.categories && parsedData.payload.categories.length >= 1) {
+                                setCategorySelection(parsedData.payload.categories);
+                                window.cacheData.set('categories', parsedData.payload.categories);
+                            }
+                            if (parsedData.payload.indices && parsedData.payload.indices.length >= 1) {
+                                setIndexSelection(parsedData.payload.indices);
+                                window.cacheData.set('indices', parsedData.payload.indices);
+                            }
+                            break;
+                        }
+                        case 'selected-category-update': {
                             setCategorySelection(parsedData.payload.categories);
-                            window.cacheData.set('categories', parsedData.payload.categories);
+                            break;
                         }
-                        if (parsedData.payload.indices && parsedData.payload.indices.length >= 1) {
+                        case 'selected-cells-update': {
                             setIndexSelection(parsedData.payload.indices);
-                            window.cacheData.set('indices', parsedData.payload.indices);
+                            break;
                         }
-                        break;
-                    }
-                    case 'selected-category-update': {
-                        setCategorySelection(parsedData.payload.categories);
-                        break;
-                    }
-                    case 'selected-cells-update': {
-                        setIndexSelection(parsedData.payload.indices);
-                        break;
-                    }
-                    default: {
-                        break;
+                        default: {
+                            break;
+                        }
                     }
                 }
             }
@@ -168,7 +170,7 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
     });
     const setCategorySelection = categories => {
         if (categories) {
-            const { label_colors, label_list } = exports.colorBar.categorical_coloring_data.Sample;
+            const { label_list } = exports.colorBar.getSampleCategoricalColoringData();
             for (let i = 0; i < exports.forceLayout.all_nodes.length; i++) {
                 if (categories.includes(label_list[i])) {
                     exports.forceLayout.all_outlines[i].selected = true;

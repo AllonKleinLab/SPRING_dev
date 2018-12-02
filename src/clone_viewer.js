@@ -76,9 +76,7 @@ export default class CloneViewer {
       //.style("text-align", "center")
       .attr('id', 'clone_key_menu')
       .on('change', () => {
-        console.log(document.getElementById('clone_key_menu').value);
-        console.log(document.getElementById('clone_key_menu').nodeValue);
-        this.clone_key = document.getElementById('clone_key_menu').nodeValue;
+        this.clone_key = document.getElementById('clone_key_menu').value;
       });
 
     this.cloneDispatch = d3.dispatch('load', 'statechange');
@@ -275,7 +273,7 @@ export default class CloneViewer {
     } finally {
       d3.select('#clone_loading_screen').style('visibility', 'hidden');
       this.cloneDispatch.call('load', this, this.clone_map);
-      this.clone_key = document.getElementById('clone_key_menu').nodeValue;
+      this.clone_key = document.getElementById('clone_key_menu').value;
     }
   }
 
@@ -378,10 +376,10 @@ export default class CloneViewer {
       }
     }
     colorBar.update_tints();
-    forceLayout.app.stage.children[1].children.sort((a, b) => {
+    forceLayout.app.stage.children.sort((a, b) => {
       return (
-        colorBar.average_color(forceLayout.base_colors[a.index]) -
-        colorBar.average_color(forceLayout.base_colors[b.index])
+        colorBar.average_color(forceLayout.base_colors[a.tabIndex]) -
+        colorBar.average_color(forceLayout.base_colors[b.tabIndex])
       );
     });
 
@@ -402,15 +400,15 @@ export default class CloneViewer {
       this.deactivate_edges(i);
     }
 
-    let maxsize = parseFloat(d3.select('#clone_size_input').node().value);
-    if (maxsize > 0 === false) {
-      maxsize = 100000000;
+    let maxGroupSize = parseFloat(d3.select('#clone_size_input').node().value);
+    if (maxGroupSize > 0 === false) {
+      maxGroupSize = 100000000;
     }
 
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       if (
         forceLayout.all_outlines[i].selected &&
-        this.clone_map[this.clone_key][i].length < maxsize &&
+        this.clone_map[this.clone_key][i].length < maxGroupSize &&
         this.node_status[i].source
       ) {
         if (!(i in this.clone_nodes)) {
@@ -428,7 +426,7 @@ export default class CloneViewer {
     this.targetCircle.lineStyle(7, 0xffffff); //(thickness, color)
     this.targetCircle.drawCircle(0, 0, this.get_clone_radius() + forceLayout.all_nodes[0].scale.x * SPRITE_IMG_WIDTH); //(x,y,radius)
     this.targetCircle.endFill();
-    this.targetCircle.alpha = 0;
+    this.targetCircle.alpha = 1;
   }
 
   get_clone_radius() {
@@ -437,6 +435,7 @@ export default class CloneViewer {
   }
 
   clone_mousemove() {
+    console.log(forceLayout.app.stage.children)
     let dim = document.getElementById('svg_graph').getBoundingClientRect();
     let x = d3.event.clientX - dim.left;
     let y = d3.event.clientY - dim.top;
@@ -451,18 +450,20 @@ export default class CloneViewer {
         this.deactivate_nodes(i);
       }
     }
+
     for (let i in this.clone_edges) {
       this.deactivate_edges(i);
     }
-    let maxsize = parseFloat(d3.select('#clone_size_input').node().value);
-    if (maxsize > 0 === false) {
-      maxsize = 100000000;
+    let maxGroupSize = parseFloat(d3.select('#clone_size_input').node().value);
+    if (maxGroupSize > 0 === false) {
+      maxGroupSize = 100000000;
     }
 
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       const rad = Math.sqrt((forceLayout.all_nodes[i].x - x) ** 2 + (forceLayout.all_nodes[i].y - y) ** 2);
       if (rad <= this.get_clone_radius()) {
-        if (this.node_status[i].source && this.clone_map[this.clone_key][i].length < maxsize) {
+        const nodeAndCloneExist = this.node_status[i].source && this.clone_map[this.clone_key] &&  this.clone_map[this.clone_key][i];
+        if (nodeAndCloneExist && this.clone_map[this.clone_key][i].length < maxGroupSize) {
           if (!(i in this.clone_nodes)) {
             this.activate_edges(i, false);
             if (this.show_source_nodes) {
@@ -489,7 +490,8 @@ export default class CloneViewer {
   }
 
   start_clone_viewer() {
-    this.svg_graph = d3.select('svg_graph');
+    this.svg_graph = d3.select('#svg_graph');
+
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
       this.node_status[i] = { active: false, active_stable: false, source: false, target: false };
     }

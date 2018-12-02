@@ -621,8 +621,8 @@ export default class ColorBar {
     }
     if (document.getElementById('labels_button').checked) {
       const name = document.getElementById('labels_menu').value;
-      const cat_color_map = this.categorical_coloring_data.Sample.label_colors;
-      const cat_label_list = this.categorical_coloring_data.Sample.label_list;
+      const cat_color_map = this.getSampleCategoricalColoringData().label_colors;
+      const cat_label_list = this.getSampleCategoricalColoringData().label_list;
 
       for (let i = 0; i < forceLayout.base_colors.length; i++) {
         forceLayout.base_colors[i] = d3.rgb(cat_color_map[cat_label_list[i]]);
@@ -834,8 +834,10 @@ export default class ColorBar {
       d3.selectAll('#gradient_bar').attr('fill', '#7e7e7e');
       d3.selectAll('#handle').style('fill', '#7e7e7e');
       const name = document.getElementById('labels_menu').value;
-      let cat_color_map = this.categorical_coloring_data.Sample.label_colors;
-      let cat_label_list = this.categorical_coloring_data.Sample.label_list;
+      console.log(this.categorical_coloring_data);
+
+      let cat_color_map = this.getSampleCategoricalColoringData().label_colors;
+      let cat_label_list = this.getSampleCategoricalColoringData().label_list;
       d3.select('#legend_mask')
         .transition()
         .attr('x', this.svg_width - 177)
@@ -982,6 +984,10 @@ export default class ColorBar {
       }
     });
     this.dispatch.call('load', this, tmpdict, 'all_genes');
+  }
+
+  getSampleCategoricalColoringData() {
+    return this.categorical_coloring_data.Sample !== undefined ? this.categorical_coloring_data.Sample : this.categorical_coloring_data.sample;
   }
 
   geneAutocomplete(gene_list) {
@@ -1559,9 +1565,9 @@ export default class ColorBar {
   count_clusters() {
     const name = document.getElementById('labels_menu').value;
     if (name.length > 0) {
-      const cat_color_map = this.categorical_coloring_data.Sample.label_colors;
-      const cat_label_list = this.categorical_coloring_data.Sample.label_list;
-      const cat_counts = this.categorical_coloring_data.Sample.label_counts;
+      const cat_color_map = this.getSampleCategoricalColoringData().label_colors;
+      const cat_label_list = this.getSampleCategoricalColoringData().label_list;
+      const cat_counts = this.getSampleCategoricalColoringData().label_counts;
 
       let counts = {};
       Object.keys(cat_color_map).forEach(d => {

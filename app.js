@@ -21,24 +21,26 @@ window.addEventListener('message', event => {
     return;
   }
   try {
-    const parsedData = JSON.parse(event.data);
-    switch (parsedData.type) {
-      case 'init': {
-        if (parsedData.payload.indices) {
-          window.cacheData.set('indices', parsedData.payload.indices);
-        }
+    if (typeof event.data === 'object') {
+      const parsedData = JSON.parse(event.data);
+      switch (parsedData.type) {
+        case 'init': {
+          if (parsedData.payload.indices) {
+            window.cacheData.set('indices', parsedData.payload.indices);
+          }
 
-        if (parsedData.payload.categories) {
-          window.cacheData.set('categories', parsedData.payload.categories);
+          if (parsedData.payload.categories) {
+            window.cacheData.set('categories', parsedData.payload.categories);
+          }
         }
-      }
-      case 'selected-cells-update': {
-        if (parsedData.payload.coordinates) {
-          window.cacheData.set('selected-cells', parsedData.payload.coordinates);
+        case 'selected-cells-update': {
+          if (parsedData.payload.coordinates) {
+            window.cacheData.set('selected-cells', parsedData.payload.coordinates);
+          }
         }
-      }
-      default: {
-        break;
+        default: {
+          break;
+        }
       }
     }
   } catch (err) {

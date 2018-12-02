@@ -220,6 +220,7 @@ export default class ForceLayout {
       stashed_coordinates[0][i] = [this.all_nodes[i].x, this.all_nodes[i].y];
     }
 
+    console.log('svg graph drag listener ?');
     this.svg_graph.call(
       d3
         .drag()
@@ -305,6 +306,7 @@ export default class ForceLayout {
   };
 
   dragstarted() {
+    console.log(`forcelayout dragstart ${selectionScript.selection_mode}`)
     if (selectionScript.selection_mode === 'drag_pan_zoom') {
       let dim = document.getElementById('svg_graph').getBoundingClientRect();
       let x = d3.event.sourceEvent.clientX - dim.left;
@@ -354,6 +356,7 @@ export default class ForceLayout {
   }
 
   dragged() {
+    console.log(`forcelayout dragged ${selectionScript.selection_mode}`)
     for (let i = 0; i < this.all_nodes.length; i++) {
       if (this.all_nodes[i].beingDragged) {
         this.all_nodes[i].x += d3.event.dx / this.sprites.scale.x;
@@ -377,6 +380,7 @@ export default class ForceLayout {
   }
 
   dragended() {
+    console.log(`forcelayout dragend ${selectionScript.selection_mode}`)
     this.being_dragged = false;
     for (let i = 0; i < this.all_nodes.length; i++) {
       this.all_nodes[i].beingDragged = false;

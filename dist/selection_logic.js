@@ -68,6 +68,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
         }
         // <-- SelectionLogic Constructor End -->
         get_selections() {
+            console.log('selection logic get selection');
             let left_name = this.left_dropdown.property('value');
             let right_name = this.right_dropdown.property('value');
             let left_sel = [];
@@ -87,6 +88,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             return [left_sel, right_sel];
         }
         union_arrays(x, y) {
+            console.log('selection logic union_arrays');
             let obj = {};
             for (let i = x.length - 1; i >= 0; --i) {
                 obj[x[i]] = x[i];
@@ -104,12 +106,14 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             return res;
         }
         apply_or() {
+            console.log('selection logic apply or');
             let sels = this.get_selections();
             let new_sel = this.union_arrays(sels[0], sels[1]);
             this.set_selections(new_sel);
             this.get_selections();
         }
         apply_and() {
+            console.log('selection logic apply and');
             let sels = this.get_selections();
             let new_sel = sels[0].filter(n => {
                 return sels[1].indexOf(n) !== -1;
@@ -117,6 +121,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             this.set_selections(new_sel);
         }
         set_selections(sel) {
+            console.log('selection logic set selections');
             for (let i = 0; i < main_1.forceLayout.all_outlines.length; i++) {
                 main_1.forceLayout.all_outlines[i].selected = false;
                 main_1.forceLayout.all_outlines[i].alpha = 0;
@@ -130,6 +135,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             main_1.colorBar.count_clusters();
         }
         clear_options() {
+            console.log('selection logic clear options');
             this.left_dropdown.selectAll('option').remove();
             this.left_dropdown.append('option').text('Current selection');
             this.right_dropdown.selectAll('option').remove();
@@ -137,6 +143,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             this.selection_data = {};
         }
         add_selection() {
+            console.log('selection logic add selections');
             let name = $('#selection_logic_input').val();
             $('#selection_logic_input').val('');
             this.left_dropdown
@@ -150,6 +157,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             this.selection_data[name.toString()] = this.get_selected_cells();
         }
         get_selected_cells() {
+            console.log('selection logic get selected cells');
             let sel = [];
             for (let i = 0; i < main_1.forceLayout.all_outlines.length; i++) {
                 if (main_1.forceLayout.all_outlines[i].selected) {
@@ -159,9 +167,11 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             return sel;
         }
         selection_logic_popup_dragstarted() {
+            console.log('selection logic drag start');
             d3.event.sourceEvent.stopPropagation();
         }
         selection_logic_popup_dragged() {
+            console.log('selection logic dragged');
             let cx = parseFloat(d3
                 .select('#selection_logic_popup')
                 .style('left')
@@ -174,9 +184,11 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             d3.select('#selection_logic_popup').style('top', (cy + d3.event.dy).toString() + 'px');
         }
         selection_logic_popup_dragended() {
+            console.log('selection logic dragend');
             return;
         }
         show_selection_logic_popup() {
+            console.log('selection logic show');
             let mywidth = parseInt(d3
                 .select('#selection_logic_popup')
                 .style('width')
@@ -191,6 +203,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
                 .style('visibility', 'visible');
         }
         hide_selection_logic_popup() {
+            console.log('selection logic hide');
             d3.select('#selection_logic_popup').style('visibility', 'hidden');
         }
     }

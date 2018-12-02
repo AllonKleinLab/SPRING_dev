@@ -67,9 +67,7 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
                 //.style("text-align", "center")
                 .attr('id', 'clone_key_menu')
                 .on('change', () => {
-                console.log(document.getElementById('clone_key_menu').value);
-                console.log(document.getElementById('clone_key_menu').nodeValue);
-                this.clone_key = document.getElementById('clone_key_menu').nodeValue;
+                this.clone_key = document.getElementById('clone_key_menu').value;
             });
             this.cloneDispatch = d3.dispatch('load', 'statechange');
             this.cloneDispatch.on('load', data => {
@@ -249,7 +247,7 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
                 finally {
                     d3.select('#clone_loading_screen').style('visibility', 'hidden');
                     this.cloneDispatch.call('load', this, this.clone_map);
-                    this.clone_key = document.getElementById('clone_key_menu').nodeValue;
+                    this.clone_key = document.getElementById('clone_key_menu').value;
                 }
             });
         }
@@ -339,9 +337,9 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
                 }
             }
             main_1.colorBar.update_tints();
-            main_1.forceLayout.app.stage.children[1].children.sort((a, b) => {
-                return (main_1.colorBar.average_color(main_1.forceLayout.base_colors[a.index]) -
-                    main_1.colorBar.average_color(main_1.forceLayout.base_colors[b.index]));
+            main_1.forceLayout.app.stage.children.sort((a, b) => {
+                return (main_1.colorBar.average_color(main_1.forceLayout.base_colors[a.tabIndex]) -
+                    main_1.colorBar.average_color(main_1.forceLayout.base_colors[b.tabIndex]));
             });
             this.clear_clone_overlays();
         }
@@ -357,13 +355,13 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
             for (let i in this.clone_edges) {
                 this.deactivate_edges(i);
             }
-            let maxsize = parseFloat(d3.select('#clone_size_input').node().value);
-            if (maxsize > 0 === false) {
-                maxsize = 100000000;
+            let maxGroupSize = parseFloat(d3.select('#clone_size_input').node().value);
+            if (maxGroupSize > 0 === false) {
+                maxGroupSize = 100000000;
             }
             for (let i = 0; i < main_1.forceLayout.all_nodes.length; i++) {
                 if (main_1.forceLayout.all_outlines[i].selected &&
-                    this.clone_map[this.clone_key][i].length < maxsize &&
+                    this.clone_map[this.clone_key][i].length < maxGroupSize &&
                     this.node_status[i].source) {
                     if (!(i in this.clone_nodes)) {
                         this.activate_edges(i, false);
@@ -379,13 +377,14 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
             this.targetCircle.lineStyle(7, 0xffffff); //(thickness, color)
             this.targetCircle.drawCircle(0, 0, this.get_clone_radius() + main_1.forceLayout.all_nodes[0].scale.x * util_1.SPRITE_IMG_WIDTH); //(x,y,radius)
             this.targetCircle.endFill();
-            this.targetCircle.alpha = 0;
+            this.targetCircle.alpha = 1;
         }
         get_clone_radius() {
             let r = parseInt(d3.select('#clone_selector_size_slider').node().value, 10);
             return Math.pow(r, 1.5) / 8;
         }
         clone_mousemove() {
+            console.log(main_1.forceLayout.app.stage.children);
             let dim = document.getElementById('svg_graph').getBoundingClientRect();
             let x = d3.event.clientX - dim.left;
             let y = d3.event.clientY - dim.top;
@@ -401,14 +400,15 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
             for (let i in this.clone_edges) {
                 this.deactivate_edges(i);
             }
-            let maxsize = parseFloat(d3.select('#clone_size_input').node().value);
-            if (maxsize > 0 === false) {
-                maxsize = 100000000;
+            let maxGroupSize = parseFloat(d3.select('#clone_size_input').node().value);
+            if (maxGroupSize > 0 === false) {
+                maxGroupSize = 100000000;
             }
             for (let i = 0; i < main_1.forceLayout.all_nodes.length; i++) {
                 const rad = Math.sqrt(Math.pow((main_1.forceLayout.all_nodes[i].x - x), 2) + Math.pow((main_1.forceLayout.all_nodes[i].y - y), 2));
                 if (rad <= this.get_clone_radius()) {
-                    if (this.node_status[i].source && this.clone_map[this.clone_key][i].length < maxsize) {
+                    const nodeAndCloneExist = this.node_status[i].source && this.clone_map[this.clone_key] && this.clone_map[this.clone_key][i];
+                    if (nodeAndCloneExist && this.clone_map[this.clone_key][i].length < maxGroupSize) {
                         if (!(i in this.clone_nodes)) {
                             this.activate_edges(i, false);
                             if (this.show_source_nodes) {
@@ -432,7 +432,7 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
             };
         }
         start_clone_viewer() {
-            this.svg_graph = d3.select('svg_graph');
+            this.svg_graph = d3.select('#svg_graph');
             for (let i = 0; i < main_1.forceLayout.all_nodes.length; i++) {
                 this.node_status[i] = { active: false, active_stable: false, source: false, target: false };
             }
