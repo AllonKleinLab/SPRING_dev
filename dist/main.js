@@ -129,7 +129,7 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
                 return;
             }
             try {
-                if (typeof event.data === 'object') {
+                if (typeof event.data === 'string') {
                     const parsedData = JSON.parse(event.data);
                     switch (parsedData.type) {
                         case 'init': {
