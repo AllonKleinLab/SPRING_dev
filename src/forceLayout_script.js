@@ -56,7 +56,7 @@ export default class ForceLayout {
     this.coordinates = new Array();
     this.edge_container = new PIXI.Container();
     this.force_on = 1;
-    this.mutable = null;
+    this.mutable = true;
     this.sprites = new PIXI.Container();
     this.stashed_coordinates = new Array();
     this.svg_graph = d3.select(null);
