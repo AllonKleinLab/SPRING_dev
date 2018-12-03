@@ -170,7 +170,8 @@ define(["require", "exports", "d3", "./clone_viewer.js", "./cluster_script.js", 
     });
     const setCategorySelection = categories => {
         if (categories) {
-            const { label_list } = exports.colorBar.getSampleCategoricalColoringData();
+            const labelsKey = document.getElementById('labels_menu').value;
+            const { label_list } = exports.colorBar.getSampleCategoricalColoringData(labelsKey);
             for (let i = 0; i < exports.forceLayout.all_nodes.length; i++) {
                 if (categories.includes(label_list[i])) {
                     exports.forceLayout.all_outlines[i].selected = true;
