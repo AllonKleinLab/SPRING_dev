@@ -67,4 +67,8 @@ define(["require", "exports", "d3"], function (require, exports, d3) {
             window.parent.postMessage(message, document.referrer);
         }
     };
+    exports.postSelectedCellUpdate = (indices) => {
+        const currentCategory = document.getElementById('labels_menu').value;
+        exports.postMessageToParent({ type: 'selected-cells-update', payload: { currentCategory, indices } });
+    };
 });

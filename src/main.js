@@ -202,7 +202,7 @@ const setupUserInterface = async () => {
         switch (parsedData.type) {
           case 'init': {
             if (parsedData.payload.categories && parsedData.payload.categories.length >= 1) {
-              setCategorySelection(parsedData.payload.categories);
+              setLabelSelection(parsedData.payload.categories);
               window.cacheData.set('categories', parsedData.payload.categories);
             }
             if (parsedData.payload.indices && parsedData.payload.indices.length >= 1) {
@@ -211,8 +211,8 @@ const setupUserInterface = async () => {
             }
             break;
           }
-          case 'selected-category-update': {
-            setCategorySelection(parsedData.payload.categories);
+          case 'selected-labels-update': {
+            setLabelSelection(parsedData.payload.selectedLabels);
             break;
           }
           case 'selected-cells-update': {
@@ -235,12 +235,12 @@ const setupUserInterface = async () => {
   });
 };
 
-const setCategorySelection = categories => {
-  if (categories) {
-    const labelsKey = document.getElementById('labels_menu').value;
-    const { label_list} = colorBar.getSampleCategoricalColoringData(labelsKey);
+const setLabelSelection = labels => {
+  if (labels) {
+    const selectedCategory = document.getElementById('labels_menu').value;
+    const { label_list } = colorBar.getSampleCategoricalColoringData(selectedCategory);
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
-      if (categories.includes(label_list[i])) {
+      if (labels.includes(label_list[i])) {
         forceLayout.all_outlines[i].selected = true;
         forceLayout.all_outlines[i].tint = '0xffff00';
         forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;

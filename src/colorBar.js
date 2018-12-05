@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { show_colorpicker_popup } from './colorpicker_layout';
 import { forceLayout, graph_directory, selectionScript, project_directory } from './main';
-import { rgbToHex, postMessageToParent } from './util';
+import { rgbToHex, postSelectedCellUpdate } from './util';
 
 export default class ColorBar {
   /** @type ColorBar */
@@ -1518,10 +1518,10 @@ export default class ColorBar {
     this.count_clusters();
   }
 
-  categorical_click(d, cat_label_list) {
+  categorical_click(selectedLabel, cat_label_list) {
     this.all_selected = true;
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
-      if (cat_label_list[i] === d) {
+      if (cat_label_list[i] === selectedLabel) {
         if (!(forceLayout.all_outlines[i].selected || forceLayout.all_outlines[i].compared)) {
           this.all_selected = false;
         }
@@ -1531,33 +1531,39 @@ export default class ColorBar {
     const my_nodes = [];
     const indices = [];
     for (let i = 0; i < forceLayout.all_nodes.length; i++) {
-      if (cat_label_list[i] === d) {
+      if (cat_label_list[i] === selectedLabel) {
         my_nodes.push(i);
         if (this.all_selected) {
           forceLayout.all_outlines[i].selected = false;
           forceLayout.all_outlines[i].compared = false;
           forceLayout.all_outlines[i].alpha = 0;
         } else {
-          if (selectionScript.selection_mode === 'negative_select') {
+          if (selectionScript && selectionScript.selection_mode === 'negative_select') {
             forceLayout.all_outlines[i].compared = true;
             forceLayout.all_outlines[i].tint = '0x0000ff';
             forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
           } else {
-            indices.push(i);
             forceLayout.all_outlines[i].selected = true;
             forceLayout.all_outlines[i].tint = '0xffff00';
             forceLayout.all_outlines[i].alpha = forceLayout.all_nodes[i].alpha;
           }
         }
       }
+      if (forceLayout.all_outlines[i].selected) {
+        indices.push(i);
+      }
     }
-
-    postMessageToParent({ type: 'selected-category-update', payload: { category: d, indices } });
 
     if (forceLayout.all_nodes.length < 25000) {
       this.shrinkNodes(6, 10, my_nodes, forceLayout.all_nodes);
     }
-    selectionScript.update_selected_count();
+
+    if (selectionScript) {
+      selectionScript.update_selected_count();
+    }
+
+    postSelectedCellUpdate(indices);
+
     this.count_clusters();
   }
 

@@ -1426,10 +1426,10 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
                 .style('width', '150px');
             this.count_clusters();
         }
-        categorical_click(d, cat_label_list) {
+        categorical_click(selectedLabel, cat_label_list) {
             this.all_selected = true;
             for (let i = 0; i < main_1.forceLayout.all_nodes.length; i++) {
-                if (cat_label_list[i] === d) {
+                if (cat_label_list[i] === selectedLabel) {
                     if (!(main_1.forceLayout.all_outlines[i].selected || main_1.forceLayout.all_outlines[i].compared)) {
                         this.all_selected = false;
                     }
@@ -1438,7 +1438,7 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
             const my_nodes = [];
             const indices = [];
             for (let i = 0; i < main_1.forceLayout.all_nodes.length; i++) {
-                if (cat_label_list[i] === d) {
+                if (cat_label_list[i] === selectedLabel) {
                     my_nodes.push(i);
                     if (this.all_selected) {
                         main_1.forceLayout.all_outlines[i].selected = false;
@@ -1446,25 +1446,29 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
                         main_1.forceLayout.all_outlines[i].alpha = 0;
                     }
                     else {
-                        if (main_1.selectionScript.selection_mode === 'negative_select') {
+                        if (main_1.selectionScript && main_1.selectionScript.selection_mode === 'negative_select') {
                             main_1.forceLayout.all_outlines[i].compared = true;
                             main_1.forceLayout.all_outlines[i].tint = '0x0000ff';
                             main_1.forceLayout.all_outlines[i].alpha = main_1.forceLayout.all_nodes[i].alpha;
                         }
                         else {
-                            indices.push(i);
                             main_1.forceLayout.all_outlines[i].selected = true;
                             main_1.forceLayout.all_outlines[i].tint = '0xffff00';
                             main_1.forceLayout.all_outlines[i].alpha = main_1.forceLayout.all_nodes[i].alpha;
                         }
                     }
                 }
+                if (main_1.forceLayout.all_outlines[i].selected) {
+                    indices.push(i);
+                }
             }
-            util_1.postMessageToParent({ type: 'selected-category-update', payload: { category: d, indices } });
             if (main_1.forceLayout.all_nodes.length < 25000) {
                 this.shrinkNodes(6, 10, my_nodes, main_1.forceLayout.all_nodes);
             }
-            main_1.selectionScript.update_selected_count();
+            if (main_1.selectionScript) {
+                main_1.selectionScript.update_selected_count();
+            }
+            util_1.postSelectedCellUpdate(indices);
             this.count_clusters();
         }
         count_clusters() {

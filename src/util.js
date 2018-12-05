@@ -78,3 +78,8 @@ export const postMessageToParent = message => {
     window.parent.postMessage(message, document.referrer);
   }
 };
+
+export const postSelectedCellUpdate = (indices) => {
+  const currentCategory = document.getElementById('labels_menu').value;
+  postMessageToParent({ type: 'selected-cells-update', payload: { currentCategory, indices } });
+};

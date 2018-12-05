@@ -241,10 +241,10 @@ define(["require", "exports", "d3", "./rotation_script", "./main", "./util"], fu
                         indices.push(i);
                     }
                 }
-                util_1.postMessageToParent({ type: 'selected-cells-update', payload: { indices } });
                 if (selected.length === 0) {
                     rotation_script_1.rotation_hide();
                 }
+                util_1.postSelectedCellUpdate(indices);
             });
             this.brush = d3
                 .select('#svg_graph')
@@ -356,11 +356,11 @@ define(["require", "exports", "d3", "./rotation_script", "./main", "./util"], fu
         update_selected_count() {
             let num_selected = 0;
             let num_compared = 0;
-            const selectedNodeIndices = new Array();
+            const indices = new Array();
             for (let i = 0; i < main_1.forceLayout.all_nodes.length; i++) {
                 if (main_1.forceLayout.all_outlines[i].selected) {
                     num_selected += 1;
-                    selectedNodeIndices.push(i);
+                    indices.push(i);
                 }
                 if (main_1.forceLayout.all_outlines[i].compared) {
                     num_compared += 1;
@@ -513,6 +513,7 @@ define(["require", "exports", "d3", "./rotation_script", "./main", "./util"], fu
                     // 				all_nodes[i].scale.set(large_radius);
                 }
             }
+            util_1.postSelectedCellUpdate([]);
             main_1.colorBar.count_clusters();
             this.update_selected_count();
         }
