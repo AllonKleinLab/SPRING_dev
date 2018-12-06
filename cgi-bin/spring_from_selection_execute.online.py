@@ -348,24 +348,22 @@ else:
         
 ################
 # Save run info
-import datetime
 info_dict = {}
-info_dict['Email'] = user_email
+info_dict['Email'] = str(user_email)
 info_dict['Date'] = '%s' %creation_time
-info_dict['Nodes'] = Epca.shape[0]
+info_dict['Nodes'] = int(Epca.shape[0])
 info_dict['Filtered_Genes'] = len(gene_filter)
-info_dict['Gene_Var_Pctl'] = min_vscore_pctl
-info_dict['Min_Cells'] = min_cells
-info_dict['Min_Counts'] = min_counts
-info_dict['Num_Neighbors'] = k_neigh
-info_dict['Num_PCs'] = num_pc
-info_dict['Num_Force_Iter'] = num_fa2_iter
-info_dict['Description'] = description
+info_dict['Gene_Var_Pctl'] = float(min_vscore_pctl)
+info_dict['Min_Cells'] = float(min_cells)
+info_dict['Min_Counts'] = float(min_counts)
+info_dict['Num_Neighbors'] = int(k_neigh)
+info_dict['Num_PCs'] = int(num_pc)
+info_dict['Num_Force_Iter'] = int(num_fa2_iter)
+info_dict['Description'] = str(description)
 start_dataset = base_name + '/' + current_dir_short
 
 with open(new_dir+'/run_info.json','w') as f:
     f.write(json.dumps(info_dict,indent=4, sort_keys=True))
-
 
 ################
 t11 = time.time()

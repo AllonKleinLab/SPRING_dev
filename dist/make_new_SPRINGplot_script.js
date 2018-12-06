@@ -148,7 +148,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
                 .append('div')
                 .attr('class', 'make_new_SPRINGplot_input_div')
                 .append('label')
-                .text('Gene letiability %ile (gene filtering)')
+                .text('Gene variability %ile (gene filtering)')
                 .append('input')
                 .attr('type', 'text')
                 .attr('id', 'input_pctl')
@@ -313,7 +313,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
             let description = $('#input_description').val();
             let minCells = $('#input_minCells').val();
             let minCounts = $('#input_minCounts').val();
-            let letPctl = $('#input_pctl').val();
+            let varPctl = $('#input_pctl').val();
             let kneigh = $('#input_kneigh').val();
             let numPC = $('#input_numPC').val();
             let nIter = $('#input_nIter').val();
@@ -366,7 +366,7 @@ define(["require", "exports", "d3", "./main"], function (require, exports, d3, m
                     numPC: numPC,
                     selected_cells: sel2text,
                     this_url: this_url,
-                    letPctl: letPctl,
+                    varPctl: varPctl,
                 },
                 success: success_message => {
                     console.log(success_message);
