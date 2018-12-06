@@ -12,6 +12,7 @@ import {
   selectionScript,
   smoothingImputation,
   springPlot,
+  doubletDetector,
   sub_directory,
 } from './main';
 import { SPRITE_IMG_WIDTH, downloadFile, rgbToHex } from './util';
@@ -738,7 +739,7 @@ export default class ForceLayout {
 
     d3.select('#show_imputation_popup').on('click', () => smoothingImputation.show_imputation_popup());
     d3.select('#show_selection_logic_popup').on('click', () => selectionLogic.show_selection_logic_popup());
-    d3.select('#show_doublet_popup').on('click', () => springPlot.show_make_new_SPRINGplot_popup());
+    d3.select('#show_doublet_popup').on('click', () => doubletDetector.show_doublet_popup());
     d3.select('#run_clustering').on('click', () => cluster2.run_clustering());
     d3.select('#show_PAGA_popup').on('click', () => paga.show_PAGA_popup());
     d3.select('#toggle_legend_hover_tooltip_button').on('click', () => colorBar.toggle_legend_hover_tooltip());

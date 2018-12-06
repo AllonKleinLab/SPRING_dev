@@ -130,7 +130,7 @@ def load_text(file_data,delim='\t'):
                     tmp = float(dat[current_col])
                     
                     try:
-                        rowdat = np.array(map(float, dat[current_col:]))
+                        rowdat = np.array(list(map(float, dat[current_col:])))
                         ncol = len(rowdat)
                         col_ix = np.nonzero(rowdat)[0]
 
@@ -149,7 +149,7 @@ def load_text(file_data,delim='\t'):
                     current_col += 1
         else:
             try:
-                rowdat = np.array(map(float, dat[start_column:]))
+                rowdat = np.array(list(map(float, dat[start_column:])))
                 if len(rowdat) != ncol:
                     return 'ERROR: Rows have different numbers of numeric columns.'
                 col_ix = np.nonzero(rowdat)[0]
@@ -177,7 +177,7 @@ def text_to_sparse(file_data,delim='\t',start_row=0,start_column=0,data_type=flo
     for row_ix, dat in enumerate(file_data):
         dat = dat.strip('\n').split(delim)
         if row_ix >= start_row:
-            rowdat = np.array(map(data_type, dat[start_column:]))
+            rowdat = np.array(list(map(data_type, dat[start_column:])))
             col_ix = np.nonzero(rowdat)[0]
             X_col.extend(col_ix)
             X_row.extend([row_ix - start_row] * len(col_ix))
@@ -423,7 +423,6 @@ def get_knn_graph(X, k=5, dist_metric='euclidean', approx=False, return_edges=Tr
     Build k-nearest-neighbor graph
     Return edge list and nearest neighbor matrix
     '''
-
     t0 = time.time()
     if approx:
         try:
@@ -440,12 +439,12 @@ def get_knn_graph(X, k=5, dist_metric='euclidean', approx=False, return_edges=Tr
         ncell = X.shape[0]
         annoy_index = AnnoyIndex(npc, metric=dist_metric)
 
-        for i in xrange(ncell):
+        for i in range(ncell):
             annoy_index.add_item(i, list(X[i,:]))
         annoy_index.build(10) # 10 trees
 
         knn = []
-        for iCell in xrange(ncell):
+        for iCell in range(ncell):
             knn.append(annoy_index.get_nns_by_item(iCell, k + 1)[1:])
         knn = np.array(knn, dtype=int)
 
@@ -634,7 +633,7 @@ def get_color_stats_custom(color_stats, custom_colors):
 
 def save_color_stats(filename, color_stats):
     with open(filename,'w') as f:
-        f.write(json.dumps(color_stats,indent=4, sort_keys=True).decode('utf-8'))
+        f.write(json.dumps(color_stats,indent=4, sort_keys=True))
 
 def build_categ_colors(categorical_coloring_data, cell_groupings):
     for k,labels in cell_groupings.items():
@@ -644,7 +643,7 @@ def build_categ_colors(categorical_coloring_data, cell_groupings):
 
 def save_cell_groupings(filename, categorical_coloring_data):
     with open(filename,'w') as f:
-        f.write(json.dumps(categorical_coloring_data,indent=4, sort_keys=True).decode('utf-8'))
+        f.write(json.dumps(categorical_coloring_data,indent=4, sort_keys=True))
 
 def save_spring_dir_sparse_hdf5(E,gene_list,project_directory, edges, custom_colors={}, cell_groupings={}):
 
@@ -794,7 +793,7 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
         info_dict['Num_PCs'] = num_pc
         info_dict['Num_Force_Iter'] = num_force_iter
         with open(save_path+'/run_info.json','w') as f:
-            f.write(json.dumps(info_dict,indent=4, sort_keys=True).decode('utf-8'))
+            f.write(json.dumps(info_dict,indent=4, sort_keys=True))
          
     return out
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from wolkit import *
 
 def sparse_var(E, axis=0):
     mean_gene = E.mean(axis=axis).A.squeeze()
@@ -67,7 +68,6 @@ def execute_spring(param_filename):
     import h5py
     import json
     import time
-    from wolkit import *
     import networkx as nx
     import pickle
     import datetime
@@ -132,7 +132,7 @@ def execute_spring(param_filename):
     cell_filter = np.load(current_dir + '/cell_filter.npy')[extra_filter]
     np.save(new_dir + '/cell_filter.npy', cell_filter)
     np.savetxt(new_dir + '/cell_filter.txt', cell_filter, fmt='%i')
-    gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t', comments="")
+    gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter=None, comments=None)
     prefix_map = {}
     for g in gene_list: prefix_map[g.split()[0]] = g
     for g in gene_list: prefix_map[g.split()[-1]] = g
@@ -182,14 +182,14 @@ def execute_spring(param_filename):
     f = open(current_dir + '/color_data_gene_sets.csv', 'r')
     for l in f:
         cols = l.strip('\n').split(',')
-        custom_colors[cols[0]] = map(float, np.array(cols[1:])[extra_filter])
+        custom_colors[cols[0]] = list(map(float, np.array(cols[1:])[extra_filter]))
     for k,v in custom_colors.items():
         color_stats[k] = tuple(map(float,(0,1,np.min(v),np.max(v)+.01,np.percentile(v,99))))
     with open(new_dir+'/color_stats.json','w') as f:
-        f.write(json.dumps(color_stats,indent=4, sort_keys=True))#.decode('utf-8'))
+        f.write(json.dumps(color_stats,indent=4, sort_keys=True))
     with open(new_dir+'/color_data_gene_sets.csv','w') as f:
         for k,v in custom_colors.items():
-            f.write(k + ',' + ','.join(map(str, v)) + '\n')
+            f.write(k + ',' + ','.join(list(map(str, v))) + '\n')
     t1 = time.time()
     update_log(timef, 'Saved color stats -- %.2f' %(t1-t0))
     ###############
@@ -209,7 +209,7 @@ def execute_spring(param_filename):
                 new_cell_groupings[k]['label_colors'][kk] = cell_groupings[k]['label_colors'][kk]
 
     with open(new_dir+'/categorical_coloring_data.json','w') as f:
-        f.write(json.dumps(new_cell_groupings,indent=4, sort_keys=True).decode('utf-8'))
+        f.write(json.dumps(new_cell_groupings,indent=4, sort_keys=True))
     t1 = time.time()
     update_log(timef, 'Saved cell labels -- %.2f' %(t1-t0))
 
@@ -355,7 +355,7 @@ def execute_spring(param_filename):
     ################
     # Save PCA, gene filter, total counts
     if os.path.exists(base_dir + '/total_counts.txt'):
-        total_counts = np.loadtxt(base_dir + '/total_counts.txt', comments="")[cell_filter]
+        total_counts = np.loadtxt(base_dir + '/total_counts.txt', comments=None)[cell_filter]
         np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter, total_counts = total_counts)
     else:
         np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter)
@@ -380,7 +380,7 @@ def execute_spring(param_filename):
     start_dataset = base_name + '/' + current_dir_short
 
     with open(new_dir+'/run_info.json','w') as f:
-        f.write(json.dumps(info_dict,indent=4, sort_keys=True).decode('utf-8'))
+        f.write(json.dumps(info_dict,indent=4, sort_keys=True))
 
 
     ################

@@ -110,7 +110,7 @@ def get_knn_graph2(X, k=5, dist_metric='euclidean',approx=False):
         ncell = X.shape[0]
         annoy_index = AnnoyIndex(npc, metric=dist_metric)
         t0 = time.time()
-        for i in xrange(ncell):
+        for i in range(ncell):
             annoy_index.add_item(i, list(X[i,:]))
         annoy_index.build(10) # 10 trees
         t1 = time.time() - t0
@@ -118,7 +118,7 @@ def get_knn_graph2(X, k=5, dist_metric='euclidean',approx=False):
 
         t0 = time.time()
         knn = []
-        for iCell in xrange(ncell):
+        for iCell in range(ncell):
             knn.append(annoy_index.get_nns_by_item(iCell, k + 1)[1:])
         knn = np.array(knn, dtype=int)
         t1 = time.time() - t0

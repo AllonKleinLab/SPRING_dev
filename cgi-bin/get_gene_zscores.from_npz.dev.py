@@ -40,13 +40,13 @@ gene_list = np.loadtxt(base_dir + '/genes.txt',
                        dtype=str, delimiter='\t', comments="")
 
 if str(sel_filter) != "None":
-    sel_filter = np.sort(np.array(map(int, sel_filter.split(','))))
+    sel_filter = np.sort(np.array(list(map(int, sel_filter.split(',')))))
 else:
     sel_filter = []
     sel_scores = np.zeros(len(gene_list), dtype=float)
 
 if str(comp_filter) != "None":
-    comp_filter = np.sort(np.array(map(int, comp_filter.split(','))))
+    comp_filter = np.sort(np.array(list(map(int, comp_filter.split(',')))))
 else:
     comp_filter = []
     comp_scores = np.zeros(len(gene_list), dtype=float)
@@ -115,4 +115,4 @@ scores = scores[o]
 t1 = time.time()
 update_log(logf, 'filtered lists -- %.3f' % (t1-t0))
 print("Content-Type: text/plain\n")
-print('\n'.join(gene_list) + '\t' + '\n'.join(map(strfloat, scores)))
+print('\n'.join(gene_list) + '\t' + '\n'.join(list(map(strfloat, scores))))

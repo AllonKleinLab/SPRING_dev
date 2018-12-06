@@ -67,7 +67,7 @@ else:
     try:
 
         rand_suffix = ''.join(str(time.time()).split('.'))
-        extra_filter = np.sort(np.array(map(int, extra_filter.split(','))))
+        extra_filter = np.sort(list(np.array(map(int, extra_filter.split(',')))))
 
         params_dict = {}
         params_dict['extra_filter'] = extra_filter

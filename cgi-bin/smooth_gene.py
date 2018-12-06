@@ -57,9 +57,9 @@ t0 = time.time()
 data = cgi.FieldStorage()
 base_dir = data.getvalue('base_dir')
 sub_dir = data.getvalue('sub_dir')
-reds = np.array(map(float, data.getvalue('raw_r').split(',')))[:, None]
-greens = np.array(map(float, data.getvalue('raw_g').split(',')))[:, None]
-blues = np.array(map(float, data.getvalue('raw_b').split(',')))[:, None]
+reds = np.array(list(map(float, data.getvalue('raw_r').split(','))))[:, None]
+greens = np.array(list(map(float, data.getvalue('raw_g').split(','))))[:, None]
+blues = np.array(list(map(float, data.getvalue('raw_b').split(','))))[:, None]
 E = np.hstack((reds, greens, blues))
 # E = np.array(map(float, data.getvalue('raw_g').split(',')))[:,None]
 
@@ -68,7 +68,7 @@ print(sel)
 if len(sel) == 0:
     sel = np.arange(E.shape[0])
 else:
-    sel = np.array(map(int, sel.split(',')), dtype=int)
+    sel = np.array(list(map(int, sel.split(','))), dtype=int)
     E = E[sel, :]
 
 
@@ -86,7 +86,7 @@ except:
     cell_filter = np.load(sub_dir + '/' + 'cell_filter.npy')
     edges = np.loadtxt(sub_dir + '/edges.csv', delimiter=';', comments="")
     A = ssp.lil_matrix((len(cell_filter), len(cell_filter)))
-    for iEdge in xrange(edges.shape[0]):
+    for iEdge in range(edges.shape[0]):
         ii = edges[iEdge, 0]
         jj = edges[iEdge, 1]
         A[ii, jj] = 1
@@ -101,7 +101,7 @@ update_log(logf, 'loaded adjacency matrix -- %.3f' % (t1-t0))
 t0 = time.time()
 A = A[:, sel].tocsr()[sel, :].tocsc()
 A = sparse_multiply(A, 1 / A.sum(1).A.squeeze())
-for iRound in xrange(n_rounds):
+for iRound in range(n_rounds):
     E = (beta * E + ((1 - beta) * A) * E)
 
 
@@ -115,7 +115,7 @@ update_log(logf, 'smoothed data -- %.3f' % (t1-t0))
 t0 = time.time()
 
 print(repr(np.min(E))+'|'+repr(np.max(E))+'|' + ';'.join([','.join(
-    map(str, E[:, 0])), ','.join(map(str, E[:, 1])), ','.join(map(str, E[:, 2]))]))
+    list(map(str, E[:, 0]))), ','.join(list(map(str, E[:, 1]))), ','.join(list(map(str, E[:, 2])))]))
 t1 = time.time()
 update_log(logf, 'returned data -- %.3f' % (t1-t0))
 

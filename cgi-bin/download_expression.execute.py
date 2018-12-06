@@ -124,7 +124,7 @@ for iG, g in enumerate(gene_list):
         # update_log(timef, 'Gene %i -- %.2f' %(iG + 1, t1-t0))
         t0 = time.time()
     counts = E[iG, :].A.squeeze()
-    o.write(g + ',' + ','.join(map(str, counts)) + '\n')
+    o.write(g + ',' + ','.join(list(map(str, counts))) + '\n')
 
 o.close()
 os.system('gzip "' + outdir + 'expr.csv"')
@@ -149,7 +149,7 @@ o = open(outdir + 'cell_groupings.csv', 'w')
 for k in categ:
     v = categ[k]['label_list']
     v_filt = [v[i] for i in extra_filter]
-    o.write(k + ',' + ','.join(map(str, v_filt)) + '\n')
+    o.write(k + ',' + ','.join(list(map(str, v_filt))) + '\n')
 o.close()
 
 # save extra continuous variables

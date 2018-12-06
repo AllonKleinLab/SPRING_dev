@@ -139,7 +139,7 @@ except:
 
 try:
     project_filter = data.getvalue('compared_cells')
-    project_filter = np.sort(np.array(map(int, project_filter.split(','))))
+    project_filter = np.sort(np.array(list(map(int, project_filter.split(',')))))
 except:
     project_filter = np.array([])
 
@@ -166,7 +166,7 @@ else:
             shutil.rmtree(new_dir)
         os.makedirs(new_dir)
 
-        base_filter = np.sort(np.array(map(int, base_filter.split(','))))
+        base_filter = np.sort(np.array(list(map(int, base_filter.split(',')))))
         extra_filter = np.array(
             np.sort(np.hstack((base_filter, project_filter))), dtype=int)
         base_ix = np.nonzero([(i in base_filter) for i in extra_filter])[0]

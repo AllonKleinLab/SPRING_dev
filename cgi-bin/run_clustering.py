@@ -34,7 +34,7 @@ def load_edges(fname):
     edges = set([])
     with open(fname) as f:
         for l in f:
-            edges.add(tuple(sorted(map(int, l.strip('\n').split(';')))))
+            edges.add(tuple(sorted(list(map(int, l.strip('\n').split(';'))))))
     return edges
 
 
@@ -76,6 +76,6 @@ np.save(sub_dir + '/louvain_clusters.npy', clusts)
 old_cell_groupings = json.load(
     open(sub_dir + '/categorical_coloring_data.json'))
 new_cell_groupings = build_categ_colors(
-    old_cell_groupings, {'Louvain cluster': map(str, clusts)})
+    old_cell_groupings, {'Louvain cluster': list(map(str, clusts))})
 save_cell_groupings(
     sub_dir + '/categorical_coloring_data.json', new_cell_groupings)

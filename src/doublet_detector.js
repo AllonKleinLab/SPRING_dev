@@ -39,33 +39,44 @@ export default class DoubletDetector {
 
     this.button_bar
       .append('label')
-      .text('k = ')
+      .html('<i>k</i> = ')
       .append('input')
-      .attr('id', 'doublet_k_input')
-      .property('value', 50);
+      .attr('id','doublet_k_input')
+      .property('value',50);
     this.button_bar
       .append('label')
-      .text('r = ')
+      .html('<i>r</i> = ')
       .append('input')
-      .attr('id', 'doublet_r_input')
-      .property('value', 2);
+      .attr('id','doublet_r_input')
+      .property('value',2);
+    this.button_bar
+      .append('label')
+      .html('<i>f</i> = ')
+      .append('input')
+      .attr('id','doublet_f_input')
+      .property('value',0.1);
     this.button_bar
       .append('button')
       .text('Run')
-      .on('click', this.run_doublet_detector);
+      .on('click', () => {
+        this.run_doublet_detector(this);
+      });
     this.button_bar
       .append('button')
       .text('Close')
-      .on('click', this.hide_doublet_popup);
+      .on('click',this.hide_doublet_popup);
 
     this.text_box = this.popup
       .append('div')
-      .attr('id', 'doublet_description')
+      .attr('id','doublet_description')
       .append('text')
-      .text(
+      .html(
         'Predict mixed-celltype doublets. \
-        Uses a kNN classifier to find cells that look like simulated doublets. \
-        k sets the number neighbors used in the classifier, and r is the ratio of simulated doublets to observed cells.',
+        Uses a kNN classifier to identify transcriptomes that \
+        resemble simulated doublets. \
+        <br><br> <b><i>k </i> : </b> number neighbors used in the classifier \
+        <br> <b><i>r </i> : </b> ratio of simulated doublets to observed cells \
+        <br> <b><i>f </i> : </b> expected doublet rate',
       );
 
     this.doublet_notify_popup = d3
@@ -119,95 +130,13 @@ export default class DoubletDetector {
     return;
   }
 
-  // function show_processing_mask() {
-  // 	popup.append('div').attr('id','doublet_processing_mask').append('div').append('text')
-  // 		.text('Running doublet detector... you will be notified upon completion.')
-  // 		.style('opacity', 0.0)
-  // 		.transition()
-  // 		.duration(500)
-  // 		.style('opacity', 1.0);
-
-  // let opts = {
-  // 	  lines: 17 // The number of lines to draw
-  // 	, length: 35 // The length of each line
-  // 	, width: 15 // The line thickness
-  // 	, radius: 50 // The radius of the inner circle
-  // 	, scale: 0.22 // Scales overall size of the spinner
-  // 	, corners: 1 // Corner roundness (0..1)
-  // 	, color: '#000' // #rgb or #rrggbb or array of colors
-  // 	, opacity: 0.2 // Opacity of the lines
-  // 	, rotate: 8 // The rotation offset
-  // 	, direction: 1 // 1: clockwise, -1: counterclockwise
-  // 	, speed: 0.9 // Rounds per second
-  // 	, trail: 60 // Afterglow percentage
-  // 	, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
-  // 	, zIndex: 2e9 // The z-index (defaults to 2000000000)
-  // 	, className: 'spinner' // The CSS class to assign to the spinner
-  // 	, top: '50%' // Top position relative to parent
-  // 	, left: '50%' // Left position relative to parent
-  // 	, shadow: false // Whether to render a shadow
-  // 	, hwaccel: true // Whether to use hardware acceleration
-  // 	, position: 'relative' // Element positioning
-  // 	}
-  // let target = document.getElementById('doublet_processing_mask');
-  // let spinner = new Spinner(opts).spin(target);
-  // $(target).data('spinner', spinner);
-
-  // }
-
-  // function hide_processing_mask() {
-  // 	// $(".spinner").remove();
-  // 	$("#doublet_processing_mask").remove();
-
-  // }
-
-  // function hide_doublet_popup_slowly() {
-  // 	d3.select("#doublet_popup").transition()
-  // 	.duration(2000)
-  // 	.transition()
-  // 	.duration(500)
-  // 	.style('opacity', 0.0)
-  // 	.each("end", function() {
-  // 		d3.select("#doublet_popup").style('visibility', 'hidden');
-  // 		d3.select("#doublet_popup").style('opacity', '1.0');
-  // 	});
-
-  // }
-
-  // function show_doublet_notification() {
-
-  // 	let mywidth = parseInt(d3.select("#doublet_notification").style("width").split("px")[0])
-  // 	let svg_width = parseInt(d3.select("svg").style("width").split("px")[0])
-
-  // 	d3.select("#doublet_notification")
-  // 		.style("left",(svg_width/2-mywidth/2).toString()+"px")
-  // 		.style("top","0px")
-  // 		.style('opacity', 0.0)
-  // 		.style('visibility','visible')
-  // 		.transition()
-  // 		.duration(1500)
-  // 		.style('opacity', 1.0)
-  // 		.transition()
-  // 		.duration(2000)
-  // 		.transition()
-  // 		.duration(1500)
-  // 		.style('opacity', 0.0)
-  // 		.each("end", function() {
-  // 			d3.select("#doublet_notification").style('visibility', 'hidden');
-  // 		});
-
-  // 	//d3.select("#doublet_notification").transition(1500).style('visibility','hidden');
-  // }
-
   // <-- DoubletDetector Constructor End -->
-  run_doublet_detector() {
+  run_doublet_detector(this) {
     if (forceLayout.mutable) {
       let t0 = new Date();
       let k = $('#doublet_k_input').val();
       let r = $('#doublet_r_input').val();
-
-      // show_processing_mask();
-      // hide_doublet_popup_slowly();
+      let f = $('#doublet_f_input').val();
 
       d3.select('#doublet_notification')
         .select('text')
@@ -215,9 +144,8 @@ export default class DoubletDetector {
       this.show_doublet_notification();
       this.hide_doublet_popup();
 
-      console.log(k, r);
       $.ajax({
-        data: { base_dir: graph_directory, sub_dir: project_directory, k: k, r: r },
+        data: {base_dir:graph_directory, sub_dir:project_directory, k:k, r:r, f:f},
         success: data => {
           let t1 = new Date();
           console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
@@ -246,7 +174,6 @@ export default class DoubletDetector {
             // cloneViewer.clone_viewer_setup();
           }
 
-          // hide_processing_mask();
           // open json file containing gene sets and populate drop down menu
           let noCache = new Date().getTime();
           d3.json(project_directory + '/color_stats.json' + '?_=' + noCache).then(colorData => {
