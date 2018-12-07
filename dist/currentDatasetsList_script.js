@@ -1,4 +1,12 @@
-define(["require", "exports", "d3", "./util", "./main"], function (require, exports, d3, util_1, main_1) {
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+define(["require", "exports", "d3", "./util"], function (require, exports, d3, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function add_list_item(project_directory, sub_directory, order) {
@@ -11,7 +19,7 @@ define(["require", "exports", "d3", "./util", "./main"], function (require, expo
             list_item.append('h3').text(sub_directory);
             let display_names = {
                 Filtered_Genes: 'Number of genes that passed filter',
-                Gene_let_Pctl: 'Gene letiability %ile (gene filtering)',
+                Gene_Var_Pctl: 'Gene variability percentile (gene filtering)',
                 Min_Cells: 'Min expressing cells (gene filtering)',
                 Min_Counts: 'Min number of UMIs (gene filtering)',
                 Nodes: 'Number of cells',
@@ -24,7 +32,7 @@ define(["require", "exports", "d3", "./util", "./main"], function (require, expo
                 .attr('class', 'dataset_key_info')
                 .style('width', '480px');
             if ('Description' in data) {
-                if (data.Description != null) {
+                if ((data.Description != null) && (data.Description != "None")) {
                     info_box
                         .append('tspan')
                         .append('text')
@@ -57,7 +65,7 @@ define(["require", "exports", "d3", "./util", "./main"], function (require, expo
                 'Filtered_Genes',
                 'Min_Cells',
                 'Min_Counts',
-                'Gene_let_Pctl',
+                'Gene_Var_Pctl',
                 'Num_PCs',
                 'Num_Neighbors',
                 'Num_Force_Iter',
@@ -99,17 +107,29 @@ define(["require", "exports", "d3", "./util", "./main"], function (require, expo
                 .attr('class', 'delete_button')
                 .text('Delete')
                 .on('click', function () {
-                d3.event.stopPropagation();
-                d3.text(project_directory + '/' + sub_directory + '/mutability.txt', (text) => {
-                    main_1.forceLayout.mutable = text;
-                    if (main_1.forceLayout.mutable == null) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    d3.event.stopPropagation();
+                    const filePath = project_directory + '/' + sub_directory + '/mutability.txt';
+                    let mutable = true;
+                    try {
+                        const mutableText = yield d3.text(filePath);
+                        if (mutableText === null) {
+                            mutable = true;
+                        }
+                        else {
+                            mutable = false;
+                        }
+                    }
+                    catch (err) {
+                        mutable = true;
+                    }
+                    if (mutable) {
                         sweetAlert({
                             icon: 'warning',
                             showCancelButton: true,
                             text: 'Do you want to delete the SPRING subplot ' + sub_directory + '?',
                             title: 'Are you sure?',
                         }, function (isConfirm) {
-                            console.log(isConfirm);
                             if (isConfirm) {
                                 list_item
                                     .style('z-index', '-10')
@@ -136,7 +156,6 @@ define(["require", "exports", "d3", "./util", "./main"], function (require, expo
                             showCancelButton: false,
                             title: 'This subplot cannot be deleted.',
                         }, function (isConfirm) {
-                            console.log(isConfirm);
                             if (isConfirm) {
                                 return;
                             }
@@ -154,7 +173,7 @@ define(["require", "exports", "d3", "./util", "./main"], function (require, expo
             });
         });
     }
-    function populate_dataset_subdirs_list(project_directory) {
+    exports.populate_dataset_subdirs_list = (project_directory) => __awaiter(this, void 0, void 0, function* () {
         const directories = project_directory.split('/');
         const title = directories[directories.length - 1];
         d3.select('#project_directory_title').text('SPRING subplots of "' + title + '"');
@@ -172,5 +191,5 @@ define(["require", "exports", "d3", "./util", "./main"], function (require, expo
             type: 'POST',
             url: 'cgi-bin/list_directories_with_filename.py',
         });
-    }
+    });
 });

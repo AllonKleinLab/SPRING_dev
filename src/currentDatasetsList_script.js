@@ -1,7 +1,6 @@
-import * as d3 from 'd3';
 
+import * as d3 from 'd3';
 import { openInNewTab } from './util';
-import { forceLayout } from './main';
 
 function add_list_item(project_directory, sub_directory, order) {
   d3.json(project_directory + '/' + sub_directory + '/run_info.json').then(data => {
@@ -14,7 +13,7 @@ function add_list_item(project_directory, sub_directory, order) {
 
     let display_names = {
       Filtered_Genes: 'Number of genes that passed filter',
-      Gene_let_Pctl: 'Gene letiability %ile (gene filtering)',
+      Gene_Var_Pctl: 'Gene variability percentile (gene filtering)',
       Min_Cells: 'Min expressing cells (gene filtering)',
       Min_Counts: 'Min number of UMIs (gene filtering)',
       Nodes: 'Number of cells',
@@ -29,7 +28,7 @@ function add_list_item(project_directory, sub_directory, order) {
       .style('width', '480px');
 
     if ('Description' in data) {
-      if (data.Description != null) {
+      if ((data.Description != null) && (data.Description != "None")) {
         info_box
           .append('tspan')
           .append('text')
@@ -66,7 +65,7 @@ function add_list_item(project_directory, sub_directory, order) {
       'Filtered_Genes',
       'Min_Cells',
       'Min_Counts',
-      'Gene_let_Pctl',
+      'Gene_Var_Pctl',
       'Num_PCs',
       'Num_Neighbors',
       'Num_Force_Iter',
@@ -109,57 +108,65 @@ function add_list_item(project_directory, sub_directory, order) {
       .append('text')
       .attr('class', 'delete_button')
       .text('Delete')
-      .on('click', function() {
+      .on('click', async function() {
         d3.event.stopPropagation();
-        d3.text(project_directory + '/' + sub_directory + '/mutability.txt', (text) => {
-          forceLayout.mutable = text;
-          if (forceLayout.mutable == null) {
-            sweetAlert(
-              {
-                icon: 'warning',
-                showCancelButton: true,
-                text: 'Do you want to delete the SPRING subplot ' + sub_directory + '?',
-                title: 'Are you sure?',
-              },
-              function(isConfirm) {
-                console.log(isConfirm);
-                if (isConfirm) {
-                  list_item
-                    .style('z-index', '-10')
-                    .transition()
-                    .duration(700)
-                    .style('margin-top', '-115px')
-                    .each(() => {
-                      list_item.remove();
-                    });
-
-                  $.ajax({
-                    data: { base_dir: project_directory, sub_dir: sub_directory },
-                    success: function(python_data) {
-                      console.log(python_data);
-                    },
-                    type: 'POST',
-                    url: 'cgi-bin/delete_subdirectory.py',
-                  });
-                }
-              },
-            );
+        const filePath = project_directory + '/' + sub_directory + '/mutability.txt';
+        let mutable = true;
+        try {
+          const mutableText = await d3.text(filePath);
+          if (mutableText === null) {
+            mutable = true;
           } else {
-            sweetAlert(
-              {
-                icon: 'warning',
-                showCancelButton: false,
-                title: 'This subplot cannot be deleted.',
-              },
-              function(isConfirm) {
-                console.log(isConfirm);
-                if (isConfirm) {
-                  return;
-                }
-              },
-            );
+            mutable = false;
           }
-        });
+        } catch (err) {
+          mutable = true;
+        }
+
+        if (mutable) {
+          sweetAlert(
+            {
+              icon: 'warning',
+              showCancelButton: true,
+              text: 'Do you want to delete the SPRING subplot ' + sub_directory + '?',
+              title: 'Are you sure?',
+            },
+            function(isConfirm) {
+              if (isConfirm) {
+                list_item
+                  .style('z-index', '-10')
+                  .transition()
+                  .duration(700)
+                  .style('margin-top', '-115px')
+                  .each(() => {
+                    list_item.remove();
+                  });
+
+                $.ajax({
+                  data: { base_dir: project_directory, sub_dir: sub_directory },
+                  success: function(python_data) {
+                    console.log(python_data);
+                  },
+                  type: 'POST',
+                  url: 'cgi-bin/delete_subdirectory.py',
+                });
+              }
+            },
+          );
+        } else {
+          sweetAlert(
+            {
+              icon: 'warning',
+              showCancelButton: false,
+              title: 'This subplot cannot be deleted.',
+            },
+            function(isConfirm) {
+              if (isConfirm) {
+                return;
+              }
+            },
+          );
+        }
       });
 
     list_item.on('click', function() {
@@ -174,7 +181,7 @@ function add_list_item(project_directory, sub_directory, order) {
   });
 }
 
-function populate_dataset_subdirs_list(project_directory) {
+export const populate_dataset_subdirs_list = async (project_directory) => {
   const directories = project_directory.split('/');
   const title = directories[directories.length - 1];
   d3.select('#project_directory_title').text('SPRING subplots of "' + title + '"');
@@ -195,3 +202,4 @@ function populate_dataset_subdirs_list(project_directory) {
     url: 'cgi-bin/list_directories_with_filename.py',
   });
 }
+
