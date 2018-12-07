@@ -16,9 +16,9 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
             }
             return this._instance;
         }
-        static create() {
+        static create(force_new = false) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (!this._instance) {
+                if (!this._instance || force_new) {
                     this._instance = new CloneViewer();
                     yield this._instance.loadData();
                     return this._instance;
@@ -230,7 +230,6 @@ define(["require", "exports", "d3", "spinner", "./util", "./main"], function (re
                 const filePath = main_1.project_directory + '/clone_map.json';
                 try {
                     const cloneData = yield d3.json(filePath + '?_=' + noCache);
-                    //console.log(error);
                     for (let k in cloneData) {
                         this.clone_map[k] = {};
                         for (let i in main_1.forceLayout.all_nodes) {

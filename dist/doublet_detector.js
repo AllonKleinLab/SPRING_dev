@@ -1,4 +1,12 @@
-define(["require", "exports", "d3", "./main", "./util"], function (require, exports, d3, main_1, util_1) {
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+define(["require", "exports", "d3", "./clone_viewer.js", "./main"], function (require, exports, d3, clone_viewer_js_1, main_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class DoubletDetector {
@@ -119,7 +127,7 @@ define(["require", "exports", "d3", "./main", "./util"], function (require, expo
                 this.hide_doublet_popup();
                 $.ajax({
                     data: { base_dir: main_1.graph_directory, sub_dir: main_1.project_directory, k: k, r: r, f: f },
-                    success: data => {
+                    success: (data) => __awaiter(this, void 0, void 0, function* () {
                         let t1 = new Date();
                         console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
                         d3.select('#doublet_notification')
@@ -139,24 +147,15 @@ define(["require", "exports", "d3", "./main", "./util"], function (require, expo
                                 main_1.cloneViewer.deactivate_edges(i);
                             }
                             main_1.cloneViewer.targetCircle.clear();
-                            // cloneViewer.clone_viewer_setup();
+                            main_1.cloneViewer = yield clone_viewer_js_1.default.create(true);
                             main_1.cloneViewer.start_clone_viewer();
                         }
                         else {
                             $('#clone_viewer_popup').remove();
-                            // cloneViewer.clone_viewer_setup();
+                            main_1.cloneViewer = yield clone_viewer_js_1.default.create(true);
                         }
-                        // open json file containing gene sets and populate drop down menu
-                        let noCache = new Date().getTime();
-                        d3.json(main_1.project_directory + '/color_stats.json' + '?_=' + noCache).then(colorData => {
-                            main_1.colorBar.color_stats = colorData;
-                        });
-                        d3.text(main_1.project_directory + '/color_data_gene_sets.csv' + '?_=' + noCache).then(text => {
-                            main_1.colorBar.gene_set_color_array = util_1.read_csv(text);
-                            main_1.colorBar.dispatch.call('load', this, main_1.colorBar.gene_set_color_array, 'gene_sets');
-                            main_1.colorBar.update_slider();
-                        });
-                    },
+                        main_1.colorBar.loadData('continuous', true);
+                    }),
                     type: 'POST',
                     url: 'cgi-bin/run_doublet_detector.py',
                 });

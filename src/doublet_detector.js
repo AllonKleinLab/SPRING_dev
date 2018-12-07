@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import CloneViewer from './clone_viewer.js';
 import { colorBar, forceLayout, cloneViewer, project_directory, graph_directory } from './main';
 import { read_csv } from './util';
 
@@ -146,7 +147,7 @@ export default class DoubletDetector {
 
       $.ajax({
         data: {base_dir:graph_directory, sub_dir:project_directory, k:k, r:r, f:f},
-        success: data => {
+        success: async data => {
           let t1 = new Date();
           console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
           d3.select('#doublet_notification')
@@ -166,24 +167,13 @@ export default class DoubletDetector {
               cloneViewer.deactivate_edges(i);
             }
             cloneViewer.targetCircle.clear();
-
-            // cloneViewer.clone_viewer_setup();
+            cloneViewer = await CloneViewer.create(true);
             cloneViewer.start_clone_viewer();
           } else {
             $('#clone_viewer_popup').remove();
-            // cloneViewer.clone_viewer_setup();
+            cloneViewer = await CloneViewer.create(true);
           }
-
-          // open json file containing gene sets and populate drop down menu
-          let noCache = new Date().getTime();
-          d3.json(project_directory + '/color_stats.json' + '?_=' + noCache).then(colorData => {
-            colorBar.color_stats = colorData;
-          });
-          d3.text(project_directory + '/color_data_gene_sets.csv' + '?_=' + noCache).then(text => {
-            colorBar.gene_set_color_array = read_csv(text);
-            colorBar.dispatch.call('load', this, colorBar.gene_set_color_array, 'gene_sets');
-            colorBar.update_slider();
-          });
+          colorBar.loadData('continuous', true);
         },
         type: 'POST',
         url: 'cgi-bin/run_doublet_detector.py',

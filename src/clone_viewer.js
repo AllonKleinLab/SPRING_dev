@@ -15,8 +15,8 @@ export default class CloneViewer {
     return this._instance;
   }
 
-  static async create() {
-    if (!this._instance) {
+  static async create(force_new=false) {
+    if (!this._instance || force_new) {
       this._instance = new CloneViewer();
       await this._instance.loadData();
       return this._instance;
@@ -258,7 +258,6 @@ export default class CloneViewer {
     const filePath = project_directory + '/clone_map.json';
     try {
       const cloneData = await d3.json(filePath + '?_=' + noCache);
-      //console.log(error);
       for (let k in cloneData) {
         this.clone_map[k] = {};
         for (let i in forceLayout.all_nodes) {
