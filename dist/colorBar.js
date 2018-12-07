@@ -563,7 +563,9 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
             return __awaiter(this, void 0, void 0, function* () {
                 if (!this._instance) {
                     this._instance = new ColorBar(color_menu_genes);
-                    yield this._instance.loadData();
+                    yield this._instance.loadData('categorical', true);
+                    yield this._instance.loadData('continuous', false);
+                    yield this._instance.loadData('genes', false);
                     return this._instance;
                 }
                 else {
@@ -572,32 +574,41 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
             });
         }
         // <-- ColorBar Constructor End -->
-        loadData() {
+        loadData(data_type, do_update_slider) {
             return __awaiter(this, void 0, void 0, function* () {
-                // open json file containing gene sets and populate drop down menu
-                this.categorical_coloring_data = yield d3.json(main_1.project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache);
-                Object.keys(this.categorical_coloring_data).forEach(k => {
-                    const label_counts = {};
-                    Object.keys(this.categorical_coloring_data[k].label_colors).forEach(n => {
-                        label_counts[n] = 0;
+                // open json files with extra color tracks and populate drop down menus
+                if (data_type === 'categorical') {
+                    this.noCache = new Date().getTime();
+                    this.categorical_coloring_data = yield d3.json(main_1.project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache);
+                    Object.keys(this.categorical_coloring_data).forEach(k => {
+                        const label_counts = {};
+                        Object.keys(this.categorical_coloring_data[k].label_colors).forEach(n => {
+                            label_counts[n] = 0;
+                        });
+                        this.categorical_coloring_data[k].label_list.forEach(n => {
+                            label_counts[n] += 1;
+                        });
+                        this.categorical_coloring_data[k].label_counts = label_counts;
                     });
-                    this.categorical_coloring_data[k].label_list.forEach(n => {
-                        label_counts[n] += 1;
-                    });
-                    this.categorical_coloring_data[k].label_counts = label_counts;
-                });
-                this.dispatch.call('load', this, this.categorical_coloring_data, 'cell_labels');
-                this.update_slider();
-                this.color_stats = yield d3.json(main_1.project_directory + '/color_stats.json' + '?_=' + this.noCache);
-                this.addStreamExp(this.color_menu_genes);
-                this.last_gene = '';
-                this.gene_entered = false;
-                // open json file containing gene sets and populate drop down menu
-                const text = yield d3.text(main_1.project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
-                this.gene_set_color_array = this.read_csv(text);
-                // gradientMenu.selectAll("option").remove();
-                this.dispatch.call('load', this, this.gene_set_color_array, 'gene_sets');
-                // update_slider();
+                    this.dispatch.call('load', this, this.categorical_coloring_data, 'cell_labels');
+                }
+                else if (data_type === 'genes' || data_type === 'continuous') {
+                    if (data_type === 'genes') {
+                        this.addStreamExp(this.color_menu_genes);
+                        this.last_gene = '';
+                        this.gene_entered = false;
+                    }
+                    else {
+                        this.noCache = new Date().getTime();
+                        this.color_stats = yield d3.json(main_1.project_directory + '/color_stats.json' + '?_=' + this.noCache);
+                        const text = yield d3.text(main_1.project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
+                        this.gene_set_color_array = this.read_csv(text);
+                        this.dispatch.call('load', this, this.gene_set_color_array, 'gene_sets');
+                    }
+                }
+                if (do_update_slider) {
+                    this.update_slider();
+                }
             });
         }
         normalize(x) {

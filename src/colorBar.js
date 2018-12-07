@@ -17,9 +17,9 @@ export default class ColorBar {
   static async create(color_menu_genes) {
     if (!this._instance) {
       this._instance = new ColorBar(color_menu_genes);
-
-      await this._instance.loadData();
-
+      await this._instance.loadData('categorical', true);
+      await this._instance.loadData('continuous', false);
+      await this._instance.loadData('genes', false);
       return this._instance;
     } else {
       throw new Error('ColorBar.create() has already been called, get the existing instance with ColorBar.instance!');
@@ -188,7 +188,6 @@ export default class ColorBar {
       .attr('offset', '100%')
       .attr('stop-color', 'yellow')
       .attr('stop-opacity', 1);
-
     this.green_gradient = d3
       .select('svg')
       .append('defs')
@@ -548,38 +547,40 @@ export default class ColorBar {
   }
   // <-- ColorBar Constructor End -->
 
-  async loadData() {
-    // open json file containing gene sets and populate drop down menu
-    this.categorical_coloring_data = await d3.json(
-      project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache,
-    );
-    Object.keys(this.categorical_coloring_data).forEach(k => {
-      const label_counts = {};
-      Object.keys(this.categorical_coloring_data[k].label_colors).forEach(n => {
-        label_counts[n] = 0;
+  async loadData(data_type, do_update_slider) {
+    // open json files with extra color tracks and populate drop down menus
+    if (data_type === 'categorical') {
+      this.noCache = new Date().getTime();
+      this.categorical_coloring_data = await d3.json(
+        project_directory + '/categorical_coloring_data.json' + '?_=' + this.noCache,
+      );
+      Object.keys(this.categorical_coloring_data).forEach(k => {
+        const label_counts = {};
+        Object.keys(this.categorical_coloring_data[k].label_colors).forEach(n => {
+          label_counts[n] = 0;
+        });
+        this.categorical_coloring_data[k].label_list.forEach(n => {
+          label_counts[n] += 1;
+        });
+        this.categorical_coloring_data[k].label_counts = label_counts;
       });
-      this.categorical_coloring_data[k].label_list.forEach(n => {
-        label_counts[n] += 1;
-      });
-      this.categorical_coloring_data[k].label_counts = label_counts;
-    });
-
-    this.dispatch.call('load', this, this.categorical_coloring_data, 'cell_labels');
-    this.update_slider();
-
-    this.color_stats = await d3.json(project_directory + '/color_stats.json' + '?_=' + this.noCache);
-    this.addStreamExp(this.color_menu_genes);
-
-    this.last_gene = '';
-    this.gene_entered = false;
-
-    // open json file containing gene sets and populate drop down menu
-    const text = await d3.text(project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
-    this.gene_set_color_array = this.read_csv(text);
-
-    // gradientMenu.selectAll("option").remove();
-    this.dispatch.call('load', this, this.gene_set_color_array, 'gene_sets');
-    // update_slider();
+      this.dispatch.call('load', this, this.categorical_coloring_data, 'cell_labels');
+    } else if (data_type === 'genes' || data_type === 'continuous') {
+      if (data_type === 'genes') {
+        this.addStreamExp(this.color_menu_genes);
+        this.last_gene = '';
+        this.gene_entered = false;
+      } else {
+        this.noCache = new Date().getTime();
+        this.color_stats = await d3.json(project_directory + '/color_stats.json' + '?_=' + this.noCache);
+        const text = await d3.text(project_directory + '/color_data_gene_sets.csv' + '?_=' + this.noCache);
+        this.gene_set_color_array = this.read_csv(text);
+        this.dispatch.call('load', this, this.gene_set_color_array, 'gene_sets');
+      }
+    }
+    if (do_update_slider) {
+      this.update_slider();
+    }
   }
 
   normalize(x) {
