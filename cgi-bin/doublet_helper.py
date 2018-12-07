@@ -485,8 +485,24 @@ def get_spectral_clusters(A, k):
     spec = SpectralClustering(n_clusters=k, random_state = 0, affinity = 'precomputed', assign_labels = 'discretize')
     return spec.fit_predict(A)
 
+def get_louvain_clusters(n_nodes, edges, resolution=1.0, random_seed=0):
+    #https://github.com/theislab/scanpy/blob/master/scanpy/tools/louvain.py
+    import louvain
+    import igraph as ig
+    g = ig.Graph()
+    g.add_vertices(n_nodes)
+    g.add_edges(list(edges))
 
-def get_louvain_clusters(nodes, edges):
+    partition_type = louvain.RBConfigurationVertexPartition
+    louvain.set_rng_seed(random_seed)
+    part = louvain.find_partition(
+        g, partition_type,
+        resolution_parameter=resolution
+    )
+    return np.array(part.membership, dtype=int)
+
+
+def get_louvain_clusters_old(nodes, edges):
     import networkx as nx
     import community
     

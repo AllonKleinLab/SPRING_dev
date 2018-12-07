@@ -282,7 +282,7 @@ define(["require", "exports", "d3", "./LineSprite", "./main", "./util", "./setti
                 d3.select('#show_imputation_popup').on('click', () => main_1.smoothingImputation.show_imputation_popup());
                 d3.select('#show_selection_logic_popup').on('click', () => main_1.selectionLogic.show_selection_logic_popup());
                 d3.select('#show_doublet_popup').on('click', () => main_1.doubletDetector.show_doublet_popup());
-                d3.select('#run_clustering').on('click', () => main_1.cluster2.run_clustering());
+                d3.select('#run_clustering').on('click', () => main_1.cluster2.show_popup());
                 d3.select('#show_PAGA_popup').on('click', () => main_1.paga.show_PAGA_popup());
                 d3.select('#toggle_legend_hover_tooltip_button').on('click', () => main_1.colorBar.toggle_legend_hover_tooltip());
                 d3.select('#extend_selection').on('click', () => main_1.selectionScript.extend_selection());
