@@ -574,6 +574,7 @@ function downloadFile(text,name) {
 	hiddenElement.href = 'data:attachment/text,' + encodeURI(text);
 	hiddenElement.target = '_blank';
 	hiddenElement.download = name;
+	document.body.appendChild(hiddenElement)
 	hiddenElement.click();
 }
 
