@@ -99,9 +99,18 @@ def calculate_doublet_scores(embedding, doub_labels, k=50, use_approx_nn=True, e
     doub_neigh_mask = doub_labels[neighbors] == 1
     n_sim_neigh = np.sum(doub_neigh_mask, axis = 1)
     n_obs_neigh = doub_neigh_mask.shape[1] - n_sim_neigh
+
+    rho = exp_doub_rate
+    r = n_sim / float(n_obs)
+    nd = n_sim_neigh
+    ns = n_obs_neigh
+    N = k_adj
     
-    doub_score = n_sim_neigh / (n_sim_neigh + n_obs_neigh * n_sim / float(n_obs) / exp_doub_rate)
-    doub_score_obs = doub_score[doub_labels == 0]
+    # Bayesian
+    q=(nd+1)/float(N+2)
+    doub_score = q*rho/r/(1-rho-q*(1-rho-rho/r))
+    
+    #doub_score = n_sim_neigh / (n_sim_neigh + n_obs_neigh * n_sim / float(n_obs) / exp_doub_rate)
 
     # get parents of doublet neighbors, if requested
     neighbors = neighbors - n_obs
@@ -174,6 +183,7 @@ base_dir = data.getvalue('base_dir')
 sub_dir = data.getvalue('sub_dir')
 k = int(data.getvalue('k'))
 r = float(data.getvalue('r'))
+f = float(data.getvalue('f'))
 
 
 if os.path.exists(sub_dir + '/intermediates.npz'):
@@ -187,8 +197,17 @@ if os.path.exists(sub_dir + '/intermediates.npz'):
 else:
     print ('Error: could not find "intermediates.npz"')
 
-doublet_scores, doublet_scores_sim, doub_neigh_parents = woublet(precomputed_pca = Epca, total_counts = total_counts, exp_doub_rate = 0.1, sim_doublet_ratio = r, k = k, use_approx_nn = True, get_doub_parents = True)
+doublet_scores, doublet_scores_sim, doub_neigh_parents = woublet(precomputed_pca = Epca, total_counts = total_counts, exp_doub_rate = f, sim_doublet_ratio = r, k = k, use_approx_nn = True, get_doub_parents = True)
 np.save(sub_dir + '/doublet_scores.npy', doublet_scores)
+np.save(sub_dir + '/doublet_scores_sim.npy', doublet_scores_sim)
+
+with open(sub_dir + '/doublet_results.tsv', 'w') as o:
+    o.write('Score\tObserved_or_Simulated\n')
+    for s in doublet_scores:
+        o.write('{:.5f}\tObserved\n'.format(s))
+    for s in doublet_scores_sim:
+        o.write('{:.5f}\tSimulated\n'.format(s))
+
 
 d = {}
 for i, neigh in enumerate(doub_neigh_parents):

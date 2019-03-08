@@ -61,6 +61,7 @@ export const downloadFile = (text, name) => {
   hiddenElement.href = 'data:attachment/text,' + encodeURI(text);
   hiddenElement.target = '_blank';
   hiddenElement.download = name;
+  document.body.appendChild(hiddenElement);
   hiddenElement.click();
 };
 
@@ -79,7 +80,7 @@ export const postMessageToParent = message => {
   }
 };
 
-export const postSelectedCellUpdate = (indices) => {
+export const postSelectedCellUpdate = indices => {
   const currentCategory = document.getElementById('labels_menu').value;
   postMessageToParent({ type: 'selected-cells-update', payload: { currentCategory, indices } });
 };

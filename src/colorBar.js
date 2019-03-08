@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { show_colorpicker_popup } from './colorpicker_layout';
 import { forceLayout, graph_directory, selectionScript, project_directory } from './main';
-import { rgbToHex, postSelectedCellUpdate } from './util';
+import { rgbToHex, postSelectedCellUpdate, downloadFile } from './util';
 
 export default class ColorBar {
   /** @type ColorBar */
@@ -147,6 +147,7 @@ export default class ColorBar {
     });
 
     d3.select('download_ranked_terms').on('click', () => this.downloadRankedTerms());
+    d3.select('download_doublet_scores').on('click', () => this.downloadDoubletScores());
 
     /* -----------------------------------------------------------------------------------
 										   Graph coloring
@@ -632,7 +633,7 @@ export default class ColorBar {
     if (document.getElementById('channels_button').checked) {
       const t0 = new Date();
       const green_selection = document.getElementById('autocomplete').value;
-
+      console.log(green_selection);
       $.ajax({
         data: { base_dir: graph_directory, sub_dir: project_directory, gene: green_selection },
         success: data => {
@@ -1373,6 +1374,16 @@ export default class ColorBar {
     hiddenElement.click();
   }
 
+  downloadFileDirect(path, filename) {
+    console.log(path);
+    var hiddenElement = document.createElement('a');
+    // hiddenElement.href = ''
+    hiddenElement.href = path;
+    hiddenElement.target = '_blank';
+    hiddenElement.download = filename;
+    hiddenElement.click();
+  }
+
   downloadRankedTerms = () => {
     let num_selected = 0;
     let termcol = [];
@@ -1420,6 +1431,10 @@ export default class ColorBar {
       text = text.slice(1, text.length);
     }
     this.downloadFile(text, 'enriched_terms.txt');
+  };
+
+  downloadDoubletScores = () => {
+    this.downloadFileDirect(`${project_directory}/doublet_results.tsv`, 'doublet_results.tsv');
   };
 
   make_legend(cat_color_map, cat_label_list) {

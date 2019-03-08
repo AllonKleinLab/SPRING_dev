@@ -39,16 +39,22 @@ export default class DoubletDetector {
 
     this.button_bar
       .append('label')
-      .text('k = ')
+      .html('<i>k</i> = ')
       .append('input')
       .attr('id', 'doublet_k_input')
       .property('value', 50);
     this.button_bar
       .append('label')
-      .text('r = ')
+      .html('<i>r</i> = ')
       .append('input')
       .attr('id', 'doublet_r_input')
       .property('value', 2);
+    this.button_bar
+      .append('label')
+      .html('<i>f</i> = ')
+      .append('input')
+      .attr('id', 'doublet_f_input')
+      .property('value', 0.1);
     this.button_bar
       .append('button')
       .text('Run')
@@ -62,10 +68,12 @@ export default class DoubletDetector {
       .append('div')
       .attr('id', 'doublet_description')
       .append('text')
-      .text(
+      .html(
         'Predict mixed-celltype doublets. \
-        Uses a kNN classifier to find cells that look like simulated doublets. \
-        k sets the number neighbors used in the classifier, and r is the ratio of simulated doublets to observed cells.',
+        Uses a kNN classifier to identify transcriptomes that resemble simulated doublets. \
+        <br><br> <b><i>k </i> : </b> the number neighbors used in the classifier \
+        <br> <b><i>r </i> : </b> the ratio of simulated doublets to observed cells \
+        <br> <b><i>f </i> : </b> the expected doublet rate',
       );
 
     this.doublet_notify_popup = d3
@@ -202,9 +210,10 @@ export default class DoubletDetector {
   // <-- DoubletDetector Constructor End -->
   run_doublet_detector() {
     if (forceLayout.mutable) {
-      let t0 = new Date();
-      let k = $('#doublet_k_input').val();
-      let r = $('#doublet_r_input').val();
+      var t0 = new Date();
+      var k = $('#doublet_k_input').val();
+      var r = $('#doublet_r_input').val();
+      var f = $('#doublet_f_input').val();
 
       // show_processing_mask();
       // hide_doublet_popup_slowly();
@@ -215,9 +224,15 @@ export default class DoubletDetector {
       this.show_doublet_notification();
       this.hide_doublet_popup();
 
-      console.log(k, r);
+      console.log(k, r, f);
       $.ajax({
-        data: { base_dir: graph_directory, sub_dir: project_directory, k: k, r: r },
+        data: {
+          base_dir: graph_directory,
+          sub_dir: project_directory,
+          k: k,
+          r: r,
+          f: f,
+        },
         success: data => {
           let t1 = new Date();
           console.log('Ran doublet detector: ', t1.getTime() - t0.getTime());
@@ -239,11 +254,9 @@ export default class DoubletDetector {
             }
             cloneViewer.targetCircle.clear();
 
-            // cloneViewer.clone_viewer_setup();
             cloneViewer.start_clone_viewer();
           } else {
             $('#clone_viewer_popup').remove();
-            // cloneViewer.clone_viewer_setup();
           }
 
           // hide_processing_mask();
@@ -256,6 +269,7 @@ export default class DoubletDetector {
             colorBar.gene_set_color_array = read_csv(text);
             colorBar.dispatch.call('load', this, colorBar.gene_set_color_array, 'gene_sets');
             colorBar.update_slider();
+            console.log('loaded doublet scores into menu');
           });
         },
         type: 'POST',

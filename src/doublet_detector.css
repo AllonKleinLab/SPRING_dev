@@ -7,7 +7,7 @@
 	visibility: hidden;
 	border: solid 1px rgb(150,150,150);
 	overflow: hidden;
-	height: 100px;
+	height: 150px;
 	padding: 20px;	
 }
 
@@ -44,7 +44,7 @@
 	padding-left: 8px;
 	padding-top: 3px;
 	padding-bottom: 3px;
-	width: 30px;
+	width: 35px;
 }
 
 #doublet_button_bar > button {
