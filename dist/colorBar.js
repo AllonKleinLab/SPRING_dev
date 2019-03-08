@@ -62,6 +62,9 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
                 }
                 this.downloadFile(text, 'enriched_terms.txt');
             };
+            this.downloadDoubletScores = () => {
+                this.downloadFileDirect(`${main_1.project_directory}/doublet_results.tsv`, 'doublet_results.tsv');
+            };
             this.get_hover_cells = e => {
                 const dim = document.getElementById('svg_graph').getBoundingClientRect();
                 let x = e.clientX - dim.left;
@@ -193,6 +196,7 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
                 });
             });
             d3.select('download_ranked_terms').on('click', () => this.downloadRankedTerms());
+            d3.select('download_doublet_scores').on('click', () => this.downloadDoubletScores());
             /* -----------------------------------------------------------------------------------
                                                    Graph coloring
               */
@@ -646,6 +650,7 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
             if (document.getElementById('channels_button').checked) {
                 const t0 = new Date();
                 const green_selection = document.getElementById('autocomplete').value;
+                console.log(green_selection);
                 $.ajax({
                     data: { base_dir: main_1.graph_directory, sub_dir: main_1.project_directory, gene: green_selection },
                     success: data => {
@@ -1336,6 +1341,15 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
             hiddenElement.href = 'data:attachment/text,' + encodeURI(text);
             hiddenElement.target = '_blank';
             hiddenElement.download = name;
+            hiddenElement.click();
+        }
+        downloadFileDirect(path, filename) {
+            console.log(path);
+            var hiddenElement = document.createElement('a');
+            // hiddenElement.href = ''
+            hiddenElement.href = path;
+            hiddenElement.target = '_blank';
+            hiddenElement.download = filename;
             hiddenElement.click();
         }
         make_legend(cat_color_map, cat_label_list) {

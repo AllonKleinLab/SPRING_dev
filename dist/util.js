@@ -53,6 +53,7 @@ define(["require", "exports", "d3"], function (require, exports, d3) {
         hiddenElement.href = 'data:attachment/text,' + encodeURI(text);
         hiddenElement.target = '_blank';
         hiddenElement.download = name;
+        document.body.appendChild(hiddenElement);
         hiddenElement.click();
     };
     exports.componentToHex = c => {
@@ -67,7 +68,7 @@ define(["require", "exports", "d3"], function (require, exports, d3) {
             window.parent.postMessage(message, document.referrer);
         }
     };
-    exports.postSelectedCellUpdate = (indices) => {
+    exports.postSelectedCellUpdate = indices => {
         const currentCategory = document.getElementById('labels_menu').value;
         exports.postMessageToParent({ type: 'selected-cells-update', payload: { currentCategory, indices } });
     };
