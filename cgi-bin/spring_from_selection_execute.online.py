@@ -11,11 +11,6 @@ import networkx as nx
 import pickle
 import datetime
 
-def sparse_var(E, axis=0):
-    mean_gene = E.mean(axis=axis).A.squeeze()
-    tmp = E.copy()
-    tmp.data **= 2
-    return tmp.mean(axis=axis).A.squeeze() - mean_gene ** 2
 
 def update_log_html(fname, logdat, overwrite=False):
     if overwrite:
@@ -25,6 +20,7 @@ def update_log_html(fname, logdat, overwrite=False):
     o.write(logdat + '<br>\n')
     o.close()
 
+
 def update_log(fname, logdat, overwrite=False):
     if overwrite:
         o = open(fname, 'w')
@@ -33,11 +29,12 @@ def update_log(fname, logdat, overwrite=False):
     o.write(logdat + '\n')
     o.close()
 
+
 def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 
     import smtplib
-    from email.MIMEMultipart import MIMEMultipart
-    from email.MIMEText import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
 
     fromaddr = "singlecellSPRING@gmail.com"
     toaddr = email
@@ -46,15 +43,23 @@ def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
     msg['To'] = toaddr
     msg['Subject'] = 'SPRING is finished processing '+name
 
-    body = 'SPRING finished processing your dataset '+name+' using the following parameters:\n\n'
+    body = 'SPRING finished processing your dataset ' + \
+        name+' using the following parameters:\n\n'
     body += 'Starting dataset ' + start_dataset + '\n'
-    body += 'Min expressing cells (gene filtering): ' + str(info_dict['Min_Cells']) + '\n'
-    body += 'Min number of UMIs (gene filtering): ' + str(info_dict['Min_Counts']) + '\n'
-    body += 'Gene variability percentile (gene filtering): ' + str(info_dict['Gene_Var_Pctl']) + '\n'
-    body += 'Number of principal components: ' + str(info_dict['Num_PCs']) + '\n'
-    body += 'Number of nearest neighbors: ' + str(info_dict['Num_Neighbors']) + '\n'
-    body += 'Number of force layout iterations: ' + str(info_dict['Num_Force_Iter']) + '\n\n'
-    body += 'Used %i cells and %i genes to build the SPRING plot.\n\n' %(info_dict['Nodes'], info_dict['Filtered_Genes'])
+    body += 'Min expressing cells (gene filtering): ' + \
+        str(info_dict['Min_Cells']) + '\n'
+    body += 'Min number of UMIs (gene filtering): ' + \
+        str(info_dict['Min_Counts']) + '\n'
+    body += 'Gene variability percentile (gene filtering): ' + \
+        str(info_dict['Gene_Var_Pctl']) + '\n'
+    body += 'Number of principal components: ' + \
+        str(info_dict['Num_PCs']) + '\n'
+    body += 'Number of nearest neighbors: ' + \
+        str(info_dict['Num_Neighbors']) + '\n'
+    body += 'Number of force layout iterations: ' + \
+        str(info_dict['Num_Force_Iter']) + '\n\n'
+    body += 'Used %i cells and %i genes to build the SPRING plot.\n\n' % (
+        info_dict['Nodes'], info_dict['Filtered_Genes'])
     body += 'You can view the results at\n' + new_url + '\n'
     msg.attach(MIMEText(body, 'plain'))
 
@@ -64,6 +69,7 @@ def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
     text = msg.as_string()
     server.sendmail(fromaddr, toaddr, text)
     server.quit()
+
 
 try:
     from fa2_anim import ForceAtlas2
@@ -110,27 +116,30 @@ logf = new_dir + '/lognewspring2.txt'
 timef = new_dir + '/lognewspringtime.txt'
 
 
-
 #######################
 # Load data
 
 cell_filter = np.load(current_dir + '/cell_filter.npy')[extra_filter]
 np.save(new_dir + '/cell_filter.npy', cell_filter)
 np.savetxt(new_dir + '/cell_filter.txt', cell_filter, fmt='%i')
-gene_list = np.loadtxt(base_dir + '/genes.txt', dtype=str, delimiter='\t', comments="")
+gene_list = np.loadtxt(base_dir + '/genes.txt',
+                       dtype=str, delimiter='\t', comments="")
 prefix_map = {}
-for g in gene_list: prefix_map[g.split()[0]] = g
-for g in gene_list: prefix_map[g.split()[-1]] = g
-custom_genes = set([prefix_map[g] for g in custom_genes if g in prefix_map]+[g for g in custom_genes if g in gene_list])
+for g in gene_list:
+    prefix_map[g.split()[0]] = g
+for g in gene_list:
+    prefix_map[g.split()[-1]] = g
+custom_genes = set([prefix_map[g] for g in custom_genes if g in prefix_map] +
+                   [g for g in custom_genes if g in gene_list])
 
 t0 = time.time()
 update_log_html(logf, 'Loading counts data...')
 E = ssp.load_npz(base_dir + '/counts_norm.npz')
-E = E[cell_filter,:]
+E = E[cell_filter, :]
 if not ssp.isspmatrix_csc(E):
     E = E.tocsc()
 t1 = time.time()
-update_log(timef, 'Counts loaded from npz -- %.2f' %(t1-t0), True)
+update_log(timef, 'Counts loaded from npz -- %.2f' % (t1-t0), True)
 
 
 ################
@@ -148,13 +157,15 @@ pctls = np.zeros(E.shape[1], dtype=float)
 for iG in range(E.shape[1]):
     n_nonzero = E.indptr[iG+1] - E.indptr[iG]
     if n_nonzero > pctl_n:
-        pctls[iG] = np.percentile(E.data[E.indptr[iG]:E.indptr[iG+1]], 100 - 100 * pctl_n / n_nonzero)
+        pctls[iG] = np.percentile(
+            E.data[E.indptr[iG]:E.indptr[iG+1]], 100 - 100 * pctl_n / n_nonzero)
     else:
         pctls[iG] = 0
-    color_stats[gene_list[iG]] = tuple(map(float, (means[iG], stdevs[iG], mins[iG], maxes[iG], pctls[iG])))
+    color_stats[gene_list[iG]] = tuple(
+        map(float, (means[iG], stdevs[iG], mins[iG], maxes[iG], pctls[iG])))
 
 t1 = time.time()
-update_log(timef, 'Stats computed -- %.2f' %(t1-t0))
+update_log(timef, 'Stats computed -- %.2f' % (t1-t0))
 
 ################
 # Save color stats, custom colors
@@ -163,79 +174,86 @@ update_log_html(logf, 'Saving stats...')
 custom_colors = {}
 f = open(current_dir + '/color_data_gene_sets.csv', 'r')
 for l in f:
-    print (l[:100])
+    print(l[:100])
     cols = l.strip('\n').split(',')
     custom_colors[cols[0]] = map(float, np.array(cols[1:])[extra_filter])
-for k,v in custom_colors.items():
-    color_stats[k] = (0,1,np.min(v),np.max(v)+.01,np.percentile(v,99))
-with open(new_dir+'/color_stats.json','w') as f:
-    f.write(json.dumps(color_stats,indent=4, sort_keys=True).decode('utf-8'))
-with open(new_dir+'/color_data_gene_sets.csv','w') as f:
-    for k,v in custom_colors.items():
+for k, v in custom_colors.items():
+    color_stats[k] = (0, 1, np.min(v), np.max(v)+.01, np.percentile(v, 99))
+with open(new_dir+'/color_stats.json', 'w') as f:
+    f.write(json.dumps(color_stats, indent=4, sort_keys=True).decode('utf-8'))
+with open(new_dir+'/color_data_gene_sets.csv', 'w') as f:
+    for k, v in custom_colors.items():
         f.write(k + ',' + ','.join(map(str, v)) + '\n')
 t1 = time.time()
-update_log(timef, 'Saved color stats -- %.2f' %(t1-t0))
+update_log(timef, 'Saved color stats -- %.2f' % (t1-t0))
 ###############
 # Save cell groupings
 t0 = time.time()
 update_log_html(logf, 'Saving cell labels...')
-cell_groupings = json.load(open(current_dir + '/categorical_coloring_data.json'))
+cell_groupings = json.load(
+    open(current_dir + '/categorical_coloring_data.json'))
 new_cell_groupings = {}
 if len(cell_groupings) > 0:
     for k in cell_groupings:
         new_cell_groupings[k] = {}
-        new_cell_groupings[k]['label_list'] = [str(cell_groupings[k]['label_list'][i]) for i in extra_filter]
+        new_cell_groupings[k]['label_list'] = [
+            str(cell_groupings[k]['label_list'][i]) for i in extra_filter]
         uniq_groups = np.unique(np.array(new_cell_groupings[k]['label_list']))
 
         new_cell_groupings[k]['label_colors'] = {}
         for kk in uniq_groups:
             new_cell_groupings[k]['label_colors'][kk] = cell_groupings[k]['label_colors'][kk]
 
-with open(new_dir+'/categorical_coloring_data.json','w') as f:
-    f.write(json.dumps(new_cell_groupings,indent=4, sort_keys=True).decode('utf-8'))
+with open(new_dir+'/categorical_coloring_data.json', 'w') as f:
+    f.write(json.dumps(new_cell_groupings, indent=4,
+                       sort_keys=True).decode('utf-8'))
 t1 = time.time()
-update_log(timef, 'Saved cell labels -- %.2f' %(t1-t0))
+update_log(timef, 'Saved cell labels -- %.2f' % (t1-t0))
 
 ################
 # Gene filtering
 t0 = time.time()
 update_log_html(logf, 'Filtering genes...')
 if (min_counts > 0) or (min_cells > 0) or (min_vscore_pctl > 0):
-    gene_filter = filter_genes(E[base_ix,:], min_counts, min_cells, min_vscore_pctl)
+    gene_filter = filter_genes(
+        E[base_ix, :], min_counts, min_cells, min_vscore_pctl)
 else:
     gene_filter = np.arange(E.shape[1])
 
 if include_exclude == 'Exclude':
-    gene_filter = np.array([i for i in gene_filter if not gene_list[i] in custom_genes])
+    gene_filter = np.array(
+        [i for i in gene_filter if not gene_list[i] in custom_genes])
 else:
-    gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
+    gene_filter = np.array(
+        [i for i in gene_filter if gene_list[i] in custom_genes])
 
-if len(gene_filter)==0: 
+if len(gene_filter) == 0:
     update_log_html(logf, 'Error: No genes survived filtering')
-    print ('Error: No genes survived filtering')
+    print('Error: No genes survived filtering')
     sys.exit()
-    
-t1 = time.time()
-update_log(timef, 'Using %i genes -- %.2f' %(len(gene_filter), t1-t0))
 
-with open(new_dir+'/filtered_genes.tsv','w') as o:
+t1 = time.time()
+update_log(timef, 'Using %i genes -- %.2f' % (len(gene_filter), t1-t0))
+
+with open(new_dir+'/filtered_genes.tsv', 'w') as o:
     o.write('gene_index\tgene_name\n')
     for iG in gene_filter:
-        o.write('%i\t%s\n' %(iG, gene_list[iG]))
+        o.write('%i\t%s\n' % (iG, gene_list[iG]))
 
 
 ################
 # PCA
 t0 = time.time()
 update_log_html(logf, 'Running PCA...')
-num_pc = np.min([num_pc,len(gene_filter)])
+num_pc = np.min([num_pc, len(gene_filter)])
 if E.shape[0] > 50000:
     pca_method = 'sparse'
 else:
     pca_method = ''
-Epca = get_PCA_sparseInput(E[:,gene_filter], numpc=num_pc, method=pca_method, base_ix=base_ix)
+Epca = get_PCA_sparseInput(
+    E[:, gene_filter], numpc=num_pc, method=pca_method, base_ix=base_ix)
 t1 = time.time()
-update_log(timef, 'PCA done -- %.2f' %(t1-t0))
+update_log(timef, 'PCA done -- %.2f' % (t1-t0))
 
 np.savetxt(new_dir+'/pca.csv', Epca, delimiter=',')
 
@@ -247,25 +265,27 @@ if Epca.shape[0] > 50000:
     approx = True
 else:
     approx = False
-links, knn_graph = get_knn_graph2(Epca, k=k_neigh, dist_metric = 'euclidean', approx=approx)
+links, knn_graph = get_knn_graph2(
+    Epca, k=k_neigh, dist_metric='euclidean', approx=approx)
 links = list(links)
 t1 = time.time()
-update_log(timef, 'KNN built -- %.2f' %(t1-t0))
+update_log(timef, 'KNN built -- %.2f' % (t1-t0))
 
 ################
 # Save graph data
 t0 = time.time()
 update_log_html(logf, 'Saving graph...')
-nodes = [{'name':int(i),'number':int(i)} for i in range(E.shape[0])]
-edges = [{'source':int(i), 'target':int(j), 'distance':0} for i,j in links]
-out = {'nodes':nodes,'links':edges}
-open(new_dir+'/graph_data.json','w').write(json.dumps(out,indent=4, separators=(',', ': ')))
+nodes = [{'name': int(i), 'number': int(i)} for i in range(E.shape[0])]
+edges = [{'source': int(i), 'target': int(j), 'distance': 0} for i, j in links]
+out = {'nodes': nodes, 'links': edges}
+open(new_dir+'/graph_data.json',
+     'w').write(json.dumps(out, indent=4, separators=(',', ': ')))
 edgef = open(new_dir+'/edges.csv', 'w')
 for ee in links:
-    edgef.write('%i;%i\n' %(ee[0], ee[1]) )
+    edgef.write('%i;%i\n' % (ee[0], ee[1]))
 edgef.close()
 t1 = time.time()
-update_log(timef, 'Graph data saved -- %.2f' %(t1-t0))
+update_log(timef, 'Graph data saved -- %.2f' % (t1-t0))
 # update_log_html(logf, str(knn_graph.shape))
 
 ################
@@ -277,19 +297,20 @@ G.add_nodes_from(range(E.shape[0]))
 G.add_edges_from(links)
 
 forceatlas2 = ForceAtlas2(
-                          # Behavior alternatives
-                          outboundAttractionDistribution=False,  # Dissuade hubs
-                          linLogMode=False,  # NOT IMPLEMENTED
-                          adjustSizes=False,  # Prevent overlap (NOT IMPLEMENTED)
-                          edgeWeightInfluence=1.0,
+    # Behavior alternatives
+    outboundAttractionDistribution=False,  # Dissuade hubs
+    linLogMode=False,  # NOT IMPLEMENTED
+    # Prevent overlap (NOT IMPLEMENTED)
+    adjustSizes=False,
+    edgeWeightInfluence=1.0,
 
-                          # Performance
-                          jitterTolerance=1.0,  # Tolerance
-                          barnesHutOptimize=True,
-                          barnesHutTheta=2,
-                          multiThreaded=False,  # NOT IMPLEMENTED
+    # Performance
+    jitterTolerance=1.0,  # Tolerance
+    barnesHutOptimize=True,
+    barnesHutTheta=2,
+    multiThreaded=False,  # NOT IMPLEMENTED
 
-                          # Tuning
+    # Tuning
                           scalingRatio=1.0,
                           strongGravityMode=False,
                           gravity=0.05,
@@ -297,62 +318,69 @@ forceatlas2 = ForceAtlas2(
                           # Log
                           verbose=False)
 
-if animation_mode and animate=='Yes':
-    f = open(new_dir+'/animation.txt','w')
-    f = open(new_dir+'/animation.txt','a')
-    positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter, writefile=f)
+if animation_mode and animate == 'Yes':
+    f = open(new_dir+'/animation.txt', 'w')
+    f = open(new_dir+'/animation.txt', 'a')
+    positions = forceatlas2.forceatlas2_networkx_layout(
+        G, pos=None, iterations=num_fa2_iter, writefile=f)
 else:
-    positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter)
+    positions = forceatlas2.forceatlas2_networkx_layout(
+        G, pos=None, iterations=num_fa2_iter)
 
 
 positions = np.array([positions[i] for i in sorted(positions.keys())])
 positions = positions / 5.0
-positions = positions - np.min(positions, axis = 0) - np.ptp(positions, axis = 0) / 2.0
-positions[:,0] = positions[:,0]  + 750
-positions[:,1] = positions[:,1]  + 250
+positions = positions - np.min(positions, axis=0) - \
+    np.ptp(positions, axis=0) / 2.0
+positions[:, 0] = positions[:, 0] + 750
+positions[:, 1] = positions[:, 1] + 250
 
 t1 = time.time()
-update_log(timef, 'Ran ForceAtlas2 -- %.2f' %(t1-t0))
+update_log(timef, 'Ran ForceAtlas2 -- %.2f' % (t1-t0))
 
 ################
 # Save coordinates
 
 base_name = base_dir.strip('/').split('/')[-1]
 new_name = new_dir.strip('/').split('/')[-1]
-np.savetxt(new_dir + '/' +  'coordinates.txt', np.hstack((np.arange(E.shape[0])[:,None], positions)), fmt='%i,%.5f,%.5f')
+np.savetxt(new_dir + '/' + 'coordinates.txt',
+           np.hstack((np.arange(E.shape[0])[:, None], positions)), fmt='%i,%.5f,%.5f')
 
 ################
 # Save new clone data if it exists in base dir
 if os.path.exists(current_dir + '/clone_map.json'):
     clone_map_dict = json.load(open(current_dir + '/clone_map.json'))
-    extra_filter_map = {i:j for j,i in enumerate(extra_filter)}
+    extra_filter_map = {i: j for j, i in enumerate(extra_filter)}
     new_clone_map_dict = {}
     for k, clone_map in clone_map_dict.items():
         new_clone_map = {}
-        for i,clone in clone_map.items():
+        for i, clone in clone_map.items():
             i = int(i)
-            new_clone = [extra_filter_map[j] for j in clone if j in extra_filter_map]
+            new_clone = [extra_filter_map[j]
+                         for j in clone if j in extra_filter_map]
             if i in extra_filter_map and len(new_clone) > 0:
                 new_clone_map[extra_filter_map[i]] = new_clone
         new_clone_map_dict[k] = new_clone_map
-    json.dump(new_clone_map_dict,open(new_dir+'/clone_map.json','w'))
+    json.dump(new_clone_map_dict, open(new_dir+'/clone_map.json', 'w'))
 
 
 ################
 # Save PCA, gene filter, total counts
 if os.path.exists(base_dir + '/total_counts.txt'):
-    total_counts = np.loadtxt(base_dir + '/total_counts.txt', comments="")[cell_filter]
-    np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter, total_counts = total_counts)
+    total_counts = np.loadtxt(
+        base_dir + '/total_counts.txt', comments="")[cell_filter]
+    np.savez_compressed(new_dir + '/intermediates.npz', Epca=Epca,
+                        gene_filter=gene_filter, total_counts=total_counts)
 else:
-    np.savez_compressed(new_dir + '/intermediates.npz', Epca = Epca, gene_filter = gene_filter)
+    np.savez_compressed(new_dir + '/intermediates.npz',
+                        Epca=Epca, gene_filter=gene_filter)
 
-        
+
 ################
 # Save run info
-import datetime
 info_dict = {}
 info_dict['Email'] = user_email
-info_dict['Date'] = '%s' %creation_time
+info_dict['Date'] = '%s' % creation_time
 info_dict['Nodes'] = Epca.shape[0]
 info_dict['Filtered_Genes'] = len(gene_filter)
 info_dict['Gene_Var_Pctl'] = min_vscore_pctl
@@ -364,15 +392,17 @@ info_dict['Num_Force_Iter'] = num_fa2_iter
 info_dict['Description'] = description
 start_dataset = base_name + '/' + current_dir_short
 
-with open(new_dir+'/run_info.json','w') as f:
-    f.write(json.dumps(info_dict,indent=4, sort_keys=True).decode('utf-8'))
+with open(new_dir+'/run_info.json', 'w') as f:
+    f.write(json.dumps(info_dict, indent=4, sort_keys=True).decode('utf-8'))
 
 
 ################
 t11 = time.time()
 url_pref = this_url.split('?')[0]
-update_log_html(logf, 'Run complete! Done in %i seconds.<br>' %(t11-t00) + '<a target="_blank" href="%s?%s"> Click here to view.</a>' %(url_pref,new_dir.strip('/')))
+update_log_html(logf, 'Run complete! Done in %i seconds.<br>' % (
+    t11-t00) + '<a target="_blank" href="%s?%s"> Click here to view.</a>' % (url_pref, new_dir.strip('/')))
 if user_email != '':
     new_url_full = url_pref + '?' + new_dir.strip('/')
-    send_confirmation_email(user_email, base_name + '/' + new_name, info_dict, start_dataset, new_url_full)
+    send_confirmation_email(user_email, base_name + '/' +
+                            new_name, info_dict, start_dataset, new_url_full)
 ################

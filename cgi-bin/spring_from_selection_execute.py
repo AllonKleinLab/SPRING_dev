@@ -25,8 +25,8 @@ def update_log(fname, logdat, overwrite=False):
 def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 
     import smtplib
-    from email.MIMEMultipart import MIMEMultipart
-    from email.MIMEText import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
 
     fromaddr = "singlecellSPRING@gmail.com"
     toaddr = email

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
+import subprocess
+import numpy as np
+import pickle
+import os
 import cgi
 import cgitb
 cgitb.enable()  # for troubleshooting
 print("Content-Type: text/html\n")
-import os
-import pickle
-import numpy as np
-import subprocess
 
 cwd = os.getcwd()
 if cwd.endswith('cgi-bin'):

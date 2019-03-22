@@ -5,3 +5,5 @@ datasets/**/*.npz
 
 yarn-error.log
 .DS_STORE
+
+.pyc

@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+import json
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import sklearn
+import sys
+import time
+
 from scipy.sparse.linalg import eigs
 from sklearn.metrics import silhouette_score
 #========================================================================================#

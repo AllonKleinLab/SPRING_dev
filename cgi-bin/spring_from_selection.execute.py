@@ -26,12 +26,6 @@ creation_time = datetime.datetime.now()
 
 t00 = time.time()
 
-def sparse_var(E, axis=0):
-    mean_gene = E.mean(axis=axis).A.squeeze()
-    tmp = E.copy()
-    tmp.data **= 2
-    return tmp.mean(axis=axis).A.squeeze() - mean_gene ** 2
-
 def update_log_html(fname, logdat, overwrite=False):
     if overwrite:
         o = open(fname, 'w')
@@ -51,8 +45,8 @@ def update_log(fname, logdat, overwrite=False):
 def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 
     import smtplib
-    from email.MIMEMultipart import MIMEMultipart
-    from email.MIMEText import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
 
     fromaddr = "singlecellSPRING@gmail.com"
     toaddr = email
