@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from wolkit import *
+
 def sparse_var(E, axis=0):
     mean_gene = E.mean(axis=axis).A.squeeze()
     tmp = E.copy()
@@ -67,7 +69,6 @@ def execute_spring(param_filename):
     import h5py
     import json
     import time
-    from wolkit import *
     import networkx as nx
     import pickle
     import datetime

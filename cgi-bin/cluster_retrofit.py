@@ -22,10 +22,10 @@ def load_coords(DIRECTORY):
     xcoords = {}
     ycoords = {}
     for l in open(DIRECTORY + '/coordinates.txt').read().split('\n')[:-1]:
-        l = l.split(',')
-        cell_number = int(l[0])
-        xcoords[cell_number] = float(l[1])
-        ycoords[cell_number] = float(l[2])
+        split_l = l.split(',')
+        cell_number = int(split_l[0])
+        xcoords[cell_number] = float(split_l[1])
+        ycoords[cell_number] = float(split_l[2])
     xx, yy = [], []
     for k in sorted(xcoords.keys()):
         xx += [xcoords[k]]
@@ -50,7 +50,7 @@ def row_norm_normalize(X):
 
 
 def frac_to_hex(frac):
-    rgb = tuple(np.array(np.array(plt.cm.jet(frac)[:3])*255, dtype=int))
+    rgb = tuple(np.array(np.array(plt.cm.jet(frac)[:3]) * 255, dtype=int))
     return '#%02x%02x%02x' % rgb
 
 #========================================================================================#
@@ -76,10 +76,10 @@ if os.path.exists(graph_path):
         A[i, j] = 1
         A[j, i] = 1
     print(project_directory, 'Spectral start')
-    ww, vv = spectral_coords(A, A.shape[0]/2)
+    ww, vv = spectral_coords(A, A.shape[0] / 2)
     ww = np.real(ww)
-    spectral_gaps = list((np.roll(ww, -1)-ww))[:-1]
-    maxk = np.argmax(spectral_gaps)*2 + 2
+    spectral_gaps = list((np.roll(ww, -1) - ww))[:-1]
+    maxk = np.argmax(spectral_gaps) * 2 + 2
     maxk = np.max([maxk, 20])
     spectral_gaps = spectral_gaps[:maxk]
 
@@ -89,30 +89,29 @@ if os.path.exists(graph_path):
     while (not (has_risen and falling)) and first_peak < len(spectral_gaps):
         first_peak += 1
         has_risen = has_risen or (
-            spectral_gaps[first_peak+1] - spectral_gaps[first_peak] > 0)
-        falling = spectral_gaps[first_peak+1] - spectral_gaps[first_peak] < 0
+            spectral_gaps[first_peak + 1] - spectral_gaps[first_peak] > 0)
+        falling = spectral_gaps[first_peak + 1] - spectral_gaps[first_peak] < 0
     first_peak += 1
-    if has_risen == False:
+    if has_risen is False:
         first_peak = 1
     print('FP', first_peak)
 
     X = row_norm_normalize(vv)
-    for k in range(1, np.min([A.shape[0]/4, 100])):
+    for k in range(1, np.min([A.shape[0] / 4, 100])):
         print(project_directory, 'Cluster', k)
         km = sklearn.cluster.KMeans(n_clusters=k)
         clus = km.fit_predict(X[:, :k])
-        clustering['Cluster'+repr(k)] = [repr(x+1) for x in clus]
+        clustering['Cluster' + repr(k)] = [repr(x + 1) for x in clus]
 
     clus_colored = {}
     for k, labels in clustering.items():
-        label_colors = {l: frac_to_hex(float(i)/len(set(labels)))
+        label_colors = {l: frac_to_hex(float(i) / len(set(labels)))
                         for i, l in enumerate(list(set(labels)))}
         clus_colored[k] = {'label_colors': label_colors, 'label_list': labels}
-    data = {'Current_clustering': 'Cluster'+repr(first_peak),
+    data = {'Current_clustering': 'Cluster' + repr(first_peak),
             'clusters': clus_colored,
             'spectral_info': {'gaps': spectral_gaps, 'argmax': first_peak}}
-    json.dump(data, open('clustering_data/' +
-                         sys.argv[1] + '_clustering_data.json', 'w'), indent=4)
+    json.dump(data, open('clustering_data/' + sys.argv[1] + '_clustering_data.json', 'w'), indent=4)
 
 print('TOTAL TIME', time.time() - t)
 #	xx,yy = load_coords('.')

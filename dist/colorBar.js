@@ -796,7 +796,7 @@ define(["require", "exports", "d3", "./colorpicker_layout", "./main", "./util"],
                 color_array = this.gene_set_color_array[current_selection];
             }
             if (document.getElementById('channels_button').checked) {
-                const green_selection = d3.select('#autocomplete').node().value;
+                this.green_selection = d3.select('#autocomplete').node().value;
                 color_array = this.green_array;
             }
             if (document.getElementById('labels_button').checked) {

@@ -19,16 +19,16 @@ gene_map = {g.split()[0]: g for g in valid_genes}
 gene_sets = {}
 all_genes = set([])
 for l in open(gene_sets_path).read().replace('\r', '\n').split('\n'):
-    l = l.split('\t')
+    split_l = l.split('\t')
     if len(l) > 1:
-        gene = l[0]
-        name = l[1]
+        gene = split_l[0]
+        name = split_l[1]
         if gene in gene_map:
             gene = gene_map[gene]
-        if not gene in valid_genes:
+        if gene not in valid_genes:
             print('Invalid', gene)
         else:
-            if not name in gene_sets:
+            if name not in gene_sets:
                 gene_sets[name] = []
             gene_sets[name].append(gene)
             all_genes.add(gene)
@@ -55,15 +55,15 @@ for k, gs in gene_sets.items():
 
 # Apply to each subplots
 for dd in sub_dirs.split(','):
-    cell_ix = np.load(base_dir+'/'+dd+'/cell_filter.npy')
-    f = open(base_dir+'/'+dd+'/color_data_gene_sets.csv', 'a')
+    cell_ix = np.load(base_dir + '/' + dd + '/cell_filter.npy')
+    f = open(base_dir + '/' + dd + '/color_data_gene_sets.csv', 'a')
     for k, ss in scores.items():
-        newline = ','.join([k]+[repr(x) for x in ss[cell_ix]])
-        f.write(newline+'\n')
+        newline = ','.join([k] + [repr(x) for x in ss[cell_ix]])
+        f.write(newline + '\n')
     f.close()
 
-    color_stats = json.load(open(base_dir+'/'+dd+'/color_stats.json'))
+    color_stats = json.load(open(base_dir + '/' + dd + '/color_stats.json'))
     for k, ss in scores.items():
         color_stats[k] = (np.mean(ss), np.std(ss), np.min(ss),
                           np.max(ss), np.percentile(ss, 99))
-    json.dump(color_stats, open(base_dir+'/'+dd+'/color_stats.json', 'w'))
+    json.dump(color_stats, open(base_dir + '/' + dd + '/color_stats.json', 'w'))
