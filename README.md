@@ -54,3 +54,12 @@ Place the main directory somehwere inside folder that contains this README and t
 3. Open web browser (preferably Chrome; best to use incognito mode to ensure no cached data is used).
 4. View data set by navigating to corresponding URL: http://localhost:8000/springViewer_1_6_dev.html?path_to/main/subplot. In the example above, if you wanted to view a SPRING plot called `HSC` in the main directory `human_bone_marrow`, then you would navigate to http://localhost:8000/springViewer_1_6_dev.html?datasets/human_bone_marrow/HSC
 
+### Build image with Dockerfile
+
+1. Opem Terminal (Mac) or PowerShell (Windows) or Terminal (Linux) and change directories (`cd`) to the directory containing this README file (`SPRING_dev/`).
+2. Execute:
+    `docker build -t <changethenamewithyouwant> .`    
+3. After build execute:
+    `docker run -d -p <localport>:8000 <changethenamewithyouwant>`
+4. Open browser with http://localhost:<localport>.
+5. Enjoy.
