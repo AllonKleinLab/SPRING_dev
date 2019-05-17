@@ -13,6 +13,8 @@ from scipy.spatial.distance import pdist
 from datetime import datetime
 import json
 import time
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import sys
 

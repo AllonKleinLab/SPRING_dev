@@ -98,13 +98,19 @@ function forceLayout(project_directory, sub_directory, callback) {
 
 	// Read coordinates file if it exists
 	coordinates = []
+	coordinates_choice = {};
+
 	d3.text(coordinates_filename, function(text) {
 		text.split('\n').forEach(function(entry,index,array) {
 			items = entry.split(',')
-			if (items.length > 1) {
+			if (items.length == 3) {
 				xx = parseFloat($.trim(items[1]));
 				yy = parseFloat($.trim(items[2]));
 				nn = parseInt($.trim(items[0]));
+				coordinates.push([xx,yy])
+			} else if (items.length == 2) {
+				xx = parseFloat($.trim(items[0]));
+				yy = parseFloat($.trim(items[1]));
 				coordinates.push([xx,yy])
 			}
 		});
@@ -193,6 +199,44 @@ function forceLayout(project_directory, sub_directory, callback) {
 		load_edges();
 		
 	});
+
+	var embedding_types = ['fa2', 'umap', 'tsne'];
+	embedding_types.forEach(function(embed_name, index) {
+		var fname = graph_directory + '/' + sub_directory + '/coordinates_' + embed_name + '.txt';
+		var run_label = "#" + embed_name + "_run";
+		var load_label = "#" + embed_name + "_load";
+		coordinates_choice[embed_name] = [];
+		$.ajax({
+			url: fname, 
+			type: 'HEAD',
+			error: function() {
+				console.log('no', embed_name);
+				d3.select(load_label).style('visibility','hidden');
+			},
+			success: function() {
+				console.log('yes', embed_name);
+				d3.text(fname, function(text) {
+					text.split('\n').forEach(function(entry,index,array) {
+						if (entry.length > 0) {
+							var items = entry.split(',')
+							if (items.length == 3) {
+								xx = parseFloat($.trim(items[1]));
+								yy = parseFloat($.trim(items[2]));
+								nn = parseInt($.trim(items[0]));
+							} else if (items.length == 2) {
+								xx = parseFloat($.trim(items[0]));
+								yy = parseFloat($.trim(items[1]));
+							}
+							coordinates_choice[embed_name].push([xx,yy]);
+						}
+					});
+					d3.select(run_label).text("Re-run");
+				});
+			}
+		});
+	});
+
+	
 
 	function load_edges() {
 		edge_container = new PIXI.ParticleContainer(all_nodes.length * 20, {scale: true, position: true, rotation: true, uvs: true, alpha: true});
@@ -395,7 +439,7 @@ function revert_positions() {
 	stashed_coordinates = stashed_coordinates.slice(0,stashed_coordinates.length-1);
 }
 
-function move_node(i, x,y) {
+function move_node(i, x, y) {
 	all_nodes[i].x = x;
 	all_nodes[i].y = y;
 	all_outlines[i].x = x;
@@ -574,7 +618,7 @@ function downloadFile(text,name) {
 	hiddenElement.href = 'data:attachment/text,' + encodeURI(text);
 	hiddenElement.target = '_blank';
 	hiddenElement.download = name;
-	document.body.appendChild(hiddenElement)
+    document.body.appendChild(hiddenElement)
 	hiddenElement.click();
 }
 
@@ -708,8 +752,6 @@ function showToolsDropdown() {
 	}
 }
 
-
-
 function showDownloadDropdown() {
 	if (d3.select("#download_dropdown").style("height") == 'auto') {
 		closeDropdown();
@@ -726,6 +768,17 @@ function showLayoutDropdown() {
 		collapse_settings();
 		setTimeout(function() {
 			document.getElementById("layout_dropdown").classList.toggle("show");
+		}, 10);
+	}
+}
+
+function showEmbeddingsDropdown() {
+	if (d3.select("#embeddings_dropdown").style("height") == 'auto') {
+		closeDropdown();
+		collapse_settings();
+		setTimeout(function() {
+			// document.getElementById("layout_dropdown").classList.toggle("show");
+			document.getElementById("embeddings_dropdown").classList.toggle("show");
 		}, 10);
 	}
 }
@@ -750,12 +803,14 @@ function setup_tools_dropdown() {
 	d3.select("#tools_dropdown_button").on("click",showToolsDropdown);
 }
 
-
 function setup_layout_dropdown() {
 	//d3.select("#layout_dropdown_button").on("mouseover",showLayoutDropdown);
 	d3.select("#layout_dropdown_button").on("click",showLayoutDropdown);
 }
 
+function setup_embeddings_dropdown() {
+	d3.select("#embeddings_dropdown_button").on("click",showEmbeddingsDropdown);
+}
 
 function fix() {
 	if (d3.selectAll(".selected")[0].length == 0) {
@@ -862,7 +917,7 @@ function center_view(on_selected) {
 			clone_edge_container.position = sprites.position;
 			clone_edge_container.scale = sprites.scale;
 			clone_sprites.position = sprites.position;
-			clone_sprites.scale = sprites.scale;			
+			clone_sprites.scale = sprites.scale;
 			
 			d3.select('#vis').attr("transform","translate(" + [sprites.x,sprites.y] + ")" + " scale(" + sprites.scale.x + ")");
 			
@@ -889,5 +944,59 @@ function save_coords() {
 		});
 	}
 }
+
+
+function refresh_coordinates_fa2() {
+	refresh_coordinates_anim('fa2');
+}
+
+function refresh_coordinates_umap() {
+	console.log('umap');
+	refresh_coordinates_anim('umap');
+}
+
+function refresh_coordinates_tsne() {
+	refresh_coordinates_anim('tsne');
+}
+
+function refresh_coordinates_anim(embed_name) {
+	var pre_coordinates = coordinates;
+	coordinates = coordinates_choice[embed_name];
+
+	function next_frame2(steps,current_frame) {
+		current_frame += 1;
+		for (i=0; i<all_nodes.length; i++) {
+			var x = pre_coordinates[i][0] + (coordinates[i][0] - pre_coordinates[i][0]) * current_frame / steps;
+			var y = pre_coordinates[i][1] + (coordinates[i][1] - pre_coordinates[i][1]) * current_frame / steps;
+			move_node(i,x,y);
+		}
+		if (current_frame < steps) {
+			setTimeout(function() { next_frame2(steps,current_frame); }, 50);
+		} else {
+			center_view(false);
+			adjust_edges();
+			if (d3.select('#edge_toggle_image').attr("xlink:href") == "stuff/check-mark.svg") {
+				blend_edges();
+			}
+		}
+	}
+	edge_container.visible = false;
+	next_frame2(20,-1)
+	
+}
+function refresh_coordinates(embed_name) {
+	coordinates = coordinates_choice[embed_name];
+	coordinates.forEach(function(entry, i) {
+		move_node(i,entry[0],entry[1]);
+	});
+	adjust_edges();
+	center_view(false);
+	//stashed_coordinates = stashed_coordinates.slice(0,stashed_coordinates.length-1);
+}
+
+
+
+
+
 
 

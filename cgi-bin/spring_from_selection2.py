@@ -129,6 +129,19 @@ except:
 	animate = 'No'
 
 try:
+	run_fa2 = data.getvalue('do_fa2')
+except:
+	run_fa2 = 'Yes'
+try:
+	run_umap = data.getvalue('do_umap')
+except:
+	run_umap = 'No'
+try:
+	run_tsne = data.getvalue('do_tsne')
+except:
+	run_tsne = 'No'
+
+try:
 	project_filter = data.getvalue('compared_cells')
 	project_filter = np.sort(np.array(map(int,project_filter.split(','))))
 except:
@@ -181,6 +194,9 @@ else:
 		params_dict['animate'] = animate
 		params_dict['include_exclude'] = include_exclude
 		params_dict['custom_genes'] = custom_genes
+		params_dict['run_fa2'] = run_fa2
+		params_dict['run_umap'] = run_umap
+		params_dict['run_tsne'] = run_tsne
 
 		params_filename = new_dir + "/params.pickle"
 		params_file = open(params_filename, 'wb')

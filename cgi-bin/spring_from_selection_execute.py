@@ -22,6 +22,15 @@ def update_log(fname, logdat, overwrite=False):
     o.write(logdat + '\n')
     o.close()
 
+def rescale_coordinates(coords):
+    import numpy as np
+    coords = coords - np.min(coords, axis=0) - np.ptp(coords, axis=0) / 2.0
+    coords = coords / np.ptp(coords, axis=0) * 30 * np.sqrt(coords.shape[0])
+    coords[:,0] = coords[:,0] + 750
+    coords[:,1] = coords[:,1] + 250
+    return coords
+
+
 def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 
     import smtplib
@@ -57,9 +66,6 @@ def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 
 
 def execute_spring(param_filename):
-
-
-
     import os
     import sys
     import scipy.sparse as ssp
@@ -71,6 +77,7 @@ def execute_spring(param_filename):
     import networkx as nx
     import pickle
     import datetime
+
 
     try:
         from fa2_anim import ForceAtlas2
@@ -88,8 +95,6 @@ def execute_spring(param_filename):
     creation_time = datetime.datetime.now()
 
     t00 = time.time()
-
-
 
     # Load parameters
     params_dict = pickle.load(open(param_filename, 'rb'))
@@ -111,6 +116,14 @@ def execute_spring(param_filename):
     this_url = params_dict['this_url']
     description = params_dict['description']
     animate = params_dict['animate']
+    run_fa2 = params_dict['run_fa2'] == 'true'
+    run_umap = params_dict['run_umap'] == 'true'
+    run_tsne = params_dict['run_tsne'] == 'true'
+
+    if run_umap:
+        import umap
+    if run_tsne:
+        from sklearn.manifold import TSNE
 
     if 'custom_genes' in params_dict and 'include_exclude' in params_dict:
         custom_genes = params_dict['custom_genes']
@@ -284,49 +297,75 @@ def execute_spring(param_filename):
 
     ################
     # Run FA2
-    t0 = time.time()
-    update_log_html(logf, 'Getting force layout...')
     G = nx.Graph()
     G.add_nodes_from(range(E.shape[0]))
     G.add_edges_from(links)
 
-    forceatlas2 = ForceAtlas2(
-                              # Behavior alternatives
-                              outboundAttractionDistribution=False,  # Dissuade hubs
-                              linLogMode=False,  # NOT IMPLEMENTED
-                              adjustSizes=False,  # Prevent overlap (NOT IMPLEMENTED)
-                              edgeWeightInfluence=1.0,
+    if run_fa2:
+        update_log_html(logf, 'Getting force layout...')
+        t0 = time.time()
+        
+        forceatlas2 = ForceAtlas2(
+                                  # Behavior alternatives
+                                  outboundAttractionDistribution=False,  # Dissuade hubs
+                                  linLogMode=False,  # NOT IMPLEMENTED
+                                  adjustSizes=False,  # Prevent overlap (NOT IMPLEMENTED)
+                                  edgeWeightInfluence=1.0,
 
-                              # Performance
-                              jitterTolerance=1.0,  # Tolerance
-                              barnesHutOptimize=True,
-                              barnesHutTheta=2,
-                              multiThreaded=False,  # NOT IMPLEMENTED
+                                  # Performance
+                                  jitterTolerance=1.0,  # Tolerance
+                                  barnesHutOptimize=True,
+                                  barnesHutTheta=2,
+                                  multiThreaded=False,  # NOT IMPLEMENTED
 
-                              # Tuning
-                              scalingRatio=1.0,
-                              strongGravityMode=False,
-                              gravity=0.05,
+                                  # Tuning
+                                  scalingRatio=1.0,
+                                  strongGravityMode=False,
+                                  gravity=0.05,
 
-                              # Log
-                              verbose=False)
+                                  # Log
+                                  verbose=False)
 
-    if animation_mode and animate=='Yes':
-        f = open(new_dir+'/animation.txt','w')
-        f = open(new_dir+'/animation.txt','a')
-        positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter, writefile=f)
-    else:
-        positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter)
+        if animation_mode and animate=='Yes':
+            f = open(new_dir+'/animation.txt','w')
+            f = open(new_dir+'/animation.txt','a')
+            positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter, writefile=f)
+        else:
+            positions = forceatlas2.forceatlas2_networkx_layout(G, pos=None, iterations=num_fa2_iter)
 
+        positions = np.array([positions[i] for i in sorted(positions.keys())])
+        positions = rescale_coordinates(positions)
+        np.save('{}/coordinates_fa2.npy'.format(new_dir), positions)
+        np.savetxt('{}/coordinates_fa2.txt'.format(new_dir), positions, delimiter=',', fmt='%.5f')
+        t1 = time.time()
+        update_log(timef, 'Ran ForceAtlas2 -- %.2f' %(t1-t0))
 
-    positions = np.array([positions[i] for i in sorted(positions.keys())])
-    positions = positions / 5.0
-    positions = positions - np.min(positions, axis = 0) - np.ptp(positions, axis = 0) / 2.0
-    positions[:,0] = positions[:,0]  + 750
-    positions[:,1] = positions[:,1]  + 250
+    if run_umap:
+        update_log_html(logf, 'Running UMAP...')
+        t0 = time.time()
+        umap_positions = umap.UMAP(n_neighbors=k_neigh).fit_transform(Epca)
+        umap_positions = rescale_coordinates(umap_positions)
 
-    t1 = time.time()
-    update_log(timef, 'Ran ForceAtlas2 -- %.2f' %(t1-t0))
+        if not run_fa2:
+            positions = umap_positions
+        np.save('{}/coordinates_umap.npy'.format(new_dir), umap_positions)
+        np.savetxt('{}/coordinates_umap.txt'.format(new_dir), umap_positions, delimiter=',', fmt='%.5f')
+        t1 = time.time()
+        update_log(timef, 'Ran UMAP -- %.2f' %(t1-t0))
+    if run_tsne:
+        update_log_html(logf, 'Running tSNE...')
+        t0 = time.time()
+        tsne_positions = TSNE().fit_transform(Epca)
+        tsne_positions = rescale_coordinates(tsne_positions)
+        if not (run_fa2 or run_umap):
+            positions = tsne_positions
+        np.save('{}/coordinates_tsne.npy'.format(new_dir), tsne_positions)
+        np.savetxt('{}/coordinates_tsne.txt'.format(new_dir), tsne_positions, delimiter=',', fmt='%.5f')
+        umap_positions
+        t1 = time.time()
+        update_log(timef, 'Ran tSNE -- %.2f' %(t1-t0))    
+
+    
 
     ################
     # Save coordinates

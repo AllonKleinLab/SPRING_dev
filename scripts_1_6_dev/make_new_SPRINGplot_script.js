@@ -23,7 +23,7 @@ function make_new_SPRINGplot_setup() {
 		.append('label').text('Name of plot')
 		.append('input').attr('type','text')
 		.attr('id','input_new_dir')
-		.attr('value','E.g. "My_favorite_cells"')
+		.attr('value','my_favorite_cells')
 		.style('width','220px');
 
 	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
@@ -116,7 +116,8 @@ function make_new_SPRINGplot_setup() {
 			if (d3.select(this).text()=='Yes') { d3.select(this).text('No'); }
 			else { d3.select(this).text('Yes'); }
 		});
-		
+
+	//
 	var custom_genes_div = popup.append('div').attr('class','make_new_SPRINGplot_input_div')
 	custom_genes_div.append('label').append('button').text('Exclude')
 		.attr('id','include_exclude_toggle')
@@ -127,6 +128,50 @@ function make_new_SPRINGplot_setup() {
 				d3.select(this).text('Exclude');
 			}
 		});
+
+	// 2-D embedding options
+	var embedding_gap = popup.append('div')
+		.attr('class','make_new_SPRINGplot_input_div')
+		.attr('id','embedding_gap')
+		.style('width','320px').style('margin-top','2px')
+
+	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
+		.append('label').text('tSNE')
+		.append('img').attr("src", "stuff/empty-mark.svg")
+		.attr('width','20px').attr('height','20px')
+		.attr('id','run_tsne')
+		.on('click', function() {
+			if (d3.select(this).attr('src') === 'stuff/check-mark.svg') {
+				d3.select(this).attr('src', 'stuff/empty-mark.svg');
+			} else {
+				d3.select(this).attr('src', 'stuff/check-mark.svg');
+			}
+		});
+	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
+		.append('label').text('UMAP')
+		.append('img').attr("src", "stuff/empty-mark.svg")
+		.attr('width','20px').attr('height','20px')
+		.attr('id','run_umap')
+		.on('click', function() {
+			if (d3.select(this).attr('src') === 'stuff/check-mark.svg') {
+				d3.select(this).attr('src', 'stuff/empty-mark.svg');
+			} else {
+				d3.select(this).attr('src', 'stuff/check-mark.svg');
+			}
+		});
+	popup.append('div').attr('class','make_new_SPRINGplot_input_div')
+		.append('label').text('Force Layout')
+		.append('img').attr("src", "stuff/check-mark.svg")
+		.attr('width','20px').attr('height','20px')
+		.attr('id','run_fa2')
+		.on('click', function() {
+			if (d3.select(this).attr('src') === 'stuff/check-mark.svg') {
+				d3.select(this).attr('src', 'stuff/empty-mark.svg');
+			} else {
+				d3.select(this).attr('src', 'stuff/check-mark.svg');
+			}
+		});
+	/////////
 		
 	var wrapper = custom_genes_div.append('label').text(' custom gene list')
 		.append('span').attr('id','gene_list_upload_wrapper');
@@ -239,6 +284,15 @@ function submit_new_SPRINGplot() {
 	var numPC = $("#input_numPC").val();
 	var nIter = $("#input_nIter").val();
 	var animate = d3.select('#input_animation').text();
+	var do_fa2 = d3.select('#run_fa2').attr('src') === 'stuff/check-mark.svg';
+	var do_umap = d3.select('#run_umap').attr('src') === 'stuff/check-mark.svg';
+	var do_tsne = d3.select('#run_tsne').attr('src') === 'stuff/check-mark.svg';
+	if (!(do_fa2 || do_umap || do_tsne)) {
+		do_fa2 = true;
+		d3.select('#run_fa2').attr('src', 'stuff/check-mark.svg');
+	}
+
+	console.log(do_fa2, do_umap, do_tsne);
 	var this_url = window.location.href;
 
 	if (running_online) {
@@ -288,7 +342,10 @@ function submit_new_SPRINGplot() {
 			description:description,
 			email:email, animate:animate,
 			include_exclude:include_exclude,
-			custom_genes:custom_genes
+			custom_genes:custom_genes,
+			do_fa2:do_fa2,
+			do_umap:do_umap,
+			do_tsne:do_tsne
 	   	},
 		success: function(output_message) {
 			console.log(output_message);

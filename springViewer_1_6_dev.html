@@ -24,18 +24,45 @@
 		</div>
 
 		<div class="dropdown">
-		  <button id="download_dropdown_button">Download</button>
-		  <div id="download_dropdown" class="dropdown-content">
-		  	<a href="javascript:downloadCoordinates()">Coordinates</a>
-			<a href="javascript:downloadSelection()">Selected cells</a>
-			<a href="javascript:show_downloadSelectedExpr_popup()">SPRING data <br> for selection</a>
-		    	<a href="javascript:downloadEdges()">Edge list</a>
-			<a href="javascript:downloadRankedTerms()">Enriched terms</a>
-			<a href="javascript:downloadDoubletScores()">Doublet scores</a>
+			<button id="embeddings_dropdown_button">Embeddings</button>
+			<!-- <div id="embeddings_dropdown" class="dropdown-content" style="position:relative; left:120px; top:-25px"> -->
+			<div id="embeddings_dropdown" class="dropdown-content">
+				<!-- <div class="column"> -->
+					<div id="fa2_label">
+						<a2 style="float:left; width:100px;">Force Layout</a2>
+						<a id="fa2_run" href="javascript:get_embedding_fa2()" style="float:left; width:45px;">Run</a>
+						<a id="fa2_load" href="javascript:refresh_coordinates_fa2()" style="float:left; width:45px;">Load</a>
+					</div>
+					<hr>
+					<div id="umap_label">
+						<a2 style="float:left; width:100px;">UMAP</a2>
+						<a id="umap_run" href="javascript:get_embedding_umap()" style="float:left; width:45px;">Run</a>
+						<a id="umap_load" href="javascript:refresh_coordinates_umap()" style="float:left; width:45px;">Load</a>
+					</div>
+					<hr>
+					<div id="tsne_label">
+						<a2 style="float:left; width:100px;">tSNE</a2>
+						<a id="tsne_run" href="javascript:get_embedding_tsne()" style="float:left; width:45px;">Run</a>
+						<a id="tsne_load" href="javascript:refresh_coordinates_tsne()" style="float:left; width:45px;">Load</a>
+					</div>
+					<!-- <div id="check" class="text_label_div"><img src="stuff/empty-mark.svg" style="width:20px; height:20px; margin-top:6px; vertical-align:top;"></div> -->
+				</div>
+			<!-- </div> -->
+		</div>
 
-			<a id="download_png">Screenshot</a>
-			<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> -->
-		  </div>
+
+		<div class="dropdown">
+			<button id="download_dropdown_button">Download</button>
+			<div id="download_dropdown" class="dropdown-content">
+				<a href="javascript:downloadCoordinates()">Coordinates</a>
+				<a href="javascript:downloadSelection()">Selected cells</a>
+				<a href="javascript:show_downloadSelectedExpr_popup()">SPRING data <br> for selection</a>
+			    <a href="javascript:downloadEdges()">Edge list</a>
+				<a href="javascript:downloadRankedTerms()">Enriched terms</a>
+				<a href="javascript:downloadDoubletScores()">Doublet scores</a>
+				<a id="download_png">Screenshot</a>
+				<!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> -->
+			</div>
 		</div>
 
 		<div class="dropdown">
@@ -119,6 +146,7 @@
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/cluster2_style.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/selection_logic.css">
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/PAGA_viewer.css">
+<link rel="stylesheet" type="text/css" href="scripts_1_6_dev/make_embedding.css">
 <!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/stratify.css"> -->
 <!-- <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/gridstack.css"> -->
 
@@ -152,6 +180,8 @@
 <script src="scripts_1_6_dev/selection_logic.js"></script>
 <script src="scripts_1_6_dev/text_annotations.js"></script>
 <script src="scripts_1_6_dev/PAGA_viewer.js"></script>
+<script src="scripts_1_6_dev/make_embedding.js"></script>
+
 
 <link rel="stylesheet" type="text/css" href="scripts_1_6_dev/colorpicker.css">
 <script src="scripts_1_6_dev/colorpicker.js"></script>
@@ -185,6 +215,7 @@ function callback() {
 	settings_setup();
 	selection_setup();
 	setup_layout_dropdown();
+	setup_embeddings_dropdown();
 	initiateButtons();
 	make_new_SPRINGplot_setup();
 	downloadSelectedExpr_setup();
@@ -193,6 +224,9 @@ function callback() {
 	imputation_setup();
 	doublet_setup();
 	cluster_setup();
+	make_embedding_setup('fa2');
+	make_embedding_setup('umap');
+	make_embedding_setup('tsne');
 
 	selection_logic_setup();
 	colorpicker_setup();
@@ -209,8 +243,8 @@ function callback() {
 		if (!(event.target.matches('#settings_dropdown *'))) { collapse_settings(); }
 		if (!event.target.matches('#download_dropdown_button')) { closeDropdown(); }
 		if (!event.target.matches('#layout_dropdown_button')) { closeDropdown(); }
+		if (!event.target.matches('#embeddings_dropdown_button')) { closeDropdown(); }
 	}
-
 }
 
 var name = window.location.search;

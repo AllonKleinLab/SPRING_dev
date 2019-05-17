@@ -31,8 +31,6 @@
     border-radius: 8px; 
 } 
 
-
-
 #make_new_SPRINGplot_button_bar > * {
 	display: inline-block;
 	margin-top: 8px;
@@ -43,7 +41,7 @@
 #make_new_SPRINGplot_button_bar {
 	background-color: rgba(0,0,0,.25);
 	height: 36px;
-	margin-bottom: 32px;
+	margin-bottom: 12px;
 }
 
 
@@ -89,6 +87,14 @@
 	vertical-align: top;
 	resize: none;
 }
+
+
+.make_new_SPRINGplot_input_div > label > img {
+	margin-left: 5px;
+	vertical-align: bottom;
+	margin-top: 5px;
+}
+
 
 .make_new_SPRINGplot_input_div > label > textarea, .make_new_SPRINGplot_input_div > label > button {
 	margin-left: 20px;

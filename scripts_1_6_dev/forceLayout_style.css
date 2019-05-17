@@ -112,8 +112,49 @@ button:active {
 	background-color: #595959;
 }
 
+/* Links inside the dropdown */
+.dropdown-content a2 {
+    color: white;
+    padding: 6px 8px;
+    text-decoration: none;
+    display: block;
+}
+
+
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display:block;}
+
+
+
+
+
+/* Submenu Content (Hidden by Default) */
+.dropdown-content-sub {
+    display: none;
+    position: absolute;
+   	font: 13px sans-serif;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    background-color:  white;
+    z-index: 15;
+}
+
+/* Links inside the dropdown */
+.dropdown-content-sub a {
+    color: white;
+    padding: 6px 8px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content-sub a:hover {
+	background-color: #595959;
+}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
+
+
 
 
 #rotation_outer_circ {	
