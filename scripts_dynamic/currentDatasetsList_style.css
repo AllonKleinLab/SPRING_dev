@@ -1,0 +1,102 @@
+body {
+	background-color: #C8C8C8;
+}
+
+
+* {margin: 0; padding: 0;}
+
+div {
+  margin: 20px;
+}
+
+ol {
+  list-style-type: none;
+  width: 600px;
+  float: top;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+#sticky_link {
+	font: bold 20px/1.5 Helvetica, Verdana, sans-serif;
+	margin-left: 15px;
+}
+
+h2 {
+  font: bold 24px/1.5 Helvetica, Verdana, sans-serif;
+  margin-top: 30px;
+  margin-bottom: 6px;
+  margin-left: 15px;
+}
+
+
+h3 {
+  font: bold 18px/1.5 Helvetica, Verdana, sans-serif;
+  margin-bottom: -4px;
+  margin-left: 5px;
+  margin-top: 0px;
+}
+
+li p {
+  font: 200 12px/1.5 Georgia, Times New Roman, serif;
+}
+
+li {
+  padding: 7px;
+  overflow: hidden;
+  background: #E8E8E8;
+  border: solid 1px #989898;
+  margin: 10px;
+  height: 105px;
+  position: relative
+}
+
+li:hover {
+  background: #a5a5a5;
+  cursor: pointer;
+}
+
+li > div {
+	margin: 6px;
+	
+}
+
+li > div > tspan {
+	display: block;
+}
+
+.show_more_less_text {
+	position: absolute; 
+	bottom: 5px;
+	right: 10px;
+	color: #7e7e7e;
+}
+
+.show_more_less_text:hover {
+	color: #2a2a2a;
+}
+
+.dataset_key_info {
+	margin-bottom: 7px;
+
+}
+
+.delete_button {
+	position: absolute;
+	top: 5px;
+	right: 10px;
+	color: #7e7e7e;
+}
+
+
+.delete_button:hover {
+	color: #2a2a2a;
+}
+
+
+
+
+
+
+
+

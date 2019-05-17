@@ -1,0 +1,107 @@
+#stickyNote_popup {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 390px;
+	background-color: rgba(50,50,50,.8);
+	visibility: hidden;
+	border: solid 1px rgb(150,150,150);
+	overflow: hidden;
+	height: 245px;
+	padding: 10px;
+	padding-bottom: 50px;
+	
+}
+
+#stickyNote_button_bar {
+	margin-top: 3px;
+	margin-bottom: 37px;
+}
+
+#stickyNote_button_bar > text {
+	font-family: Arial, Helvetica, sans-serif;
+	color: white;
+	margin-left: 6px;
+	float: left;
+}
+
+#stickyNote_button_bar > button {
+	margin: 2px;
+	float: right;
+}
+
+.sticky_note {
+	width: 380;
+	height: 100px;
+	margin: 5px;
+	background-color: rgba(0,0,0,.5);
+	border: 0px;
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+
+
+.sticky_note > textarea {
+	background: transparent;
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	width: 95%;
+	padding-top: 5px;
+	padding-left: 8px;
+	padding-right: 8px;
+	border: none;
+	resize: none;
+}
+
+#sticky_email {
+	margin-bottom: 20px;
+	padding-top: 10px;
+}
+
+#sticky_email > label {
+	color: rgb(200,200,200);
+	font-family: Arial, Helvetica, sans-serif;
+	user-select: none;
+	font-size: 14px;
+	margin-left: 8px;
+}
+
+#sticky_email > label > input {
+	margin-left: 18px;
+	height: 13px;
+	font-size: 14px;
+	color: white;
+	border: none;
+	background: rgba(0,0,0,.25);
+	border: solid 1px rgba(200,200,200,.4);
+	padding-left: 10px;
+	padding-top: 4.5px;
+	padding-bottom: 4.5px;
+}
+
+#sticky_div {
+	overflow: scroll;
+	width: 100%;
+	height: 215px;
+}
+
+.flash {
+    -webkit-animation-name: flash-animation;
+    -webkit-animation-duration: 0.3s;
+
+    animation-name: flash-animation;
+    animation-duration: 0.3s;
+}
+
+@-webkit-keyframes flash-animation {  
+    from { background: yellow; }
+    to   { background: default; }
+}
+
+@keyframes flash-animation {  
+    from { background: yellow; }
+    to   { background: default; }
+}
+

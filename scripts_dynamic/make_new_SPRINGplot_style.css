@@ -1,0 +1,212 @@
+#make_new_SPRINGplot_popup {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 420px;
+	background-color: rgba(50,50,50,.9);
+	visibility: hidden;
+	border: solid 1px rgb(150,150,150);
+	overflow: scroll;
+	height: 610px;
+	padding-bottom: 15px;
+}
+
+
+#make_new_SPRINGplot_popup::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+#make_new_SPRINGplot_popup::-webkit-scrollbar:vertical {
+    width: 11px;
+}
+#make_new_SPRINGplot_popup::-webkit-scrollbar:horizontal {
+    height: 0px;
+}
+#make_new_SPRINGplot_popup::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid rgba(50,50,50,1.0); 
+    background-color: rgba(0, 0, 0, .5);
+}
+#make_new_SPRINGplot_popup::-webkit-scrollbar-track { 
+    background-color: rgba(50,50,50,.9); 
+    border-radius: 8px; 
+} 
+
+
+
+#make_new_SPRINGplot_button_bar > * {
+	display: inline-block;
+	margin-top: 8px;
+	cursor: default;
+}
+
+
+#make_new_SPRINGplot_button_bar {
+	background-color: rgba(0,0,0,.25);
+	height: 36px;
+	margin-bottom: 32px;
+}
+
+
+#make_new_SPRINGplot_button_bar > text {
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: 55px;
+}
+
+
+#make_new_SPRINGplot_button_bar > button {
+	float: right;
+	margin-right: 10px;
+	background-color: rgb(80,80,80);
+}
+
+.make_new_SPRINGplot_input_div {
+	float: right;
+	margin-top: 4px;
+	margin-right: 35px;
+}
+
+.make_new_SPRINGplot_input_div > label {
+	color: rgb(220,220,220);
+	font-family: Arial, Helvetica, sans-serif;
+	user-select: none;
+	font-size: 14px;
+	margin-top: 10px;
+}
+
+.make_new_SPRINGplot_input_div > label > textarea, .make_new_SPRINGplot_input_div > label > input[type=text] {
+	margin-left: 20px;
+	height: 20px;
+	font-size: 14px;
+	color: white;
+	background-color: rgba(0,0,0,.7);
+	border: solid 0px;
+	padding-left: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	width: 70px;
+	overflow: wrap;
+	vertical-align: top;
+	resize: none;
+}
+
+.make_new_SPRINGplot_input_div > label > textarea, .make_new_SPRINGplot_input_div > label > button {
+	margin-left: 20px;
+	height: 24px;
+	font-size: 14px;
+	color: white;
+	background-color: rgba(0,0,0,.7);
+	border: solid 0px;
+	padding-left: 13px;
+	text-align: left;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	width: 82px;
+	vertical-align: top;
+	resize: none;
+}
+
+#batch_correction_blurb > text {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-style: italic;
+	user-select: none;
+}
+
+#make_new_SPRINGplot_optional_params {
+	float: left;
+	margin-left: 28px;
+	margin-top: 25px;
+	margin-bottom: 15px;
+}
+
+#make_new_SPRINGplot_optional_params > text {
+	font-size: 16px;
+	color: rgb(170,170,170);
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+#make_new_SPRINGplot_optional_params > hr {
+	margin-left: 18px;
+	margin-right: 18px;
+	width: 60px;
+	border: solid 2px rgb(120,120,120);
+}
+
+#make_new_SPRINGplot_submission_div {
+	margin-top: 24px;
+	margin-right: 185px;
+}
+
+#make_new_SPRINGplot_submission_div > button {
+	 font-size: 14px;
+	 padding: 4px 7px 4px 7px;
+	 background-color: rgb(30,30,30);
+	 border: solid 1px rgb(110,110,110);
+}
+
+#make_new_SPRINGplot_message_div {
+	border: solid 1px rgb(110,110,110);
+	width: 88%;
+	margin-right: 15px;
+	height: 0px;
+	float: right;
+	margin-top: 30px;
+	background-color: rgba(0,0,0,.3);
+	padding: 10px;
+	visibility: hidden;
+	margin-bottom: 15px;
+}
+
+#make_new_SPRINGplot_message_div > text {
+	font-family: Arial, Helvetica, sans-serif;
+	color: white;
+	font-size: 14px;
+    overflow: auto;
+}
+
+#make_new_SPRINGplot_optional_params > text {
+	user-select: none;
+}
+
+#include_exclude_toggle {
+	background-color: rgba(0,0,0,0);
+	border: 1px solid rgb(110,110,110);
+	padding: 2px;
+	padding-left: 12px;
+	width: 72px;
+	color: rgb(220,220,220);
+	margin-right: 4px;
+	height: 21px;
+	top: 5px;
+	position: relative;
+}
+
+#gene_list_upload_wrapper {
+    overflow: hidden;
+    background-color: rgba(0,0,0,.7);
+    margin-left: 20px;
+	height: 20px;
+	font-size: 14px;
+	color: white;
+	background-color: rgba(0,0,0,.7);
+	border: solid 0px;
+	padding: 4px 8px 4px 8px;
+	width: 100px;
+	border-radius: 4px;
+	border: 1px solid rgb(110,110,110);
+	margin-right: -2px;
+}
+
+#gene_list_upload_input {
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    width: 1px;
+}
+
+#make_new_SPRINGplot_message_div a:link { color: #00ff00; }
+#make_new_SPRINGplot_message_div a:visited { color: #00ff00; }
+#make_new_SPRINGplot_message_div a:hover { color: #000; background-color: #9cf; }
+

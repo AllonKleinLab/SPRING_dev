@@ -1,0 +1,32 @@
+
+
+#cluster_popup {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 320px;
+	background-color: rgba(50,50,50,.9);
+	visibility: hidden;
+	border: solid 1px rgb(150,150,150);
+	overflow: hidden;
+	height: 60px;
+	padding: 0px;	
+	text-align: center;
+	vertical-align: middle;
+}
+
+#cluster_text > text {
+	font-family: Arial, Helvetica, sans-serif;
+	color: rgb(220,220,220);
+	font-size: 14px;
+	user-select: none;
+	
+}
+
+#cluster_popup > button {
+	float: middle;
+	padding: 3px;
+	margin-top: 10px;
+	background-color: rgb(80,80,80);
+	border: solid 1px rgb(150,150,150);
+}
