@@ -128,8 +128,6 @@ cwd = os.getcwd()
 if cwd.endswith('cgi-bin'):
     os.chdir('../')
 
-update_log('/Users/sam/Desktop/tmp.txt', '1', overwrite=True)
-
 data = cgi.FieldStorage()
 base_dir = data.getvalue('base_dir')
 sub_dir = data.getvalue('sub_dir')
@@ -139,14 +137,11 @@ k = int(data.getvalue('k'))
 min_dist = float(data.getvalue('min_dist'))
 perplex = float(data.getvalue('perplex'))
 angle = float(data.getvalue('angle'))
-update_log('/Users/sam/Desktop/tmp.txt', '2')
-
 
 if os.path.exists(sub_dir + '/intermediates.npz'):
     tmp = np.load(sub_dir + '/intermediates.npz')
     Epca = tmp['Epca']
     del tmp
-    update_log('/Users/sam/Desktop/tmp.txt', '3')
 else:
     print 'Error: could not find "intermediates.npz"'
 
@@ -156,17 +151,12 @@ if embed_method == 'fa2':
 elif embed_method == 'umap':
     coords = get_umap(Epca, n_neighbors=k, min_dist=min_dist, metric='euclidean')
 elif embed_method == 'tsne':
-    update_log('/Users/sam/Desktop/tmp.txt', '4')
     coords = get_tsne(Epca, angle=angle, perplexity=perplex)
 
 
-update_log('/Users/sam/Desktop/tmp.txt', '5')
 coords = rescale_coordinates(coords)
-update_log('/Users/sam/Desktop/tmp.txt', '6')
 np.save('{}/coordinates_{}.npy'.format(sub_dir, embed_method), coords)
-update_log('/Users/sam/Desktop/tmp.txt', '7')
 np.savetxt('{}/coordinates_{}.txt'.format(sub_dir, embed_method), coords, delimiter=',', fmt='%.5f')
-update_log('/Users/sam/Desktop/tmp.txt', '8')
 
 
 
