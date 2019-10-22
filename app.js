@@ -50,4 +50,8 @@ window.addEventListener('message', event => {
   }
 });
 
+requirejs.config({
+  waitSeconds: 200,
+});
+
 requirejs(['dist/main']);
