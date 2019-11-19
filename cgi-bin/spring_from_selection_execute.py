@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from wolkit import *
+
 def sparse_var(E, axis=0):
     mean_gene = E.mean(axis=axis).A.squeeze()
     tmp = E.copy()
@@ -25,8 +27,8 @@ def update_log(fname, logdat, overwrite=False):
 def send_confirmation_email(email, name, info_dict, start_dataset, new_url):
 
     import smtplib
-    from email.MIMEMultipart import MIMEMultipart
-    from email.MIMEText import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
 
     fromaddr = "singlecellSPRING@gmail.com"
     toaddr = email
@@ -67,7 +69,6 @@ def execute_spring(param_filename):
     import h5py
     import json
     import time
-    from wolkit import *
     import networkx as nx
     import pickle
     import datetime
@@ -229,7 +230,7 @@ def execute_spring(param_filename):
         gene_filter = np.array([i for i in gene_filter if gene_list[i] in custom_genes])
     
     if len(gene_filter)==0: 
-    	print 'Error: No genes survived filtering'
+    	print ('Error: No genes survived filtering')
     	sys.exit()
     
     t1 = time.time()

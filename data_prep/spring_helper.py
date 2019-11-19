@@ -715,7 +715,7 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
 
 
             if len(gene_filter) == 0:
-                print 'Error: No genes passed filter'
+                print ('Error: No genes passed filter')
                 sys.exit(2)
                 #print 'Error: All genes have mean expression < '+repr(min_exp) + ' or CV < '+repr(min_cv)
             #print 'Using %i genes' %(len(gene_filter))
@@ -723,7 +723,7 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
             if not exclude_corr_genes_list is None:
                 gene_filter = remove_corr_genes(E, gene_list, exclude_corr_genes_list, gene_filter, min_corr = exclude_corr_genes_minCorr)
                 if len(gene_filter) == 0:
-                    print 'Error: No genes passed filter'
+                    print( 'Error: No genes passed filter')
                     sys.exit(2)
 
             # Remove user-excluded genes from consideration
@@ -732,7 +732,7 @@ def make_spring_subplot(E, gene_list, save_path, base_ix = None, normalize = Tru
                 #print 'Excluded %i user-provided genes' %(len(gene_filter)-len(keep_ix))
                 gene_filter = gene_filter[keep_ix]
                 if len(gene_filter) == 0:
-                    print 'Error: No genes passed filter'
+                    print ('Error: No genes passed filter')
                     sys.exit(2)
 
         out['gene_filter'] = gene_filter
@@ -927,8 +927,8 @@ def plot_groups(x, y, groups, lim_buffer = 50, saving = False, fig_dir = './', f
 
 def rank_enriched_genes(E, gene_list, cell_mask, min_counts=3, min_cells=3):
     gix = (E[cell_mask,:]>=min_counts).sum(0).A.squeeze() >= min_cells
-    print '%i cells in group' %(sum(cell_mask))
-    print 'Considering %i genes' %(sum(gix))
+    print ('%i cells in group' %(sum(cell_mask)))
+    print ('Considering %i genes' %(sum(gix)))
     
     gene_list = gene_list[gix]
     

@@ -1,0 +1,12 @@
+{
+  "extends": "tslint:recommended",
+  "jsRules": {
+    "forin": false,
+    "max-line-length": [true, 180],
+    "no-console": false,
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false,
+    "semicolon": false,
+    "variable-name": false
+  }
+}

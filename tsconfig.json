@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+  "typeRoots": ["node_modules/@types"],
+    "allowJs": true,
+    "checkJs": true, // Report errors in .js files.
+    "lib": [
+      "dom",
+      "es6",
+      "es2015"
+    ],
+    "module": "amd",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "target": "es6",
+  },
+  "include": [
+    "./src",
+    "./spring.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+  ]
+}

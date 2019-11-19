@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+  <script src="vendor/d3.v5.min.js"></script>
+  <script src="vendor/jquery-3.1.0.min.js"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="vendor/jquery.autocomplete.min.js"></script>
+  <script src="vendor/colorpicker.js"></script>
+  <script src="vendor/colorpicker_eye.js"></script>
+  <script src="vendor/colorpicker_utils.js"></script>
+  <script src="vendor/jspdf.min.js"></script>
+  <script src="vendor/canvg.min.js"></script>
+  <script src="vendor/FileSaver.js"></script>
+  <script src="vendor/spin.min.js"></script>
+  <script src="vendor/sweetalert.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="vendor/autocomplete_style.css" />
+  <link rel="stylesheet" type="text/css" href="vendor/colorpicker.css" />
+  <link rel="stylesheet" type="text/css" href="vendor/sweetalert.css" />
+</head>
+
+<body>
+  <div id="options_bar">
+    <div id="button_panel">
+      <!--
+		<div id="help">
+			<button>HELP!</button>
+		</div>
+		-->
+      <div id="layout_tools">
+        <button id="layout_dropdown_button">Layout</button>
+        <div id="layout_dropdown" class="dropdown-content">
+          <a id="save_coords">Save coordinates</a>
+          <a id="center_view">Center view</a>
+          <a id="rotation_update">Rotate / scale</a>
+          <a id="revert_positions">Undo</a>
+          <a id="move_left">Move left</a>
+          <a id="move_right">Move right</a>
+          <a id="toggle_edges_layout">Hide edges</a>
+        </div>
+      </div>
+
+      <div class="dropdown">
+        <button id="download_dropdown_button">Download</button>
+        <div id="download_dropdown" class="dropdown-content">
+          <a id="download_coordinates">Coordinates</a>
+          <a id="download_selection">Selected cells</a>
+          <a id="show_download__selected_expr_popup"
+            >SPRING data <br />
+            for selection</a
+          >
+          <!-- <a href="javascript:downloadEdges()">Edge list</a> -->
+          <a id="download_ranked_terms">Enriched terms</a>
+          <a id="download_doublet_scores">Doublet scores</a>
+
+          <a id="download_png">Screenshot</a>
+          <!-- <a href="javascript:downloadSVG()">Screenshot (.svg)</a> -->
+        </div>
+      </div>
+
+      <div class="dropdown">
+        <button id="tools_dropdown_button">Tools</button>
+        <div id="tools_dropdown" class="dropdown-content">
+          <a id="show_make_new_SPRINGplot_popup">Make new subplot</a>
+          <a target="_blank" id="all_SPRINGplots_menu">All subplots menu</a>
+          <a target="_blank" id="changeViewer_link">Dynamic mode</a>
+          <a id="start_clone_viewer">Linkage broswer</a>
+          <!-- <a href="javascript:show_stickyNote_popup()">Sticky notes</a> -->
+          <a id="show_imputation_popup">Smooth / Impute</a>
+          <a id="show_selection_logic_popup">Selection logic</a>
+          <a id="show_doublet_popup">Doublet detector</a>
+          <a id="run_clustering">Louvain clustering</a>
+          <a id="show_PAGA_popup">Graph abstraction</a>
+          <a id="toggle_legend_hover_tooltip_button">Show label tooltip</a>
+        </div>
+      </div>
+      <div id="settings">
+        <button>Settings</button>
+      </div>
+
+      <div id="sound_toggle"></div>
+    </div>
+    <div id="color_chooser"></div>
+    <div id="fast_buttons_box">
+      <div id="deselect">
+        <button>(De)select All</button>
+      </div>
+      <div id="slider_select_button">
+        <button>Slider select</button>
+      </div>
+      <div id="quick_dark">
+        <button>Dark</button>
+      </div>
+      <div id="quick_light">
+        <button>Light</button>
+      </div>
+      <div id="extend_selection">
+        <button>Extend selection</button>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div id="pixi_canvas_holder"></div>
+    <div id="force_layout"></div>
+    <div id="termsheet" class="sidebar">
+      <div class="column" id="termcolumn"></div>
+      <div class="column" id="scorecolumn"></div>
+    </div>
+    <div id="legend" class="sidebar">
+      <div class="column" id="count_column"></div>
+      <div class="column" id="label_column"></div>
+    </div>
+  </div>
+
+  <div id="colorpicker_popup">
+    <div id="colorpicker_button_bar"></div>
+    <div id="colorpickerHolder"></div>
+  </div>
+
+  <link rel="stylesheet" type="text/css" href="src/forceLayout_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/selection_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/colorbar_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/settings_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/coexpression_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/diffex_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/make_new_SPRINGplot_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/downloadSelectedExpr_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/clone_viewer.css" />
+  <link rel="stylesheet" type="text/css" href="src/stickyNote.css" />
+  <link rel="stylesheet" type="text/css" href="src/smoothing_imputation.css" />
+  <link rel="stylesheet" type="text/css" href="src/doublet_detector.css" />
+  <link rel="stylesheet" type="text/css" href="src/cluster2_style.css" />
+  <link rel="stylesheet" type="text/css" href="src/selection_logic.css" />
+  <link rel="stylesheet" type="text/css" href="src/PAGA_viewer.css" />
+
+  <!-- <link rel="stylesheet" type="text/css" href="src/stratify.css"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="src/gridstack.css"> -->
+
+  <script data-main="app" src="vendor/require.js"></script>
+</body>

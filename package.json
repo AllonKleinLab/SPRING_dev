@@ -1,0 +1,22 @@
+{
+  "name": "SPRING_Viewer",
+  "version": "1.7.0",
+  "repository": "https://github.com/cBioCenter/SPRING_dev",
+  "author": "Klein Lab <https://klein.hms.harvard.edu/>",
+  "license": "MIT",
+  "scripts": {
+    "build": "rm -rf dist ; tsc --checkJs false -p ./tsconfig.json ",
+    "lint": "tslint --config tslint.json --project tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/d3": "^5.0.0",
+    "@types/html2canvas": "^0.0.33",
+    "@types/jquery": "^3.3.6",
+    "@types/pixi.js": "^4.8.4",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1"
+  },
+  "dependencies": {
+    "requirejs": "^2.3.6"
+  }
+}

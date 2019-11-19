@@ -5,7 +5,7 @@ import cgitb
 import os
 import json
 cgitb.enable()  # for troubleshooting
-print "Content-Type: text/plain\n"
+print ("Content-Type: text/plain\n")
 
 #========================================================================================#
 
@@ -135,7 +135,7 @@ def woublet(E=None, exp_doub_rate = 0.1, sim_doublet_ratio=3, k=50, use_approx_n
     
     # Check that input is valid
     if E is None and precomputed_pca is None:
-        print 'Please supply a counts matrix (E) or PCA coordinates (precomputed_pca)'
+        print ('Please supply a counts matrix (E) or PCA coordinates (precomputed_pca)')
         return
     
     # Convert counts matrix to sparse format if necessary
@@ -195,7 +195,7 @@ if os.path.exists(sub_dir + '/intermediates.npz'):
         total_counts = None
     del tmp
 else:
-    print 'Error: could not find "intermediates.npz"'
+    print ('Error: could not find "intermediates.npz"')
 
 doublet_scores, doublet_scores_sim, doub_neigh_parents = woublet(precomputed_pca = Epca, total_counts = total_counts, exp_doub_rate = f, sim_doublet_ratio = r, k = k, use_approx_nn = True, get_doub_parents = True)
 np.save(sub_dir + '/doublet_scores.npy', doublet_scores)
