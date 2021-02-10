@@ -66,7 +66,7 @@ celltypes = Generate_lbls(labels, E = E)
 dat <- CID.writeJSON(celltypes, data.dir = dir)
 ```
 
-Subsequently, the single cell data together with the cellular phenotypes (and Louvain clusters) can be visualized in SPRING Viewer (Signac writes them to the categorical_coloring_data.json file).
+Subsequently, the single cell data together with the cellular phenotypes (and Louvain clusters) can be visualized in SPRING Viewer (Signac writes the cell type and clustering information to the categorical_coloring_data.json file).
 
 ### Running SPRING Viewer
 
