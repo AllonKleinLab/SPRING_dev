@@ -1,6 +1,23 @@
-### Getting started
+### Installing Python libraries
 
-Please see the [original SPRING GitHub](https://github.com/AllonKleinLab/SPRING_dev) for how to install and get started.
+To run SPRING Viewer locally, make sure Python 2.7 is installed (and that it's your active version). You will also need the following Python libraries:  
+
+`scikit-learn`  
+`numpy`  
+`scipy`  
+`matplotlib`  
+`h5py`  
+`networkx`  
+`fa2`  
+`python-louvain`
+
+We recommend Anaconda to manage your Python libraries. You can download it here (be sure to get the Python 2.7 version):   https://conda.io/miniconda.html. Libraries can then be installed using the command `conda`. To do so, open Terminal (Mac) or Anaconda Prompt (Windows) and enter:  
+
+`conda install scikit-learn numpy scipy matplotlib h5py`
+
+The remaining libraries can be installed using `pip`. Note that if you're a Windows user, you'll first need to install Microsoft Visual C++ compiler for Python (available from http://aka.ms/vcpython27). Enter the following into Terminal or Anaconda Prompt:  
+
+`pip install networkx fa2 python-louvain`
 
 ### Setting up a SPRING data directory
 See the example notebooks:  
@@ -26,7 +43,7 @@ Each subdirectory should contain:
 `graph_data.json`  
 `run_info.json`  
 
-To classify cellular phenotypes in single cell data, [Signac](https://github.com/mathewchamberlain/Signac) was integrated with the files output by SPRING (specifically, the matrix.mtx, genes.txt, edges.csv and categorical_coloring_data.json files), such that SPRING data can be classified by Signac with only a few lines of code:
+To classify cellular phenotypes in single cell data, [Signac](https://github.com/mathewchamberlain/Signac) was integrated with the files output by SPRING (specifically, the matrix.mtx, genes.txt, edges.csv and categorical_coloring_data.json files), such that SPRING data can be classified by Signac in R with only a few lines of code:
 
 ```r
 # load the Signac library
@@ -48,6 +65,8 @@ celltypes = Generate_lbls(labels, E = E)
 # write cell types and Louvain clusters to SPRING
 dat <- CID.writeJSON(celltypes, data.dir = dir)
 ```
+
+Subsequently, these data can be visualized in SPRING Viewer.
 
 ### Running SPRING Viewer
 
