@@ -26,6 +26,8 @@ Each subdirectory should contain:
 `graph_data.json`  
 `run_info.json`  
 
+To classify cellular phenotypes in single cell data, we integrated SPRING with [Signac](https://github.com/mathewchamberlain/Signac). 
+
 ### Running SPRING Viewer
 
 1. Open Terminal (Mac) or Anaconda Prompt (Windows) and change directories (`cd`) to the directory containing this README file (`SPRING_dev/`). 
