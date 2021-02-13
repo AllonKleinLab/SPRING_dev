@@ -21,8 +21,10 @@ The remaining libraries can be installed using `pip`. Note that if you're a Wind
 
 ### Setting up a SPRING data directory
 See the example notebooks:  
+[Hematopoietic progenitor FACS subpopulations](./data_prep/spring_example_HPCs.ipynb)  
+[Mature blood cells (10X Genomics 4k PBMCs)](./data_prep/spring_example_pbmc4k.ipynb)  
 [CITE-seq data from 10X Genomics](./data_prep/spring_notebook_10X_CITEseq.ipynb)  
-[PBMCs from 10X Genomics](./data_prep/spring_notebook_10X.ipynb)  
+[PBMCs from 10X Genomics](./data_prep/spring_notebook_10X.ipynb)
 
 A SPRING data set consist of a main directory and any number of subdirectories, with each subdirectory corresponding to one SPRING plot (i.e. subplot) that draws on a data matrix stored in the main directory. The main directory should have the following files, as well as one subdirectory for each SPRING plot. 
 
@@ -42,6 +44,8 @@ Each subdirectory should contain:
 `edges.csv`  
 `graph_data.json`  
 `run_info.json`  
+
+### Signac
 
 To classify cellular phenotypes in single cell data, [Signac](https://github.com/mathewchamberlain/Signac) was integrated with the files output by SPRING (specifically, the matrix.mtx, genes.txt, edges.csv and categorical_coloring_data.json files), such that SPRING data can be classified by Signac in R with only a few lines of code:
 
