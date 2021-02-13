@@ -45,6 +45,13 @@ Each subdirectory should contain:
 `graph_data.json`  
 `run_info.json`  
 
+### Running SPRING Viewer
+
+1. Open Terminal (Mac) or Anaconda Prompt (Windows) and change directories (`cd`) to the directory containing this README file (`SPRING_dev/`). 
+2. Start a local server by entering the following: `python -m CGIHTTPServer 8000`
+3. Open web browser (preferably Chrome; best to use incognito mode to ensure no cached data is used).
+4. View data set by navigating to corresponding URL: http://localhost:8000/springViewer_1_6_dev.html?path_to/main/subplot. In the example above, if you wanted to view a SPRING plot called `FullDataset_v1` in the main directory `10X_PBMCs_Signac_GitHub`, then you would navigate to http://localhost:8000/springViewer_1_6_dev.html?datasets/10X_PBMCs_Signac_GitHub/FullDataset_v1
+
 ### Signac
 
 To classify cellular phenotypes in single cell data, [Signac](https://github.com/mathewchamberlain/Signac) was integrated with the files output by SPRING (specifically, the matrix.mtx, genes.txt, edges.csv and categorical_coloring_data.json files), such that SPRING data can be classified by Signac in R with only a few lines of code:
@@ -71,10 +78,3 @@ dat <- CID.writeJSON(celltypes, data.dir = dir)
 ```
 
 Subsequently, the single cell data together with the cellular phenotypes (and Louvain clusters) can be visualized in SPRING Viewer (Signac writes the cell type and clustering information to the categorical_coloring_data.json file).
-
-### Running SPRING Viewer
-
-1. Open Terminal (Mac) or Anaconda Prompt (Windows) and change directories (`cd`) to the directory containing this README file (`SPRING_dev/`). 
-2. Start a local server by entering the following: `python -m CGIHTTPServer 8000`
-3. Open web browser (preferably Chrome; best to use incognito mode to ensure no cached data is used).
-4. View data set by navigating to corresponding URL: http://localhost:8000/springViewer_1_6_dev.html?path_to/main/subplot. In the example above, if you wanted to view a SPRING plot called `FullDataset_v1` in the main directory `10X_PBMCs_Signac_GitHub`, then you would navigate to http://localhost:8000/springViewer_1_6_dev.html?datasets/10X_PBMCs_Signac_GitHub/FullDataset_v1
